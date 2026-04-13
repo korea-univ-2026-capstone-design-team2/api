@@ -1,4 +1,4 @@
-package com.univent.api
+package com.examhelper.api.bootstrap
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
