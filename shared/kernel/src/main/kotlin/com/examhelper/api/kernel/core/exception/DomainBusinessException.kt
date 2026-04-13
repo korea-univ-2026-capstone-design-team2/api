@@ -1,6 +1,6 @@
 package com.examhelper.api.kernel.core.exception
 
-sealed class DomainBusinessException(
+abstract class DomainBusinessException(
     override val code: String,
     override val message: String,
     val status: ErrorStatus,
