@@ -1,5 +1,5 @@
 rootProject.name = "api"
 
-include("bootstrap")
+include(":bootstrap")
 include(":shared:kernel")
 include(":shared:infrastructure")
