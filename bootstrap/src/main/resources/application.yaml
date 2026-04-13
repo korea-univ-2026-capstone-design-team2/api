@@ -21,3 +21,7 @@ spring:
 snowflake:
   datacenter-id: 1
   worker-id: 10
+
+cors:
+  allowed-origins:
+    - http://localhost:*
