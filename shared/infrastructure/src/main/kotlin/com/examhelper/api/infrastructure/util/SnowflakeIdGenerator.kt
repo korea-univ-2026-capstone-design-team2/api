@@ -38,8 +38,10 @@ class SnowflakeIdGenerator(
         var timestamp = currentTime()
 
         if (timestamp < lastTimestamp) {
-            throw IllegalStateException("시계가 뒤로 이동했습니다. 마지막 타임스탬프: $lastTimestamp, 현재 타임스탬프: $timestamp. " +
-                    "${lastTimestamp - timestamp}ms 만큼의 차이가 발생했습니다.")
+            throw IllegalStateException(
+                "시계가 뒤로 이동했습니다. 마지막 타임스탬프: $lastTimestamp, 현재 타임스탬프: $timestamp. " +
+                        "${lastTimestamp - timestamp}ms 만큼의 차이가 발생했습니다."
+            )
         }
         if (lastTimestamp == timestamp) {
             sequence = (sequence + 1) and sequenceMask
@@ -56,11 +58,18 @@ class SnowflakeIdGenerator(
     }
 
     private fun waitNextMillis(lastTimestamp: Long): Long {
-        val deadline = lastTimestamp + 5L
+        val timeoutMs = 5L
         var timestamp = currentTime()
         while (timestamp <= lastTimestamp) {
-            if (timestamp > deadline) throw IllegalStateException("\"시간이 역전되었습니다. 마지막 타임스탬프: \$lastTimestamp, 현재 타임스탬프: \$currentTimestamp. \" +\n" +
-                    "    \"\${lastTimestamp - currentTimestamp}ms 만큼의 차이가 발생했습니다.\"")
+            // while 조건과 독립적으로 경과 시간으로 타임아웃 판단
+            if (currentTime() - lastTimestamp > timeoutMs) {
+                throw IllegalStateException(
+                    "시간이 역행했습니다. " +
+                            "마지막 타임스탬프: $lastTimestamp, " +
+                            "현재 타임스탬프: $timestamp, " +
+                            "차이: ${lastTimestamp - timestamp}ms"
+                )
+            }
             Thread.onSpinWait()
             timestamp = currentTime()
         }

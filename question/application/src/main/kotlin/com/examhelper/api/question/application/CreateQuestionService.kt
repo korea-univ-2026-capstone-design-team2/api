@@ -1,4 +1,4 @@
-package com.examhelper.api.application
+package com.examhelper.api.question.application
 
 import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.QuestionId
