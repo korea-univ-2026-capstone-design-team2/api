@@ -3,10 +3,10 @@ package com.examhelper.api.question.application
 import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question.domain.Question
-import com.examhelper.api.question.port.`in`.CreateQuestionUseCase
-import com.examhelper.api.question.port.`in`.command.CreateQuestionCommand
-import com.examhelper.api.question.port.`in`.result.CreateQuestionResult
-import com.examhelper.api.question.port.out.QuestionRepository
+import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
+import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
+import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
+import com.examhelper.api.question.port.outbound.QuestionRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

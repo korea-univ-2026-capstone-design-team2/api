@@ -1,7 +1,7 @@
-package com.examhelper.api.question.port.`in`
+package com.examhelper.api.question.port.inbound
 
-import com.examhelper.api.question.port.`in`.command.CreateQuestionCommand
-import com.examhelper.api.question.port.`in`.result.CreateQuestionResult
+import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
+import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
 
 /**
  * port in: 애플리케이션의 내부에서 사용되는 인터페이스를 정의하는 패키지입니다.(service의 인터페이스를 제공합니다.)

@@ -1,7 +1,7 @@
 package com.examhelper.api.question.adapter.persistence
 
 import com.examhelper.api.question.domain.Question
-import com.examhelper.api.question.port.out.QuestionRepository
+import com.examhelper.api.question.port.outbound.QuestionRepository
 import org.springframework.stereotype.Repository
 
 /**
