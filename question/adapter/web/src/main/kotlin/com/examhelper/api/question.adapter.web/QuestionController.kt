@@ -3,7 +3,8 @@ package com.examhelper.api.question.adapter.web
 import com.examhelper.api.infrastructure.web.ApiResponse
 import com.examhelper.api.question.adapter.web.request.CreateQuestionReqDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
-import com.examhelper.api.question.port.`in`.CreateQuestionUseCase
+import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/questions")
+@Tag(name = "Question", description = "PSAT 문제 생성 API")
 class QuestionController(
     private val createQuestionUseCase: CreateQuestionUseCase
 ) {
     @PostMapping
+    @CreateQuestionDocs
     fun createQuestion(
         @RequestBody request: CreateQuestionReqDto
     ): ResponseEntity<ApiResponse.Success<CreateQuestionResDto>> {
