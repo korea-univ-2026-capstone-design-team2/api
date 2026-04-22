@@ -1,6 +1,6 @@
 package com.examhelper.api.question.adapter.web.request
 
-import com.examhelper.api.question.port.`in`.command.CreateQuestionCommand
+import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 
 data class CreateQuestionReqDto(
     val content: String

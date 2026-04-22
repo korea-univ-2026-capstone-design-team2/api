@@ -9,7 +9,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-
+    // Swagger
+    implementation("org.springdoc:springdoc-openapi-starter-common:3.0.3")
 
     // Configuration Processor
     kapt("org.springframework.boot:spring-boot-configuration-processor")

@@ -1,6 +1,6 @@
 package com.examhelper.api.question.adapter.web.response
 
-import com.examhelper.api.question.port.`in`.result.CreateQuestionResult
+import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
 
 data class CreateQuestionResDto(
     val questionId: Long

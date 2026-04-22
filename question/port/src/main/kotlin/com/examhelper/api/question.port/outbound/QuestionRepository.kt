@@ -1,4 +1,4 @@
-package com.examhelper.api.question.port.out
+package com.examhelper.api.question.port.outbound
 
 import com.examhelper.api.question.domain.Question
 
