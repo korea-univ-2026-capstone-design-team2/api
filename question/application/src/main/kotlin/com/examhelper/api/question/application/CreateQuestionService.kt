@@ -1,12 +1,15 @@
 package com.examhelper.api.question.application
 
 import com.examhelper.api.kernel.core.IdGenerator
+import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question.domain.Question
+import com.examhelper.api.question.domain.vo.QuestionContent
+import com.examhelper.api.question.domain.vo.QuestionMetadata
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
 import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
-import com.examhelper.api.question.port.outbound.QuestionRepository
+import com.examhelper.api.question.port.outbound.QuestionStore
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,18 +19,34 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class CreateQuestionService(
-    private val questionRepository: QuestionRepository,
-    private val idGenerator: IdGenerator
-): CreateQuestionUseCase {
+    private val questionStore: QuestionStore,
+    private val idGenerator: IdGenerator,
+) : CreateQuestionUseCase {
+
     @Transactional
     override fun execute(command: CreateQuestionCommand): CreateQuestionResult {
         val question = Question.create(
             id = QuestionId(idGenerator.generateId()),
-            content = command.content
+            generationId = QuestionGenerationId(command.generationId),
+            content = QuestionContent(
+                stem = command.stem,
+                passage = command.passage,
+                exhibit = command.exhibit,
+            ),
+            answerSheet = command.answerSheet,
+            metadata = QuestionMetadata(
+                subject = command.subject,
+                questionType = command.questionType,
+                questionSubType = command.questionSubType,
+                difficulty = command.difficulty,
+                passageTopic = command.passageTopic,
+            ),
+            explanation = command.explanation,
+            sourceFrame = command.sourceFrame,
         )
 
-        questionRepository.save(question)
+        questionStore.save(question)
 
-        return CreateQuestionResult(question.id.value)
+        return CreateQuestionResult(questionId = question.id.value)
     }
 }

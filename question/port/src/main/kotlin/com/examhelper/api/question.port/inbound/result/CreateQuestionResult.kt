@@ -6,4 +6,3 @@ package com.examhelper.api.question.port.inbound.result
 data class CreateQuestionResult(
     val questionId: Long
 )
-
