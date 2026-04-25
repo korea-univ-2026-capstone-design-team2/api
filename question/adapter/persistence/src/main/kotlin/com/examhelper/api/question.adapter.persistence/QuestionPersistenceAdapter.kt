@@ -1,7 +1,9 @@
 package com.examhelper.api.question.adapter.persistence
 
+import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question.domain.Question
-import com.examhelper.api.question.port.outbound.QuestionRepository
+import com.examhelper.api.question.port.outbound.QuestionStore
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 /**
@@ -11,9 +13,13 @@ import org.springframework.stereotype.Repository
 @Repository
 class QuestionPersistenceAdapter(
     private val jpaRepository: QuestionJpaRepository
-): QuestionRepository {
+): QuestionStore {
     override fun save(question: Question) {
         val questionEntity = QuestionEntity.fromDomain(question)
         jpaRepository.save(questionEntity)
+    }
+
+    override fun loadById(id: QuestionId): Question? {
+        return jpaRepository.findByIdOrNull(id.value)?.toDomain()
     }
 }
