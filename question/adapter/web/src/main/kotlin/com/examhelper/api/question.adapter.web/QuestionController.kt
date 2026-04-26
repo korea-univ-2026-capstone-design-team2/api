@@ -3,10 +3,20 @@ package com.examhelper.api.question.adapter.web
 import com.examhelper.api.infrastructure.web.ApiResponse
 import com.examhelper.api.question.adapter.web.request.CreateQuestionReqDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
+import com.examhelper.api.question.adapter.web.response.PublishQuestionResDto
+import com.examhelper.api.question.adapter.web.response.RejectQuestionResDto
+import com.examhelper.api.question.port.inbound.AssignQualityScoreUseCase
+import com.examhelper.api.question.port.inbound.AssignQuestionToSetUseCase
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
+import com.examhelper.api.question.port.inbound.PublishQuestionUseCase
+import com.examhelper.api.question.port.inbound.RejectQuestionUseCase
+import com.examhelper.api.question.port.inbound.command.PublishQuestionCommand
+import com.examhelper.api.question.port.inbound.command.RejectQuestionCommand
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,7 +33,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/questions")
 @Tag(name = "Question", description = "PSAT 문제 생성 API")
 class QuestionController(
-    private val createQuestionUseCase: CreateQuestionUseCase
+    private val createQuestionUseCase: CreateQuestionUseCase,
+    private val publishQuestionUseCase: PublishQuestionUseCase,
+    private val rejectQuestionUseCase: RejectQuestionUseCase
 ) {
     @PostMapping
     @CreateQuestionDocs
@@ -36,5 +48,25 @@ class QuestionController(
         val data = ApiResponse.Success(CreateQuestionResDto.fromResult(result))
 
         return ResponseEntity.status(HttpStatus.CREATED).body(data)
+    }
+
+    // ── 출제 ──────────────────────────────────────────────────
+    @PatchMapping("/{questionId}/publish")
+    @PublishQuestionDocs
+    fun publishQuestion(
+        @PathVariable questionId: Long,
+    ): ResponseEntity<ApiResponse.Success<PublishQuestionResDto>> {
+        val result = publishQuestionUseCase.execute(PublishQuestionCommand(questionId))
+        return ResponseEntity.ok(ApiResponse.Success(PublishQuestionResDto.fromResult(result)))
+    }
+
+    // ── 반려 ──────────────────────────────────────────────────
+    @PatchMapping("/{questionId}/reject")
+    @RejectQuestionDocs
+    fun rejectQuestion(
+        @PathVariable questionId: Long,
+    ): ResponseEntity<ApiResponse.Success<RejectQuestionResDto>> {
+        val result = rejectQuestionUseCase.execute(RejectQuestionCommand(questionId))
+        return ResponseEntity.ok(ApiResponse.Success(RejectQuestionResDto.fromResult(result)))
     }
 }
