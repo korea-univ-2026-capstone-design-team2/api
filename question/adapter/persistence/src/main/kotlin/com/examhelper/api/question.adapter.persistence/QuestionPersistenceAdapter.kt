@@ -12,14 +12,14 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class QuestionPersistenceAdapter(
-    private val jpaRepository: QuestionJpaRepository
+    private val jpaStore: QuestionJpaStore
 ): QuestionStore {
     override fun save(question: Question) {
         val questionEntity = QuestionEntity.fromDomain(question)
-        jpaRepository.save(questionEntity)
+        jpaStore.save(questionEntity)
     }
 
     override fun loadById(id: QuestionId): Question? {
-        return jpaRepository.findByIdOrNull(id.value)?.toDomain()
+        return jpaStore.findByIdOrNull(id.value)?.toDomain()
     }
 }
