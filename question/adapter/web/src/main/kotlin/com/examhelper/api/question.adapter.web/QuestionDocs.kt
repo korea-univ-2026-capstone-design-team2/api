@@ -5,6 +5,8 @@ import com.examhelper.api.question.adapter.web.response.AssignQuestionToSetResDt
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
 import com.examhelper.api.question.adapter.web.response.PublishQuestionResDto
 import com.examhelper.api.question.adapter.web.response.RejectQuestionResDto
+import com.examhelper.api.question.port.inbound.view.QuestionPaperView
+import com.examhelper.api.question.port.inbound.view.QuestionReviewView
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -123,3 +125,47 @@ annotation class AssignQualityScoreDocs
     ApiResponse(responseCode = "404", description = "문제 또는 세트를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
 )
 annotation class AssignQuestionToSetDocs
+
+// ── 문제지용 조회 ──────────────────────────────────────────
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "문제지 조회",
+    description = """
+        수험생에게 제공할 문제지 데이터를 반환합니다.
+        - 정답(correctNumber, isCorrect)은 포함되지 않습니다.
+        - stem, passage, exhibit, choices(정답 제외)를 포함합니다.
+    """,
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "조회 성공",
+        content = [Content(schema = Schema(implementation = QuestionPaperView::class))],
+    ),
+    ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
+)
+annotation class GetQuestionPaperDocs
+
+// ── 풀이 확인용 조회 ───────────────────────────────────────
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "풀이 확인 조회",
+    description = """
+        풀이 확인에 필요한 전체 데이터를 반환합니다.
+        - 정답(correctNumber, isCorrect)이 포함됩니다.
+        - 정답 해설(correctReason) 및 오답 해설(incorrectReasons)이 포함됩니다.
+    """,
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "조회 성공",
+        content = [Content(schema = Schema(implementation = QuestionReviewView::class))],
+    ),
+    ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
+)
+annotation class GetQuestionReviewDocs
