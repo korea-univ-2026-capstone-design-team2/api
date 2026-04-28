@@ -1,6 +1,7 @@
 package com.examhelper.api.question.adapter.persistence
 
 import com.examhelper.api.question.adapter.persistence.record.AnswerChoiceRecord
+import com.examhelper.api.question.domain.exception.QuestionException
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceView
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceViewWithAnswer
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
@@ -152,8 +153,8 @@ private fun QuestionEntity.toDetailView(): QuestionDetailView {
 }
 
 private fun AnswerChoiceRecord.toDisplayText(): String = when (type) {
-    "TEXT" -> content ?: ""
+    "TEXT" -> content ?: throw QuestionException.AnswerChoiceBlank()
     "PROPOSITION_COMBINATION" ->
-        labels?.joinToString(", ") { it } ?: ""
+        labels?.joinToString(", ") { it } ?: throw QuestionException.AnswerChoiceBlank()
     else -> error("Unknown AnswerChoice type: $type")
 }

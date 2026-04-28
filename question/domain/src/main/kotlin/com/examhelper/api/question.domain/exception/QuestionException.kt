@@ -26,4 +26,7 @@ sealed class QuestionException(
     class QuestionSetAlreadyAssigned(questionSetId: Long) : QuestionException(
         "Q006", "이미 세트에 편입된 문제입니다: set=$questionSetId", ErrorStatus.CONFLICT
     )
+    class AnswerChoiceBlank : QuestionException(
+        "Q007", "선지는 비어 있을 수 없습니다.", ErrorStatus.BAD_REQUEST
+    )
 }
