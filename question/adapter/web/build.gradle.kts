@@ -2,6 +2,7 @@ dependencies {
     implementation(project(":shared:kernel"))
     implementation(project(":shared:infrastructure"))
 
+    implementation(project(":question:domain"))
     implementation(project(":question:port"))
 
     // Spring Boot
