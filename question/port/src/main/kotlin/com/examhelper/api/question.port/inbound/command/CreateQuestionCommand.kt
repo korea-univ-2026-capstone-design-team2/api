@@ -1,9 +1,9 @@
 package com.examhelper.api.question.port.inbound.command
 
-import com.examhelper.api.question.domain.type.DifficultyLevel
-import com.examhelper.api.question.domain.type.QuestionSubType
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
+import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionSubType
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.domain.vo.AnswerSheet
 import com.examhelper.api.question.domain.vo.Exhibit
 import com.examhelper.api.question.domain.vo.Explanation

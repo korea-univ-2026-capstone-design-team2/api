@@ -1,9 +1,9 @@
 package com.examhelper.api.question.port.outbound
 
-import com.examhelper.api.question.domain.type.DifficultyLevel
+import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.domain.type.QuestionStatus
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
 
 data class QuestionFilter(
     val subject: Subject? = null,

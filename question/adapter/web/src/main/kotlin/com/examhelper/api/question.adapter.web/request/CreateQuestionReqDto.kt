@@ -1,10 +1,6 @@
 package com.examhelper.api.question.adapter.web.request
 
 import com.examhelper.api.kernel.identifier.LogicalFrameId
-import com.examhelper.api.question.domain.type.DifficultyLevel
-import com.examhelper.api.question.domain.type.QuestionSubType
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
 import com.examhelper.api.question.domain.vo.AnswerChoice
 import com.examhelper.api.question.domain.vo.AnswerSheet
 import com.examhelper.api.question.domain.vo.Exhibit
