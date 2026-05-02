@@ -12,7 +12,7 @@ import com.examhelper.api.question.domain.vo.Explanation
 import com.examhelper.api.question.domain.vo.FrameReference
 import com.examhelper.api.question.domain.vo.Passage
 import com.examhelper.api.question.domain.vo.Proposition
-import com.examhelper.api.question.domain.vo.PropositionLabel
+import com.examhelper.api.kernel.type.PropositionLabel
 import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 
 data class CreateQuestionReqDto(
