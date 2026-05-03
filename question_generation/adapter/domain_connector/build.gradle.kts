@@ -5,6 +5,10 @@ dependencies {
     implementation(project(":question_generation:domain"))
     implementation(project(":question_generation:port"))
 
-    // Spring Boot
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(project(":question:domain"))
+    implementation(project(":question:port"))
+
+    // Spring
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
 }

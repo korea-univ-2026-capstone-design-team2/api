@@ -28,6 +28,7 @@ subprojects {
 		imports {
 			mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.5")
 			mavenBom("tools.jackson:jackson-bom:3.1.2")
+			mavenBom("org.springframework.ai:spring-ai-bom:1.1.5")
 		}
 	}
 
@@ -71,5 +72,13 @@ subprojects {
 			.replace(":", "-")
 
 		archiveBaseName.set(modulePath)
+	}
+
+	group = when {
+		path.startsWith(":question:") -> "com.examhelper.api.question"
+		path.startsWith(":question_generation:") -> "com.examhelper.api.question_generation"
+		path.startsWith(":user:") -> "com.examhelper.api.user"
+		path.startsWith(":auth:") -> "com.examhelper.api.auth"
+		else -> "com.examhelper.api.shared"
 	}
 }
