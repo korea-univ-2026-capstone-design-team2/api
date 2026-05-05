@@ -39,7 +39,7 @@ class QuestionGenerationStepLogEntity(
     @Column(name = "duration_ms")
     val durationMs: Long?,
 
-    @Column(length = 1000)
+    @Column(length = 10000)
     val detail: String?,
 
     @Column(name = "occurred_at", nullable = false)
