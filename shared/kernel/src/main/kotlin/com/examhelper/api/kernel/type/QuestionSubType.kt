@@ -1,4 +1,4 @@
-package com.examhelper.api.question.domain.type
+package com.examhelper.api.kernel.type
 
 enum class QuestionSubType {
     // 독해형 하위 유형

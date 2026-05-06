@@ -1,9 +1,9 @@
 package com.examhelper.api.question.adapter.persistence
 
-import com.examhelper.api.question.domain.type.DifficultyLevel
+import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.domain.type.QuestionStatus
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
 import com.examhelper.api.question.port.inbound.view.QuestionSummaryView
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository

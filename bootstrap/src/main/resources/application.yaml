@@ -18,6 +18,33 @@ spring:
         use_sql_comments: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  ai:
+    google:
+      genai:
+        api-key: ${GOOGLE_GENAI_API_KEY}
+        project-id: ${GOOGLE_GENAI_PROJECT_ID}
+        location: ${GOOGLE_GENAI_LOCATION}
+        chat:
+          options:
+            model: ${GOOGLE_GENAI_CHAT_MODEL}
+            temperature: ${GOOGLE_GENAI_TEMPERATURE:0.7}
+            max-tokens: ${GOOGLE_GENAI_MAX_TOKENS:4096}
+        embedding:
+          text:
+            options:
+              model: ${GOOGLE_GENAI_EMBEDDING_MODEL}
+          project-id: ${GOOGLE_GENAI_PROJECT_ID}
+          location: ${GOOGLE_GENAI_LOCATION}
+          api-key: ${GOOGLE_GENAI_API_KEY}
+
+    vectorstore:
+      qdrant:
+        host: ${QDRANT_HOST:localhost}
+        port: ${QDRANT_PORT:6334}
+        collection-name: psat_frames
+        use-tls: false
+        initialize-schema: false
+
 snowflake:
   datacenter-id: 1
   worker-id: 10

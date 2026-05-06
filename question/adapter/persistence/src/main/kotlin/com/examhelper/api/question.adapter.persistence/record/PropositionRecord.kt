@@ -1,7 +1,7 @@
 package com.examhelper.api.question.adapter.persistence.record
 
 import com.examhelper.api.question.domain.vo.Proposition
-import com.examhelper.api.question.domain.vo.PropositionLabel
+import com.examhelper.api.kernel.type.PropositionLabel
 
 class PropositionRecord (
     val label: String,

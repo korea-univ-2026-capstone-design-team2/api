@@ -1,5 +1,6 @@
 package com.examhelper.api.question.domain.vo
 
+import com.examhelper.api.kernel.type.PropositionLabel
 import com.examhelper.api.question.domain.exception.QuestionAssertionException
 
 sealed class AnswerChoice {

@@ -1,10 +1,10 @@
 package com.examhelper.api.question.domain.vo
 
+import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionSubType
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.domain.exception.QuestionAssertionException
-import com.examhelper.api.question.domain.type.DifficultyLevel
-import com.examhelper.api.question.domain.type.QuestionSubType
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
 
 data class QuestionMetadata(
     val subject: Subject,

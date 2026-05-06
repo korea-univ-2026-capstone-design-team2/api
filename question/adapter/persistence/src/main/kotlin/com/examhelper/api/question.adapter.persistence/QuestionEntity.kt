@@ -3,6 +3,10 @@ package com.examhelper.api.question.adapter.persistence
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.kernel.identifier.QuestionSetId
+import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionSubType
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.adapter.persistence.converter.AnswerSheetConverter
 import com.examhelper.api.question.adapter.persistence.converter.ExplanationConverter
 import com.examhelper.api.question.adapter.persistence.converter.FrameReferenceConverter
@@ -14,11 +18,7 @@ import com.examhelper.api.question.adapter.persistence.record.FrameReferenceReco
 import com.examhelper.api.question.adapter.persistence.record.PassageTopicRecord
 import com.examhelper.api.question.adapter.persistence.record.QuestionContentRecord
 import com.examhelper.api.question.domain.Question
-import com.examhelper.api.question.domain.type.DifficultyLevel
 import com.examhelper.api.question.domain.type.QuestionStatus
-import com.examhelper.api.question.domain.type.QuestionSubType
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
 import com.examhelper.api.question.domain.vo.QualityScore
 import com.examhelper.api.question.domain.vo.QuestionMetadata
 import jakarta.persistence.Column

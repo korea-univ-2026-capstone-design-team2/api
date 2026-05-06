@@ -1,10 +1,7 @@
 package com.examhelper.api.question.adapter.web.request
 
 import com.examhelper.api.kernel.identifier.LogicalFrameId
-import com.examhelper.api.question.domain.type.DifficultyLevel
-import com.examhelper.api.question.domain.type.QuestionSubType
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
+import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.question.domain.vo.AnswerChoice
 import com.examhelper.api.question.domain.vo.AnswerSheet
 import com.examhelper.api.question.domain.vo.Exhibit
@@ -12,7 +9,10 @@ import com.examhelper.api.question.domain.vo.Explanation
 import com.examhelper.api.question.domain.vo.FrameReference
 import com.examhelper.api.question.domain.vo.Passage
 import com.examhelper.api.question.domain.vo.Proposition
-import com.examhelper.api.question.domain.vo.PropositionLabel
+import com.examhelper.api.kernel.type.PropositionLabel
+import com.examhelper.api.kernel.type.QuestionSubType
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 
 data class CreateQuestionReqDto(

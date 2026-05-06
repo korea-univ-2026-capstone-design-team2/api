@@ -1,10 +1,10 @@
 package com.examhelper.api.question.port.inbound.view
 
-import com.examhelper.api.question.domain.type.DifficultyLevel
+import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionSubType
+import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.domain.type.QuestionStatus
-import com.examhelper.api.question.domain.type.QuestionSubType
-import com.examhelper.api.question.domain.type.QuestionType
-import com.examhelper.api.question.domain.type.Subject
 
 data class QuestionSummaryView(
     val questionId: Long,
