@@ -10,18 +10,10 @@ enum class QuestionType(val korean: String) {
         )
     },
     LOGIC_PUZZLE("논리퀴즈") {
-        override fun compatibleSubTypes() = listOf(
-            QuestionSubType.MATCH,
-            QuestionSubType.KNOWABLE,
-        )
+        override fun compatibleSubTypes() = emptyList<QuestionSubType>()
     },
     ARGUMENTATION("논증") {
-        override fun compatibleSubTypes() = listOf(
-            QuestionSubType.CORE_ARGUMENT,
-            QuestionSubType.INFERENCE,
-            QuestionSubType.ARGUMENT_ANALYSIS,
-            QuestionSubType.STRENGTHEN_WEAKEN,
-        )
+        override fun compatibleSubTypes() = emptyList<QuestionSubType>()
     };
 
     abstract fun compatibleSubTypes(): List<QuestionSubType>

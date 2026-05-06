@@ -30,7 +30,8 @@ data class GenerateQuestionReqDto(
         val resolvedQuestionType = questionType?.let { enumValueOrThrow<QuestionType>(it) }
             ?: QuestionType.entries.random()
 
-        val resolvedQuestionSubType = questionSubType?.let { enumValueOrThrow<QuestionSubType>(it) }
+        val resolvedQuestionSubType = questionSubType
+            ?.let { enumValueOrThrow<QuestionSubType>(it) }
             ?: resolvedQuestionType.compatibleSubTypes().randomOrNull()
 
         val resolvedDifficulty = difficulty?.let { enumValueOrThrow<DifficultyLevel>(it) }

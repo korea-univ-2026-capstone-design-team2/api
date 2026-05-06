@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 )
 @ApiResponses(
     ApiResponse(
-        responseCode = "202",
+        responseCode = "201",
         description = "문제 생성 요청 수락",
         content = [Content(schema = Schema(implementation = GenerateQuestionResDto::class))]
     ),

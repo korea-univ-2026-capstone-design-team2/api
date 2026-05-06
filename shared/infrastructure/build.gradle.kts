@@ -9,9 +9,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-    // Spring Ai
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
-
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-common:3.0.3")
 

@@ -61,6 +61,7 @@ class LlmGenerationAdapter(
     private fun parseResponse(rawJson: String): LlmQuestionResponse =
         try {
             val cleaned = rawJson
+                .trim()
                 .removePrefix("```json")
                 .removePrefix("```")
                 .removeSuffix("```")
@@ -72,14 +73,26 @@ class LlmGenerationAdapter(
         }
 
     // ── LlmQuestionResponse → LlmGenerationResult 변환 ────────
-    private fun LlmQuestionResponse.toDomain(): LlmGenerationResult =
-        LlmGenerationResult(
+    private fun LlmQuestionResponse.toDomain(): LlmGenerationResult {
+        val correctChoices = choices.filter { it.isCorrect }
+        when {
+            correctChoices.isEmpty() ->
+                throw LlmGenerationException.InvalidChoice("정답(isCorrect=true)이 없습니다")
+
+            correctChoices.size > 1 ->
+                throw LlmGenerationException.InvalidChoice(
+                    "정답이 ${correctChoices.size}개입니다. 반드시 1개여야 합니다"
+                )
+        }
+
+        return LlmGenerationResult(
             stem = stem,
             passage = passage?.toDomain(),
             exhibit = exhibit?.toDomain(),
             choices = choices.map { it.toDomain() },
             explanation = explanation.toDomain(),
         )
+    }
 
     private fun LlmQuestionResponse.LlmPassageResponse.toDomain(): LlmPassageResult? {
         val c = content?.takeIf { it.isNotBlank() } ?: return null
@@ -95,16 +108,21 @@ class LlmGenerationAdapter(
                 val props = propositions
                     ?.map { p ->
                         LlmPropositionResult(
-                            label = PropositionLabel.valueOf(p.label),
+                            label = runCatching { PropositionLabel.valueOf(p.label) }
+                                .getOrElse {
+                                    throw LlmGenerationException.InvalidExhibit(
+                                        "유효하지 않은 PropositionLabel: '${p.label}'"
+                                    )
+                                },
                             content = p.content,
                         )
                     }
                     ?.takeIf { it.isNotEmpty() }
-                    ?: throw LlmGenerationException.InvalidExhibit("PROPOSITION exhibit에 propositions가 없습니다")
-
+                    ?: throw LlmGenerationException.InvalidExhibit(
+                        "PROPOSITION exhibit에 propositions가 없습니다"
+                    )
                 LlmExhibitResult.Proposition(propositions = props)
             }
-
             "TEXT" -> {
                 val c = content?.takeIf { it.isNotBlank() }
                     ?: throw LlmGenerationException.InvalidExhibit("TEXT exhibit에 content가 없습니다")
@@ -127,22 +145,42 @@ class LlmGenerationAdapter(
             "PROPOSITION_COMBINATION" -> LlmChoiceResult.PropositionCombination(
                 number = number,
                 isCorrect = isCorrect,
-                labels = labels
-                    ?.map { PropositionLabel.valueOf(it) }
+                labels =  labels
+                    ?.map { label ->
+                        runCatching { PropositionLabel.valueOf(label) }
+                            .getOrElse {
+                                throw LlmGenerationException.InvalidChoice(
+                                    "유효하지 않은 PropositionLabel: '$label' (선지 $number)"
+                                )
+                            }
+                    }
                     ?.takeIf { it.isNotEmpty() }
-                    ?: throw LlmGenerationException.InvalidChoice("PROPOSITION_COMBINATION 선지에 labels가 없습니다: $number"),
+                    ?: throw LlmGenerationException.InvalidChoice(
+                        "PROPOSITION_COMBINATION 선지에 labels가 없습니다: $number"
+                    )
             )
-
             else -> throw LlmGenerationException.InvalidChoice("알 수 없는 choice type: $type")
         }
 
-    private fun LlmQuestionResponse.LlmExplanationResponse.toDomain(): LlmExplanationResult =
-        LlmExplanationResult(
+    private fun LlmQuestionResponse.LlmExplanationResponse.toDomain(): LlmExplanationResult {
+        val parsedKeys = incorrectReasons.mapKeys { (k, _) ->
+            k.toIntOrNull()
+                ?: throw LlmGenerationException.InvalidExplanation(
+                    "incorrectReasons key가 숫자가 아닙니다: $k"
+                )
+        }
+
+        val requiredKeys = (1..5).toSet()
+        val missingKeys = requiredKeys - parsedKeys.keys
+        if (missingKeys.isNotEmpty()) {
+            throw LlmGenerationException.InvalidExplanation(
+                "incorrectReasons에 필수 키가 누락되었습니다: $missingKeys"
+            )
+        }
+
+        return LlmExplanationResult(
             correctReason = correctReason,
-            incorrectReasons = incorrectReasons
-                .mapKeys { (k, _) ->
-                    k.toIntOrNull()
-                        ?: throw LlmGenerationException.InvalidExplanation("incorrectReasons key가 숫자가 아닙니다: $k")
-                },
+            incorrectReasons = parsedKeys,
         )
+    }
 }
