@@ -4,6 +4,7 @@ import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
+import com.examhelper.api.kernel.type.TopicCategory
 import com.examhelper.api.question_generation.port.inbound.command.GenerateQuestionCommand
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
@@ -37,8 +38,8 @@ data class GenerateQuestionReqDto(
         val resolvedDifficulty = difficulty?.let { enumValueOrThrow<DifficultyLevel>(it) }
             ?: DifficultyLevel.entries.random()
 
-        val resolvedTopicCategory = topicCategory ?: resolvedSubject.defaultTopicCategories().random()
-
+        val resolvedTopicCategory = topicCategory?.let { enumValueOrThrow<TopicCategory>(it) }
+            ?: TopicCategory.entries.random()
 
         return GenerateQuestionCommand(
             subject = Subject.valueOf(subject),
@@ -54,7 +55,5 @@ data class GenerateQuestionReqDto(
 
     private inline fun <reified T : Enum<T>> enumValueOrThrow(value: String): T =
         enumValues<T>().find { it.name == value }
-            ?: throw IllegalArgumentException(
-                "유효하지 않은 값: '$value'. 허용값: ${enumValues<T>().map { it.name }}"
-            )
+            ?: throw IllegalArgumentException("유효하지 않은 값: '$value'. 허용값: ${enumValues<T>().map { it.name }}")
 }
