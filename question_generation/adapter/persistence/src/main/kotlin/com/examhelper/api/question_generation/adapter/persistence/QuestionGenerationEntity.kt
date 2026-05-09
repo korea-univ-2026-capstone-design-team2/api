@@ -5,6 +5,7 @@ import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
+import com.examhelper.api.kernel.type.TopicCategory
 import com.examhelper.api.question_generation.domain.QuestionGeneration
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
@@ -46,8 +47,9 @@ class QuestionGenerationEntity(
     @Column(nullable = false, length = 10)
     val difficulty: DifficultyLevel,
 
-    @Column(name = "topic_category", nullable = false, length = 100)
-    val topicCategory: String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "topic_category", nullable = false, length = 10)
+    val topicCategory: TopicCategory,
 
     @Column(name = "topic_keyword", length = 100)
     val topicKeyword: String?,
