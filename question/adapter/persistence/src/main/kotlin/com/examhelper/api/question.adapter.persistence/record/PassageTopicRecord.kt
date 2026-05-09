@@ -9,7 +9,7 @@ class PassageTopicRecord(
 ) {
     fun toDomain(): PassageTopic =
         PassageTopic(
-            category = TopicCategory.valueOf(category),
+            category = TopicCategory.fromString(category),
             keyword = keyword,
         )
 
