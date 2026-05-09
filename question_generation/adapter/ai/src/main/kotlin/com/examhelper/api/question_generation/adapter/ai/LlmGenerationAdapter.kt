@@ -62,9 +62,8 @@ class LlmGenerationAdapter(
         try {
             val cleaned = rawJson
                 .trim()
-                .removePrefix("```json")
-                .removePrefix("```")
-                .removeSuffix("```")
+                .replace(Regex("""^```[a-zA-Z]*\s*""", RegexOption.MULTILINE), "")
+                .replace(Regex("""```\s*$""", RegexOption.MULTILINE), "")
                 .trim()
 
             objectMapper.readValue(cleaned, LlmQuestionResponse::class.java)
@@ -90,7 +89,7 @@ class LlmGenerationAdapter(
             passage = passage?.toDomain(),
             exhibit = exhibit?.toDomain(),
             choices = choices.map { it.toDomain() },
-            explanation = explanation.toDomain(),
+            explanation = explanation.toDomain(choices.size),
         )
     }
 
@@ -162,7 +161,7 @@ class LlmGenerationAdapter(
             else -> throw LlmGenerationException.InvalidChoice("알 수 없는 choice type: $type")
         }
 
-    private fun LlmQuestionResponse.LlmExplanationResponse.toDomain(): LlmExplanationResult {
+    private fun LlmQuestionResponse.LlmExplanationResponse.toDomain(expectedChoiceCount: Int): LlmExplanationResult {
         val parsedKeys = incorrectReasons.mapKeys { (k, _) ->
             k.toIntOrNull()
                 ?: throw LlmGenerationException.InvalidExplanation(
@@ -170,7 +169,7 @@ class LlmGenerationAdapter(
                 )
         }
 
-        val requiredKeys = (1..5).toSet()
+        val requiredKeys = (1..expectedChoiceCount).toSet()
         val missingKeys = requiredKeys - parsedKeys.keys
         if (missingKeys.isNotEmpty()) {
             throw LlmGenerationException.InvalidExplanation(
