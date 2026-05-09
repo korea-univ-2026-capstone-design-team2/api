@@ -12,12 +12,14 @@ import com.examhelper.api.question_generation.port.outbound.result.FrameSearchRe
 import org.springframework.ai.document.Document
 import org.springframework.ai.vectorstore.SearchRequest
 import org.springframework.ai.vectorstore.VectorStore
+import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreProperties
 import org.springframework.stereotype.Component
 
 @Component
 class PsatFrameSearchAdapter(
     private val vectorStore: VectorStore,
-    private val properties: FrameSearchProperties
+    private val frameSearchProperties: FrameSearchProperties,
+    private val qdrantProperties : QdrantVectorStoreProperties
 ) : FrameSearchPort {
     override fun search(query: FrameSearchQuery): List<FrameSearchResult> {
         val queryText = buildQueryText(query)
@@ -28,14 +30,14 @@ class PsatFrameSearchAdapter(
                 SearchRequest.builder()
                     .query(queryText)
                     .topK(query.topK)
-                    .similarityThreshold(properties.scoreThreshold)
+                    .similarityThreshold(frameSearchProperties.scoreThreshold)
                     .filterExpression(filterExpression)
                     .build()
             )
         } catch (ex: Exception) {
             throw FrameSearchException.QdrantUnavailable(
                 cause = ex,
-                collection = "psat-frames"
+                collection = qdrantProperties.collectionName
             )
         }
 

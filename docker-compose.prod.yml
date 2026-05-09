@@ -5,6 +5,7 @@ services:
     env_file: .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST}
     restart: always
     deploy:
       resources:

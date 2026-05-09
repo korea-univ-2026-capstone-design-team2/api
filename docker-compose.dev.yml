@@ -4,6 +4,7 @@ services:
     env_file: .env
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: mysql
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
       - "5005:5005"            # Remote debug
