@@ -48,7 +48,7 @@ class QuestionGenerationEntity(
     val difficulty: DifficultyLevel,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "topic_category", nullable = false, length = 10)
+    @Column(name = "topic_category", nullable = false, length = 20)
     val topicCategory: TopicCategory,
 
     @Column(name = "topic_keyword", length = 100)

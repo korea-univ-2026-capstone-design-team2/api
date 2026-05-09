@@ -25,7 +25,7 @@ class FrameRetrievalTextBuilder {
             appendLine(frame.reasoningType)
             appendLine()
 
-            appendLine("[TOPIC]")
+            appendLine("[TOPIC_CATEGORY]")
             appendLine(frame.topicCategory)
             frame.topicKeyword?.let {
                 appendLine()

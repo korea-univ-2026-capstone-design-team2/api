@@ -5,10 +5,8 @@ services:
       dockerfile: Dockerfile
       target: runtime
     restart: unless-stopped
-    environment:
-      DB_PORT: 3306
-      QDRANT_HOST: qdrant
-      QDRANT_PORT: 6334
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     depends_on:
@@ -32,5 +30,5 @@ volumes:
   app-logs:
 
 networks:
-  psat-net:
+  examhelper-net:
     driver: bridge

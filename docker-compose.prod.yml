@@ -5,7 +5,6 @@ services:
     env_file: .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DB_HOST: ${DB_HOST}      # RDS 엔드포인트 (.env.prod 주입)
     restart: always
     deploy:
       resources:
