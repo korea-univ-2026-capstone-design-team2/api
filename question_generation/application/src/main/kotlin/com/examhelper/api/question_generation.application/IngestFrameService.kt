@@ -21,12 +21,14 @@ class IngestFrameService(
             val retrievalText = retrievalTextBuilder.build(it)
 
             val embedding = embeddingPort.embed(TextEmbeddingCommand(retrievalText))
+            val frameId = buildFrameId(it)
 
             IndexedFramePoint(
-                id = buildFrameId(it),
+                id = frameId,
                 vector = embedding.embedding,
                 payload = buildPayload(
                     frame = it,
+                    frameId = frameId,
                     retrievalText = retrievalText
                 )
             )
@@ -47,9 +49,9 @@ class IngestFrameService(
         return UUID.nameUUIDFromBytes(rawKey.toByteArray()).toString()
     }
 
-    private fun buildPayload(frame: LogicalFrameDocument, retrievalText: String): Map<String, Any> {
+    private fun buildPayload(frame: LogicalFrameDocument, frameId: String, retrievalText: String): Map<String, Any> {
         return buildMap {
-            put("frame_id", buildFrameId(frame))
+            put("frame_id", frameId)
 
             put("exam", frame.exam)
             put("year", frame.year)
