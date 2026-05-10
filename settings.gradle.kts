@@ -19,3 +19,9 @@ include(":question_generation:adapter:web")
 include(":question_generation:adapter:persistence")
 include(":question_generation:adapter:ai")
 include(":question_generation:adapter:domain_connector")
+
+// auth
+include(":auth")
+
+//member
+include(":member")

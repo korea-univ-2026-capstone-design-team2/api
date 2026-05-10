@@ -19,6 +19,12 @@ dependencies {
     implementation(project(":question_generation:adapter:domain_connector"))
     implementation(project(":question_generation:adapter:persistence"))
 
+    // Auth
+    implementation(project(":auth"))
+
+    // Member
+    implementation(project(":member"))
+
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -34,7 +40,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
     // OAuth2
-    implementation ("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
     // Database
     runtimeOnly("com.mysql:mysql-connector-j")
