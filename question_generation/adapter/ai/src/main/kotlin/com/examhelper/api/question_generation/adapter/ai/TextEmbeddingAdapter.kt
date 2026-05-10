@@ -1,6 +1,6 @@
 package com.examhelper.api.question_generation.adapter.ai
 
-import com.examhelper.api.question_generation.adapter.ai.exception.FrameSearchException
+import com.examhelper.api.question_generation.adapter.ai.exception.TextEmbeddingException
 import com.examhelper.api.question_generation.port.outbound.TextEmbeddingPort
 import com.examhelper.api.question_generation.port.outbound.command.TextEmbeddingCommand
 import com.examhelper.api.question_generation.port.outbound.result.TextEmbeddingResult
@@ -19,6 +19,6 @@ class TextEmbeddingAdapter(
 
             return TextEmbeddingResult(embedding)
         } catch (ex: Exception) {
-            throw FrameSearchException.EmbeddingFailed(ex)
+            throw TextEmbeddingException.EmbeddingFailed(ex)
         }
 }

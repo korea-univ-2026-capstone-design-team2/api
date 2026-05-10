@@ -4,6 +4,7 @@ import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
+import com.examhelper.api.kernel.type.TopicCategory
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationTopic
 
@@ -12,7 +13,7 @@ data class GenerateQuestionCommand(
     val questionType: QuestionType,
     val questionSubType: QuestionSubType?,
     val difficulty: DifficultyLevel,
-    val topicCategory: String,
+    val topicCategory: TopicCategory,
     val topicKeyword: String?,
     val topicDescription: String?,
     val quantity: Int,
@@ -20,16 +21,16 @@ data class GenerateQuestionCommand(
 ) {
     fun toGenerationRequest(): QuestionGenerationRequest =
         QuestionGenerationRequest(
-            subject         = subject,
-            questionType    = questionType,
+            subject = subject,
+            questionType = questionType,
             questionSubType = questionSubType,
-            difficulty      = difficulty,
-            topic           = QuestionGenerationTopic(
-                category    = topicCategory,
-                keyword     = topicKeyword,
+            difficulty = difficulty,
+            topic = QuestionGenerationTopic(
+                category = topicCategory,
+                keyword = topicKeyword,
                 description = topicDescription,
             ),
-            quantity        = quantity,
+            quantity = quantity,
             frameSearchTopK = frameSearchTopK,
         )
 }

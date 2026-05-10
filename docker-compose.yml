@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    environment:
+      DB_PORT: 3306
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6334
+    ports:
+      - "8080:8080"
+    depends_on:
+      qdrant:
+        condition: service_started
+    networks:
+      - examhelper-net
+    volumes:
+      - app-logs:/app/logs
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - examhelper-net
+
+volumes:
+  qdrant-data:
+  app-logs:
+
+networks:
+  examhelper-net:
+    driver: bridge

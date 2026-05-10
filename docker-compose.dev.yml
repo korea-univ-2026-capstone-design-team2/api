@@ -1,0 +1,59 @@
+services:
+  app:
+    container_name: examhelper-app-dev
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: mysql
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - "5005:5005"            # Remote debug
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command:
+      - java
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - -XX:+UseG1GC
+      - -XX:MaxRAMPercentage=75.0
+      - -Djava.security.egd=file:/dev/./urandom
+      - -jar
+      - app.jar
+
+  mysql:
+    image: mysql:8.4
+    container_name: examhelper-mysql-dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "${DB_PORT_DOCKER}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./infra/mysql/init:/docker-entrypoint-initdb.d:ro
+      - ./infra/mysql/conf.d:/etc/mysql/conf.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - examhelper-net
+
+  qdrant:
+    container_name: psat-qdrant-dev
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+
+volumes:
+  mysql-data:    # dev 전용 볼륨
+
+networks:
+  examhelper-net:

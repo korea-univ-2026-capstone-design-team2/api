@@ -32,7 +32,7 @@ spring:
         embedding:
           text:
             options:
-              model: ${GOOGLE_GENAI_EMBEDDING_MODEL}
+              model: ${GOOGLE_GENAI_TEXT_EMBEDDING_MODEL}
           project-id: ${GOOGLE_GENAI_PROJECT_ID}
           location: ${GOOGLE_GENAI_LOCATION}
           api-key: ${GOOGLE_GENAI_API_KEY}
@@ -41,9 +41,13 @@ spring:
       qdrant:
         host: ${QDRANT_HOST:localhost}
         port: ${QDRANT_PORT:6334}
-        collection-name: psat_frames
+        collection-name: ${QDRANT_COLLECTION_NAME}
         use-tls: false
         initialize-schema: false
+
+frame-search:
+  score-threshold: 0.60
+  post-filter-multiplier: 3
 
 snowflake:
   datacenter-id: 1

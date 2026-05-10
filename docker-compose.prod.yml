@@ -1,0 +1,43 @@
+services:
+  app:
+    image: psat-api:${APP_VERSION:-latest}
+    container_name: examhelper-app
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST}
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "10"
+
+  qdrant:
+    container_name: examhelper-qdrant
+    restart: always
+    expose:
+      - "6333"
+      - "6334"
+    volumes:
+      - ./infra/qdrant/config.yaml:/qdrant/config/production.yaml:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  examhelper-net:
