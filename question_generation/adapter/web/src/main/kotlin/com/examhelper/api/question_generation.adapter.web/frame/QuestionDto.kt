@@ -1,6 +1,6 @@
 package com.examhelper.api.question_generation.adapter.web.frame
 
-data class ProblemDto(
+data class QuestionDto(
     val stem: String,
     val passage: PassageDto?,
     val choices: List<ChoiceDto>,
