@@ -27,9 +27,7 @@ class QuestionGenerationController(
         @RequestBody @Valid request: GenerateQuestionReqDto,
     ): ResponseEntity<ApiResponse.Success<GenerateQuestionResDto>> {
         val result = generateQuestionUseCase.execute(request.toCommand())
-        val data = ApiResponse.Success(GenerateQuestionResDto(
-            generationId = result.questionGenerationId.value
-        ))
+        val data = ApiResponse.Success(GenerateQuestionResDto.fromResult(result))
 
         return ResponseEntity.status(HttpStatus.CREATED).body(data)
     }
