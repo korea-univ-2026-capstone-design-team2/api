@@ -73,3 +73,25 @@ springdoc:
   default-produces-media-type: application/json
   enable-kotlin: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+  endpoint:
+    prometheus:
+      access: unrestricted
+
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+      percentiles:
+        http.server.requests: 0.5,0.95,0.99

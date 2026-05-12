@@ -52,6 +52,35 @@ services:
       - "6333:6333"
       - "6334:6334"
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - examhelper-net
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3002:3002"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - examhelper-net
+
+  k6:
+    image: grafana/k6
+    volumes:
+      - ./infrastructure/performance/k6:/scripts
+    working_dir: /scripts
+    entrypoint: [ "k6" ]
+    networks:
+      - examhelper-net
+
 volumes:
   mysql-data:    # dev 전용 볼륨
 
