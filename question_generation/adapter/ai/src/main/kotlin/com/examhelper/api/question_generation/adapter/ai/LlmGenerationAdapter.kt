@@ -3,6 +3,7 @@ package com.examhelper.api.question_generation.adapter.ai
 import com.examhelper.api.kernel.type.PropositionLabel
 import com.examhelper.api.question_generation.adapter.ai.dto.LlmQuestionResponse
 import com.examhelper.api.question_generation.adapter.ai.exception.LlmGenerationException
+import com.examhelper.api.question_generation.adapter.ai.metrics.LlmGenerationMetrics
 import com.examhelper.api.question_generation.port.outbound.LlmGenerationPort
 import com.examhelper.api.question_generation.port.outbound.command.LlmGenerationCommand
 import com.examhelper.api.question_generation.port.outbound.result.LlmChoiceResult
@@ -11,6 +12,8 @@ import com.examhelper.api.question_generation.port.outbound.result.LlmExplanatio
 import com.examhelper.api.question_generation.port.outbound.result.LlmGenerationResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmPassageResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmPropositionResult
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Timer
 import org.springframework.ai.chat.messages.SystemMessage
 import org.springframework.ai.chat.messages.UserMessage
 import org.springframework.ai.chat.model.ChatModel
@@ -25,6 +28,8 @@ class LlmGenerationAdapter(
     private val promptAssembler: PromptAssembler,
     private val objectMapper: ObjectMapper,
     resourceLoader: ResourceLoader,
+    private val metrics: LlmGenerationMetrics,
+    private val meterRegistry: MeterRegistry
 ) : LlmGenerationPort {
     private val systemPrompt: String by lazy {
         resourceLoader
@@ -33,28 +38,34 @@ class LlmGenerationAdapter(
     }
 
     override fun generate(command: LlmGenerationCommand): LlmGenerationResult {
-        val userPrompt = promptAssembler.assembleUserPrompt(command)
+        val sample = Timer.start(meterRegistry)
 
-        val rawJson = try {
-            val prompt = Prompt(
-                listOf(
-                    SystemMessage(systemPrompt),
-                    UserMessage(userPrompt),
+        try {
+            val userPrompt = promptAssembler.assembleUserPrompt(command)
+
+            val rawJson = try {
+                val prompt = Prompt(
+                    listOf(
+                        SystemMessage(systemPrompt),
+                        UserMessage(userPrompt),
+                    )
                 )
-            )
-            chatModel.call(prompt)
-                .result
-                .output
-                .text
-                ?: throw LlmGenerationException.EmptyResponse()
-        } catch (ex: LlmGenerationException) {
-            throw ex
-        } catch (ex: Exception) {
-            throw LlmGenerationException.ApiCallFailed(ex)
-        }
+                chatModel.call(prompt)
+                    .result
+                    .output
+                    .text
+                    ?: throw LlmGenerationException.EmptyResponse()
+            } catch (ex: LlmGenerationException) {
+                throw ex
+            } catch (ex: Exception) {
+                throw LlmGenerationException.ApiCallFailed(ex)
+            }
 
-        val response = parseResponse(rawJson)
-        return response.toDomain()
+            val response = parseResponse(rawJson)
+            return response.toDomain()
+        } finally {
+            sample.stop(metrics.generationTimer)
+        }
     }
 
     // ── JSON 파싱 ─────────────────────────────────────────────
