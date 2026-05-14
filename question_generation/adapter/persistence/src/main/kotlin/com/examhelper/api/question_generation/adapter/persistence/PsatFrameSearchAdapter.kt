@@ -6,6 +6,7 @@ import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.TopicCategory
 import com.examhelper.api.question_generation.adapter.persistence.config.FrameSearchProperties
 import com.examhelper.api.question_generation.adapter.persistence.exception.FrameSearchException
+import com.examhelper.api.question_generation.adapter.persistence.metrics.FrameSearchMetrics
 import com.examhelper.api.question_generation.port.outbound.FrameSearchPort
 import com.examhelper.api.question_generation.port.outbound.query.FrameSearchQuery
 import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
@@ -19,29 +20,33 @@ import org.springframework.stereotype.Component
 class PsatFrameSearchAdapter(
     private val vectorStore: VectorStore,
     private val frameSearchProperties: FrameSearchProperties,
-    private val qdrantProperties : QdrantVectorStoreProperties
+    private val qdrantProperties : QdrantVectorStoreProperties,
+    private val metrics: FrameSearchMetrics
 ) : FrameSearchPort {
     override fun search(query: FrameSearchQuery): List<FrameSearchResult> {
-        val queryText = buildQueryText(query)
-        val filterExpression = buildFilterExpression(query)
+        return metrics.searchTimer.recordCallable {
 
-        val documents = try {
-            vectorStore.similaritySearch(
-                SearchRequest.builder()
-                    .query(queryText)
-                    .topK(query.topK)
-                    .similarityThreshold(frameSearchProperties.scoreThreshold)
-                    .filterExpression(filterExpression)
-                    .build()
-            )
-        } catch (ex: Exception) {
-            throw FrameSearchException.QdrantUnavailable(
-                cause = ex,
-                collection = qdrantProperties.collectionName
-            )
+            val queryText = buildQueryText(query)
+            val filterExpression = buildFilterExpression(query)
+
+            val documents = try {
+                vectorStore.similaritySearch(
+                    SearchRequest.builder()
+                        .query(queryText)
+                        .topK(query.topK)
+                        .similarityThreshold(frameSearchProperties.scoreThreshold)
+                        .filterExpression(filterExpression)
+                        .build()
+                )
+            } catch (ex: Exception) {
+                throw FrameSearchException.QdrantUnavailable(
+                    cause = ex,
+                    collection = qdrantProperties.collectionName
+                )
+            }
+
+            documents.map { it.toFrameSearchResult() }
         }
-
-        return documents.map { it.toFrameSearchResult() }
     }
 
     // retrieval_text 와 최대한 동일한 구조로 query 생성
