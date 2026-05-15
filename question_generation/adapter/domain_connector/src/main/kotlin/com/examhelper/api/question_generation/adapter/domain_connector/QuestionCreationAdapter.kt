@@ -21,17 +21,19 @@ import com.examhelper.api.question_generation.port.outbound.result.LlmExplanatio
 import com.examhelper.api.question_generation.port.outbound.result.LlmGenerationResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmPassageResult
 import com.examhelper.api.question_generation.port.outbound.result.QuestionCreationResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Component
 
 @Component
 class QuestionCreationAdapter(
     private val createQuestionUseCase: CreateQuestionUseCase
 ) : QuestionCreationPort {
-
-    override fun create(command: QuestionCreationCommand): QuestionCreationResult {
-        val result = createQuestionUseCase.execute(command.toCreateQuestionCommand())
-        return QuestionCreationResult(QuestionId(result.questionId))
-    }
+    override suspend fun create(command: QuestionCreationCommand): QuestionCreationResult =
+        withContext(Dispatchers.IO) {
+            val result = createQuestionUseCase.execute(command.toCreateQuestionCommand())
+            QuestionCreationResult(QuestionId(result.questionId))
+        }
 
     private fun QuestionCreationCommand.toCreateQuestionCommand(): CreateQuestionCommand =
         CreateQuestionCommand(

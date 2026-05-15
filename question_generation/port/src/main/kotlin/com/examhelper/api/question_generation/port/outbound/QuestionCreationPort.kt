@@ -4,5 +4,5 @@ import com.examhelper.api.question_generation.port.outbound.command.QuestionCrea
 import com.examhelper.api.question_generation.port.outbound.result.QuestionCreationResult
 
 interface QuestionCreationPort {
-    fun create(command: QuestionCreationCommand): QuestionCreationResult
+    suspend fun create(command: QuestionCreationCommand): QuestionCreationResult
 }
