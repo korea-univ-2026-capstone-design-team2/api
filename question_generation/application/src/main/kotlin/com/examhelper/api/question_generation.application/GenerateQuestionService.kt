@@ -77,7 +77,7 @@ class GenerateQuestionService(
                     questionIds = emptyList(),
                     successCount = 0,
                     failCount = generation.request.quantity,
-                    status = QuestionGenerationStatus.FAILED,
+                    status = QuestionGenerationStatus.FAILED
                 )
             }
 
@@ -91,7 +91,7 @@ class GenerateQuestionService(
                     questionIds = emptyList(),
                     successCount = 0,
                     failCount = generation.request.quantity,
-                    status = QuestionGenerationStatus.FAILED,
+                    status = QuestionGenerationStatus.FAILED
                 )
             }
 
@@ -105,7 +105,7 @@ class GenerateQuestionService(
                             generation = generation,
                             frames = frames,
                             referenceFrame = framePerSlot[index],
-                            index = index,
+                            index = index
                         )
                     }
                 }.awaitAll()
@@ -123,11 +123,6 @@ class GenerateQuestionService(
                 generation.complete()
             }
 
-            val status = when {
-                createdQuestionIds.isEmpty() -> QuestionGenerationStatus.FAILED
-                else -> QuestionGenerationStatus.COMPLETED
-            }
-
             questionGenerationStore.save(generation)
 
             return GenerateQuestionResult(
@@ -135,7 +130,7 @@ class GenerateQuestionService(
                 questionIds = createdQuestionIds,
                 successCount = createdQuestionIds.size,
                 failCount = failures.size,
-                status = status,
+                status = generation.status
             )
         } finally {
             metricsPort.recordTotalDuration(System.currentTimeMillis() - start)
@@ -152,7 +147,7 @@ class GenerateQuestionService(
         val llmResult = runWithLog(
             generationId = generation.id,
             step = QuestionGenerationStep.LLM_CALL,
-            detail = "index=$index",
+            detail = "index=$index"
         ) {
             llmGenerationPort.generate(LlmGenerationCommand(generation.request, frames))
         }.getOrElse {
@@ -177,7 +172,7 @@ class GenerateQuestionService(
                         topicCategory = generation.request.topic.category,
                         topicKeyword = generation.request.topic.keyword,
                         frameId = referenceFrame.frameId,
-                        similarityScore = referenceFrame.similarityScore,
+                        similarityScore = referenceFrame.similarityScore
                     )
                 )
             ).questionId
@@ -204,7 +199,7 @@ class GenerateQuestionService(
                     else QuestionGenerationStepStatus.FAILED,
                     durationMs = System.currentTimeMillis() - start,
                     detail = result.exceptionOrNull()?.message ?: detail,
-                    occurredAt = Instant.now(),
+                    occurredAt = Instant.now()
                 )
             )
         }

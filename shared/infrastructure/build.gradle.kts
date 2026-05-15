@@ -19,7 +19,7 @@ dependencies {
     compileOnly("jakarta.persistence:jakarta.persistence-api")
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
 
-    // Test
+    // Monitoring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
 
