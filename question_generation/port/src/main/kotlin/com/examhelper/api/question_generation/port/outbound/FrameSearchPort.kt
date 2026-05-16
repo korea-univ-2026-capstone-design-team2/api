@@ -4,5 +4,5 @@ import com.examhelper.api.question_generation.port.outbound.query.FrameSearchQue
 import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
 
 interface FrameSearchPort {
-    fun search(query: FrameSearchQuery): List<FrameSearchResult>
+    suspend fun search(query: FrameSearchQuery): List<FrameSearchResult>
 }

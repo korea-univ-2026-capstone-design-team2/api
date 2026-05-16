@@ -29,6 +29,7 @@ subprojects {
 			mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.5")
 			mavenBom("tools.jackson:jackson-bom:3.1.2")
 			mavenBom("org.springframework.ai:spring-ai-bom:1.1.5")
+			//mavenBom("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0")
 		}
 	}
 

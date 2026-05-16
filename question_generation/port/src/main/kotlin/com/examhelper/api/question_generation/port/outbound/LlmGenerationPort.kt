@@ -4,5 +4,5 @@ import com.examhelper.api.question_generation.port.outbound.command.LlmGeneratio
 import com.examhelper.api.question_generation.port.outbound.result.LlmGenerationResult
 
 interface LlmGenerationPort {
-    fun generate(command: LlmGenerationCommand): LlmGenerationResult
+    suspend fun generate(command: LlmGenerationCommand): LlmGenerationResult
 }

@@ -5,7 +5,7 @@ import com.examhelper.api.question_generation.port.inbound.model.LogicalFrameDoc
 data class FrameDocumentDto(
     val source: SourceDto,
     val metadata: MetadataDto,
-    val problem: ProblemDto,
+    val question: QuestionDto,
     val logicalFrame: LogicalFrameDto,
 
     val reasoningPatterns: List<String>,
@@ -45,18 +45,18 @@ data class FrameDocumentDto(
 
             reasoningComplexity = reasoningComplexity,
 
-            stem = problem.stem,
+            stem = question.stem,
 
-            passage = problem.passage?.content,
-            passageDescription = problem.passage?.description,
+            passage = question.passage?.content,
+            passageDescription = question.passage?.description,
 
-            choices = problem.choices
+            choices = question.choices
                 .sortedBy { it.number }
                 .map { it.content },
 
-            answer = problem.answer,
+            answer = question.answer,
 
-            correctReason = problem.explanation.correctReason,
+            correctReason = question.explanation.correctReason,
 
             mustPreserve = generationConstraints.mustPreserve,
             variableElements = generationConstraints.variableElements

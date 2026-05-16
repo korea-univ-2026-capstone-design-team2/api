@@ -6,9 +6,12 @@ import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.TopicCategory
 import com.examhelper.api.question_generation.adapter.persistence.config.FrameSearchProperties
 import com.examhelper.api.question_generation.adapter.persistence.exception.FrameSearchException
+import com.examhelper.api.question_generation.adapter.persistence.metrics.FrameSearchMetrics
 import com.examhelper.api.question_generation.port.outbound.FrameSearchPort
 import com.examhelper.api.question_generation.port.outbound.query.FrameSearchQuery
 import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.ai.document.Document
 import org.springframework.ai.vectorstore.SearchRequest
 import org.springframework.ai.vectorstore.VectorStore
@@ -19,30 +22,34 @@ import org.springframework.stereotype.Component
 class PsatFrameSearchAdapter(
     private val vectorStore: VectorStore,
     private val frameSearchProperties: FrameSearchProperties,
-    private val qdrantProperties : QdrantVectorStoreProperties
+    private val qdrantProperties: QdrantVectorStoreProperties,
+    private val metrics: FrameSearchMetrics
 ) : FrameSearchPort {
-    override fun search(query: FrameSearchQuery): List<FrameSearchResult> {
-        val queryText = buildQueryText(query)
-        val filterExpression = buildFilterExpression(query)
+    override suspend fun search(query: FrameSearchQuery): List<FrameSearchResult> =
+        withContext(Dispatchers.IO) {
+            metrics.searchTimer.recordCallable {
+                val queryText = buildQueryText(query)
+                val filterExpression = buildFilterExpression(query)
 
-        val documents = try {
-            vectorStore.similaritySearch(
-                SearchRequest.builder()
-                    .query(queryText)
-                    .topK(query.topK)
-                    .similarityThreshold(frameSearchProperties.scoreThreshold)
-                    .filterExpression(filterExpression)
-                    .build()
-            )
-        } catch (ex: Exception) {
-            throw FrameSearchException.QdrantUnavailable(
-                cause = ex,
-                collection = qdrantProperties.collectionName
-            )
+                val documents = try {
+                    vectorStore.similaritySearch(
+                        SearchRequest.builder()
+                            .query(queryText)
+                            .topK(query.topK)
+                            .similarityThreshold(frameSearchProperties.scoreThreshold)
+                            .filterExpression(filterExpression)
+                            .build()
+                    )
+                } catch (ex: Exception) {
+                    throw FrameSearchException.QdrantUnavailable(
+                        cause = ex,
+                        collection = qdrantProperties.collectionName,
+                    )
+                }
+
+                documents.map { it.toFrameSearchResult() }
+            }
         }
-
-        return documents.map { it.toFrameSearchResult() }
-    }
 
     // retrieval_text 와 최대한 동일한 구조로 query 생성
     private fun buildQueryText(query: FrameSearchQuery): String = buildString {
@@ -77,9 +84,9 @@ class PsatFrameSearchAdapter(
                 QuestionSubType.ARGUMENT_ANALYSIS -> "논증 구조와 전제-결론 관계 분석"
                 QuestionSubType.STRENGTHEN_WEAKEN -> "논증 강화 및 약화 요소 분석"
                 null -> when (query.questionType) {
-                    QuestionType.READING     -> "독해 기반 정보 추출 및 이해"
-                    QuestionType.ARGUMENTATION    -> "논증 구조 및 전제-결론 관계 분석"
-                    QuestionType.LOGIC_PUZZLE  -> "조건 관계 기반 논리 퍼즐 풀이"
+                    QuestionType.READING -> "독해 기반 정보 추출 및 이해"
+                    QuestionType.ARGUMENTATION -> "논증 구조 및 전제-결론 관계 분석"
+                    QuestionType.LOGIC_PUZZLE -> "조건 관계 기반 논리 퍼즐 풀이"
                 }
             }
         )
@@ -145,11 +152,11 @@ class PsatFrameSearchAdapter(
         (this[key] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
 
     private fun Map<String, Any>.getInt(key: String): Int = when (val value = this[key]) {
-            is Int -> value
-            is Long -> value.toInt()
-            is Double -> value.toInt()
-            else -> throw FrameSearchException.PayloadFieldMissing(key)
-        }
+        is Int -> value
+        is Long -> value.toInt()
+        is Double -> value.toInt()
+        else -> throw FrameSearchException.PayloadFieldMissing(key)
+    }
 
     private inline fun <reified T : Enum<T>> safeEnum(value: Any?): T? {
         val str = value as? String ?: return null
