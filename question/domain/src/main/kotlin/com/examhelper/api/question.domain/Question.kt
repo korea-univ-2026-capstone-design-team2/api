@@ -91,7 +91,7 @@ class Question private constructor(
                 it.validate()
                 it.addDomainEvent(
                     QuestionCreatedEvent(
-                        groupId = id.value,
+                        questionId = id.value,
                         generationId = generationId.value,
                         subject = metadata.subject.name,
                         difficulty = metadata.difficulty.name,

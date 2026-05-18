@@ -1,6 +1,6 @@
 package com.examhelper.api.question.domain.vo
 
-import com.examhelper.api.question.domain.exception.QuestionAssertionException
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 
 data class Explanation(
     val correctReason: String,
@@ -8,7 +8,7 @@ data class Explanation(
 ) {
     init {
         require(correctReason.isNotBlank()) {
-            throw QuestionAssertionException.ExplanationCorrectReasonBlank()
+            throw QuestionItemAssertionException.ExplanationCorrectReasonBlank()
         }
     }
 }

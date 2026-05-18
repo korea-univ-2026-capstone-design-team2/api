@@ -3,13 +3,13 @@ package com.examhelper.api.question.adapter.web.response
 import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
 
 data class CreateQuestionResDto(
-    val questionId: Long
+    val groupId: Long,
+    val questionIds: List<Long>,
 ) {
     companion object {
-        fun fromResult(result: CreateQuestionResult): CreateQuestionResDto {
-            return CreateQuestionResDto(
-                questionId = result.questionId
-            )
-        }
+        fun fromResult(result: CreateQuestionResult) = CreateQuestionResDto(
+            groupId = result.groupId,
+            questionIds = result.questionIds,
+        )
     }
 }

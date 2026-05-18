@@ -25,4 +25,9 @@ sealed class QuestionException(
         "QUESTION_GROUP_CANNOT_PUBLISH_EMPTY",
         "문제가 없는 그룹은 출제할 수 없습니다"
     )
+
+    class NotFound(questionId: Long) : QuestionException(
+        "QUESTION_NOT_FOUND",
+        "questionId: $questionId 에 해당하는 문제를 찾을 수 없습니다."
+    )
 }

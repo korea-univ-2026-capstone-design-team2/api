@@ -1,6 +1,6 @@
 package com.examhelper.api.question.domain.vo
 
-import com.examhelper.api.question.domain.exception.QuestionAssertionException
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 
 sealed class Exhibit {
 
@@ -11,11 +11,11 @@ sealed class Exhibit {
 
         private fun validate() {
             require(propositions.size in 2..5) {
-                throw QuestionAssertionException.PropositionSizeMismatch(propositions.size)
+                throw QuestionItemAssertionException.PropositionSizeMismatch(propositions.size)
             }
             val labels = propositions.map { it.label }
             require(labels.distinct().size == labels.size) {
-                throw QuestionAssertionException.PropositionLabelDuplicated()
+                throw QuestionItemAssertionException.PropositionLabelDuplicated()
             }
         }
     }
@@ -25,7 +25,7 @@ sealed class Exhibit {
     ) : Exhibit() {
         init {
             require(content.isNotBlank()) {
-                throw QuestionAssertionException.ExhibitContentBlank()
+                throw QuestionItemAssertionException.ExhibitContentBlank()
             }
         }
     }

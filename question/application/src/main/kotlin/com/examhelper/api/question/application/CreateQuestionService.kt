@@ -3,13 +3,16 @@ package com.examhelper.api.question.application
 import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
+import com.examhelper.api.kernel.identifier.QuestionItemId
+import com.examhelper.api.question.domain.QuestionItem
 import com.examhelper.api.question.domain.Question
-import com.examhelper.api.question.domain.vo.QuestionContent
-import com.examhelper.api.question.domain.vo.QuestionMetadata
+import com.examhelper.api.question.domain.vo.QuestionItemContent
+import com.examhelper.api.question.domain.vo.QuestionItemMetadata
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
 import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
 import com.examhelper.api.question.port.outbound.QuestionStore
+import com.examhelper.api.question.port.outbound.QuestionItemStore
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,33 +23,51 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CreateQuestionService(
     private val questionStore: QuestionStore,
+    private val questionItemStore: QuestionItemStore,
     private val idGenerator: IdGenerator,
 ) : CreateQuestionUseCase {
-
     @Transactional
     override fun execute(command: CreateQuestionCommand): CreateQuestionResult {
-        val question = Question.create(
-            id = QuestionId(idGenerator.generateId()),
+        // 1. QuestionGroup 생성
+        val questionId = QuestionId(idGenerator.generateId())
+        val group = Question.create(
+            id = questionId,
             generationId = QuestionGenerationId(command.generationId),
-            content = QuestionContent(
-                stem = command.stem,
-                passage = command.passage,
-                exhibit = command.exhibit,
-            ),
-            answerSheet = command.answerSheet,
-            metadata = QuestionMetadata(
-                subject = command.subject,
-                questionType = command.questionType,
-                questionSubType = command.questionSubType,
-                difficulty = command.difficulty,
-                passageTopic = command.passageTopic,
-            ),
-            explanation = command.explanation,
-            sourceFrame = command.sourceFrame,
+            sharedContext = command.sharedContext,
+            metadata = command.metadata,
         )
 
-        questionStore.save(question)
+        // 2. Question들 생성 및 Group에 편입
+        val questions = command.questions.map { q ->
+            val questionItemId = QuestionItemId(idGenerator.generateId())
+            val question = QuestionItem.create(
+                id = questionItemId,
+                questionId = questionId,
+                generationId = QuestionGenerationId(command.generationId),
+                content = QuestionItemContent(
+                    stem = q.stem,
+                    exhibit = q.exhibit
+                ),
+                answerSheet = q.answerSheet,
+                metadata = QuestionItemMetadata(
+                    subject = command.metadata.subject,
+                    questionType = command.metadata.questionType,
+                    questionSubType = null,
+                    difficulty = command.metadata.difficulty
+                ),
+                explanation = q.explanation,
+            )
+            group.addQuestion(questionItemId)  // Group에 순서대로 편입
+            question
+        }
 
-        return CreateQuestionResult(questionId = question.id.value)
+        // 3. 저장
+        questionStore.save(group)
+        questionItemStore.saveAll(questions)
+
+        return CreateQuestionResult(
+            groupId = group.id.value,
+            questionIds = questions.map { it.id.value },
+        )
     }
 }
