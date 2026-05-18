@@ -8,8 +8,8 @@ data class CreateQuestionResDto(
 ) {
     companion object {
         fun fromResult(result: CreateQuestionResult) = CreateQuestionResDto(
-            groupId = result.groupId,
-            questionIds = result.questionIds,
+            groupId = result.questionId,
+            questionIds = result.questionItemIds,
         )
     }
 }

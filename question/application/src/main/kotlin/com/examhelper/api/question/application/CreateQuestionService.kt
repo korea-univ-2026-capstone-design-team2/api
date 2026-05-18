@@ -12,7 +12,6 @@ import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
 import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
 import com.examhelper.api.question.port.outbound.QuestionStore
-import com.examhelper.api.question.port.outbound.QuestionItemStore
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,51 +22,57 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CreateQuestionService(
     private val questionStore: QuestionStore,
-    private val questionItemStore: QuestionItemStore,
     private val idGenerator: IdGenerator,
 ) : CreateQuestionUseCase {
+
     @Transactional
-    override fun execute(command: CreateQuestionCommand): CreateQuestionResult {
-        // 1. QuestionGroup 생성
+    override fun execute(
+        command: CreateQuestionCommand
+    ): CreateQuestionResult {
+
+        // ── Aggregate 생성 ─────────────────────────────
         val questionId = QuestionId(idGenerator.generateId())
-        val group = Question.create(
+
+        val question = Question.create(
             id = questionId,
             generationId = QuestionGenerationId(command.generationId),
             sharedContext = command.sharedContext,
             metadata = command.metadata,
         )
 
-        // 2. Question들 생성 및 Group에 편입
-        val questions = command.questions.map { q ->
-            val questionItemId = QuestionItemId(idGenerator.generateId())
-            val question = QuestionItem.create(
-                id = questionItemId,
-                questionId = questionId,
+        // ── QuestionItems 생성 및 aggregate 편입 ───────
+        command.questions.forEach { q ->
+
+            val questionItem = QuestionItem.create(
+                id = QuestionItemId(idGenerator.generateId()),
                 generationId = QuestionGenerationId(command.generationId),
+
                 content = QuestionItemContent(
                     stem = q.stem,
-                    exhibit = q.exhibit
+                    exhibit = q.exhibit,
                 ),
+
                 answerSheet = q.answerSheet,
+
                 metadata = QuestionItemMetadata(
                     subject = command.metadata.subject,
                     questionType = command.metadata.questionType,
                     questionSubType = null,
-                    difficulty = command.metadata.difficulty
+                    difficulty = command.metadata.difficulty,
                 ),
+
                 explanation = q.explanation,
             )
-            group.addQuestion(questionItemId)  // Group에 순서대로 편입
-            question
+
+            question.addItem(questionItem)
         }
 
-        // 3. 저장
-        questionStore.save(group)
-        questionItemStore.saveAll(questions)
+        questionStore.save(question)
 
+        // ── 결과 반환 ──────────────────────────────────
         return CreateQuestionResult(
-            groupId = group.id.value,
-            questionIds = questions.map { it.id.value },
+            questionId = question.id.value,
+            questionItemIds = question.items.map { it.id.value }
         )
     }
 }

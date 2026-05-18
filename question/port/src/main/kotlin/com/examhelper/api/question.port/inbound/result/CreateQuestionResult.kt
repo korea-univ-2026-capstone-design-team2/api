@@ -4,6 +4,6 @@ package com.examhelper.api.question.port.inbound.result
  * ~~~Result는 UseCase의 결과를 나타내는 객체입니다.
  */
 data class CreateQuestionResult(
-    val groupId: Long,
-    val questionIds: List<Long>,
+    val questionId: Long,
+    val questionItemIds: List<Long>
 )

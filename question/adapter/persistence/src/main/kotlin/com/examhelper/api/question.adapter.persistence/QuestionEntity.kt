@@ -2,24 +2,24 @@ package com.examhelper.api.question.adapter.persistence
 
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
-import com.examhelper.api.kernel.identifier.QuestionItemId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.adapter.persistence.converter.PassageTopicConverter
-import com.examhelper.api.question.adapter.persistence.converter.QuestionIdsConverter
 import com.examhelper.api.question.adapter.persistence.converter.SharedQuestionContextConverter
 import com.examhelper.api.question.adapter.persistence.record.PassageTopicRecord
 import com.examhelper.api.question.adapter.persistence.record.SharedQuestionContextRecord
 import com.examhelper.api.question.domain.Question
 import com.examhelper.api.question.domain.type.QuestionStatus
 import com.examhelper.api.question.domain.vo.QuestionMetadata
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.time.Instant
 
@@ -59,9 +59,12 @@ class QuestionEntity(
     @Column(columnDefinition = "JSON")
     val passageTopic: PassageTopicRecord?,
 
-    @Convert(converter = QuestionIdsConverter::class)
-    @Column(nullable = false, columnDefinition = "JSON")
-    val questionItemIds: List<Long>,
+    @OneToMany(
+        mappedBy = "question",
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true,
+    )
+    private val items: MutableList<QuestionItemEntity>,
 
     // ── 타임스탬프 ─────────────────────────────────────────
     @Column(nullable = false, updatable = false)
@@ -71,26 +74,39 @@ class QuestionEntity(
     val updatedAt: Instant,
 ) {
     companion object {
-        fun fromDomain(domain: Question): QuestionEntity = QuestionEntity(
-            id = domain.id.value,
-            generationId = domain.generationId.value,
-            subject = domain.metadata.subject,
-            questionType = domain.metadata.questionType,
-            difficulty = domain.metadata.difficulty,
-            status = domain.status,
-            sharedContext = SharedQuestionContextRecord.fromDomain(domain.sharedContext),
-            passageTopic = domain.metadata.passageTopic?.let { PassageTopicRecord.fromDomain(it) },
-            questionItemIds = domain.questionItemIds.map { it.value },
-            createdAt = domain.createdAt,
-            updatedAt = domain.updatedAt,
-        )
+        fun fromDomain(domain: Question): QuestionEntity {
+            val entity = QuestionEntity(
+                id = domain.id.value,
+                generationId = domain.generationId.value,
+                subject = domain.metadata.subject,
+                questionType = domain.metadata.questionType,
+                difficulty = domain.metadata.difficulty,
+                status = domain.status,
+                sharedContext = SharedQuestionContextRecord.fromDomain(domain.sharedContext),
+                passageTopic = domain.metadata.passageTopic?.let { PassageTopicRecord.fromDomain(it) },
+                items = mutableListOf(),
+                createdAt = domain.createdAt,
+                updatedAt = domain.updatedAt,
+            )
+
+            val itemEntities = domain.items.map {
+                QuestionItemEntity.fromDomain(
+                    domain = it,
+                    question = entity,
+                )
+            }
+
+            entity.items.addAll(itemEntities)
+
+            return entity
+        }
     }
 
     fun toDomain(): Question = Question.of(
         id = QuestionId(id),
         generationId = QuestionGenerationId(generationId),
         sharedContext = sharedContext?.toDomain(),
-        questionItemIds = questionItemIds.map { QuestionItemId(it) },
+        items = items.map { it.toDomain() },
         metadata = QuestionMetadata(
             subject = subject,
             questionType = questionType,

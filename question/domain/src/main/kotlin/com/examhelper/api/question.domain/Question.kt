@@ -16,19 +16,17 @@ class Question private constructor(
     id: QuestionId,
     val generationId: QuestionGenerationId,
     sharedContext: SharedQuestionContext?,
-    questionItemIds: List<QuestionItemId>,
+    items: List<QuestionItem>,
     val metadata: QuestionMetadata,
     status: QuestionStatus,
     val createdAt: Instant,
     updatedAt: Instant,
 ) : AggregateRoot<QuestionId>(id) {
-
     var sharedContext: SharedQuestionContext? = sharedContext
         private set
 
-    // 순서 보장을 위해 내부는 MutableList
-    private val _questionItemIds: MutableList<QuestionItemId> = questionItemIds.toMutableList()
-    val questionItemIds: List<QuestionItemId> get() = _questionItemIds.toList()
+    private val _items: MutableList<QuestionItem> = items.toMutableList()
+    val items: List<QuestionItem> get() = _items.toList()
 
     var status: QuestionStatus = status
         private set
@@ -37,34 +35,22 @@ class Question private constructor(
         private set
 
     // ── 문제 편입 ──────────────────────────────────────────────
-    fun addQuestion(questionItemId: QuestionItemId) {
+    fun addItem(item: QuestionItem) {
         check(status == QuestionStatus.DRAFT) {
             throw QuestionException.CannotModifyNonDraft(status.name)
         }
-        check(!_questionItemIds.contains(questionItemId)) {
-            throw QuestionException.QuestionAlreadyIn(questionItemId.value)
+
+        check(_items.none { it.id == item.id }) {
+            throw QuestionException.QuestionAlreadyIn(item.id.value)
         }
 
-        _questionItemIds.add(questionItemId)
+        _items.add(item)
         updatedAt = Instant.now()
-    }
-
-    fun archive(): Question {
-        check(status == QuestionStatus.PUBLISHED) {
-            throw QuestionException.StatusTransitionNotAllowed(
-                status.name,
-                QuestionStatus.ARCHIVED.name
-            )
-        }
-
-        status = QuestionStatus.ARCHIVED
-        updatedAt = Instant.now()
-        return this
     }
 
     // ── 도메인 검증 ────────────────────────────────────────────
     private fun validate() {
-        require(_questionItemIds.size == _questionItemIds.distinct().size) {
+        require(_items.size == _items.distinct().size) {
             throw QuestionAssertionException.DuplicateQuestionIds()
         }
     }
@@ -82,7 +68,7 @@ class Question private constructor(
                 id = id,
                 generationId = generationId,
                 sharedContext = sharedContext,
-                questionItemIds = emptyList(),          // Question들이 이후에 addQuestion()으로 편입
+                items = emptyList(),
                 metadata = metadata,
                 status = QuestionStatus.DRAFT,
                 createdAt = now,
@@ -105,7 +91,7 @@ class Question private constructor(
             id: QuestionId,
             generationId: QuestionGenerationId,
             sharedContext: SharedQuestionContext?,
-            questionItemIds: List<QuestionItemId>,
+            items: List<QuestionItem>,
             metadata: QuestionMetadata,
             status: QuestionStatus,
             createdAt: Instant,
@@ -114,7 +100,7 @@ class Question private constructor(
             id = id,
             generationId = generationId,
             sharedContext = sharedContext,
-            questionItemIds = questionItemIds,
+            items = items,
             metadata = metadata,
             status = status,
             createdAt = createdAt,
