@@ -2,7 +2,6 @@ package com.examhelper.api.member
 
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.MemberId
-import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.kernel.type.AuthType
 import java.time.Instant
 
