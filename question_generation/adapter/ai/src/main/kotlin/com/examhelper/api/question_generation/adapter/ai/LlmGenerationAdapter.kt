@@ -1,7 +1,7 @@
 package com.examhelper.api.question_generation.adapter.ai
 
 import com.examhelper.api.kernel.type.PropositionLabel
-import com.examhelper.api.question_generation.adapter.ai.dto.LlmQuestionResponse
+import com.examhelper.api.question_generation.adapter.ai.dto.LlmGenerationResponse
 import com.examhelper.api.question_generation.adapter.ai.exception.LlmGenerationException
 import com.examhelper.api.question_generation.adapter.ai.metrics.LlmGenerationMetrics
 import com.examhelper.api.question_generation.port.outbound.LlmGenerationPort
@@ -10,8 +10,9 @@ import com.examhelper.api.question_generation.port.outbound.result.LlmChoiceResu
 import com.examhelper.api.question_generation.port.outbound.result.LlmExhibitResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmExplanationResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmGenerationResult
-import com.examhelper.api.question_generation.port.outbound.result.LlmPassageResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmPropositionResult
+import com.examhelper.api.question_generation.port.outbound.result.LlmQuestionResult
+import com.examhelper.api.question_generation.port.outbound.result.LlmSharedContextResult
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,7 @@ class LlmGenerationAdapter(
             .getResource("classpath:prompts/question-generation.system.prompt")
             .getContentAsString(Charsets.UTF_8)
     }
+
 
     override suspend fun generate(command: LlmGenerationCommand): LlmGenerationResult {
         return withContext(Dispatchers.IO) {
@@ -69,7 +71,7 @@ class LlmGenerationAdapter(
     }
 
     // ── JSON 파싱 ─────────────────────────────────────────────
-    private fun parseResponse(rawJson: String): LlmQuestionResponse =
+    private fun parseResponse(rawJson: String): LlmGenerationResponse =
         try {
             val cleaned = rawJson
                 .trim()
@@ -77,42 +79,51 @@ class LlmGenerationAdapter(
                 .replace(Regex("""```\s*$""", RegexOption.MULTILINE), "")
                 .trim()
 
-            objectMapper.readValue(cleaned, LlmQuestionResponse::class.java)
+            objectMapper.readValue(cleaned, LlmGenerationResponse::class.java)
         } catch (ex: Exception) {
             throw LlmGenerationException.ResponseParseFailed(ex)
         }
 
     // ── LlmQuestionResponse → LlmGenerationResult 변환 ────────
-    private fun LlmQuestionResponse.toDomain(): LlmGenerationResult {
+    private fun LlmGenerationResponse.toDomain(): LlmGenerationResult {
+        if (questions.isEmpty())
+            throw LlmGenerationException.InvalidResponse("생성된 문제가 없습니다")
+
+        return LlmGenerationResult(
+            sharedContext = sharedContext?.toDomain(),
+            questions = questions.map { it.toDomain() },
+        )
+    }
+
+    // ── LlmQuestionResponse → LlmQuestionResult ───────────────
+    private fun LlmGenerationResponse.LlmQuestionResponse.toDomain(): LlmQuestionResult {
         val correctChoices = choices.filter { it.isCorrect }
         when {
             correctChoices.isEmpty() ->
                 throw LlmGenerationException.InvalidChoice("정답(isCorrect=true)이 없습니다")
-
             correctChoices.size > 1 ->
                 throw LlmGenerationException.InvalidChoice(
                     "정답이 ${correctChoices.size}개입니다. 반드시 1개여야 합니다"
                 )
         }
 
-        return LlmGenerationResult(
+        return LlmQuestionResult(
             stem = stem,
-            passage = passage?.toDomain(),
             exhibit = exhibit?.toDomain(),
             choices = choices.map { it.toDomain() },
             explanation = explanation.toDomain(choices.size),
         )
     }
 
-    private fun LlmQuestionResponse.LlmPassageResponse.toDomain(): LlmPassageResult? {
+    private fun LlmGenerationResponse.LlmSharedContextResponse.toDomain(): LlmSharedContextResult? {
         val c = content?.takeIf { it.isNotBlank() } ?: return null
-        return LlmPassageResult(
+        return LlmSharedContextResult(
             content = c,
             description = description?.takeIf { it.isNotBlank() },
         )
     }
 
-    private fun LlmQuestionResponse.LlmExhibitResponse.toDomain(): LlmExhibitResult? =
+    private fun LlmGenerationResponse.LlmExhibitResponse.toDomain(): LlmExhibitResult? =
         when (type?.uppercase()) {
             "PROPOSITION" -> {
                 val props = propositions
@@ -144,7 +155,7 @@ class LlmGenerationAdapter(
             else -> throw LlmGenerationException.InvalidExhibit("알 수 없는 exhibit type: $type")
         }
 
-    private fun LlmQuestionResponse.LlmChoiceResponse.toDomain(): LlmChoiceResult =
+    private fun LlmGenerationResponse.LlmChoiceResponse.toDomain(): LlmChoiceResult =
         when (type.uppercase()) {
             "TEXT" -> LlmChoiceResult.Text(
                 number = number,
@@ -174,7 +185,7 @@ class LlmGenerationAdapter(
             else -> throw LlmGenerationException.InvalidChoice("알 수 없는 choice type: $type")
         }
 
-    private fun LlmQuestionResponse.LlmExplanationResponse.toDomain(expectedChoiceCount: Int): LlmExplanationResult {
+    private fun LlmGenerationResponse.LlmExplanationResponse.toDomain(expectedChoiceCount: Int): LlmExplanationResult {
         val parsedKeys = incorrectReasons.mapKeys { (k, _) ->
             k.toIntOrNull()
                 ?: throw LlmGenerationException.InvalidExplanation(

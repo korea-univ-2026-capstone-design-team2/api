@@ -4,7 +4,6 @@ sealed class LlmGenerationException(
     val code    : String,
     message : String,
 ) : RuntimeException(message) {
-
     class ApiCallFailed(cause: Throwable) : LlmGenerationException(
         "LLM_API_CALL_FAILED",
         "LLM API 호출에 실패했습니다: ${cause.message}",
@@ -37,5 +36,10 @@ sealed class LlmGenerationException(
     class InvalidExplanation(reason: String) : LlmGenerationException(
         "LLM_INVALID_EXPLANATION",
         "LLM 응답의 해설 형식이 잘못됐습니다: $reason",
+    )
+
+    class InvalidResponse(reason: String) : LlmGenerationException(
+        "LLM_INVALID_RESPONSE",
+        "생성된 문제가 없습니다: $reason"
     )
 }

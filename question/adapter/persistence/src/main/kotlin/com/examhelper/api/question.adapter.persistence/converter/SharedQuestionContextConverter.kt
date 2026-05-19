@@ -8,10 +8,11 @@ import kotlin.jvm.java
 
 @Converter
 class SharedQuestionContextConverter(private val objectMapper: ObjectMapper) : AttributeConverter<SharedQuestionContextRecord, String> {
-    override fun convertToDatabaseColumn(attribute: SharedQuestionContextRecord): String =
-        objectMapper.writeValueAsString(attribute)
+    override fun convertToDatabaseColumn(attribute: SharedQuestionContextRecord?): String? =
+        attribute?.let { objectMapper.writeValueAsString(it) }
 
-    override fun convertToEntityAttribute(dbData: String): SharedQuestionContextRecord {
+    override fun convertToEntityAttribute(dbData: String?): SharedQuestionContextRecord? {
+        if (dbData == null) return null
         val node = objectMapper.readTree(dbData)
         val type = node.get("type")?.asString()
             ?: throw IllegalStateException("SharedQuestionContext JSON에 type 필드가 없습니다: $dbData")

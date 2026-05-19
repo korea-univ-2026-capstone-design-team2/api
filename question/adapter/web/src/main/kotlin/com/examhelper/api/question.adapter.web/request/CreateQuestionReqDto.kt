@@ -38,6 +38,7 @@ data class CreateQuestionReqDto(
     data class QuestionGroupMetadataReqDto(
         val subject: Subject,
         val questionType: QuestionType,
+        val questionSubType: QuestionSubType,
         val difficulty: DifficultyLevel,
         val passageTopicCategory: String?,
         val passageTopicKeyword: String?,
@@ -46,6 +47,7 @@ data class CreateQuestionReqDto(
             QuestionMetadata(
                 subject = subject,
                 questionType = questionType,
+                questionSubType = questionSubType,
                 difficulty = difficulty,
                 passageTopic = passageTopicCategory?.let {
                     PassageTopic(category = TopicCategory.fromString(it), keyword = passageTopicKeyword)

@@ -57,7 +57,7 @@ class CreateQuestionService(
                 metadata = QuestionItemMetadata(
                     subject = command.metadata.subject,
                     questionType = command.metadata.questionType,
-                    questionSubType = null,
+                    questionSubType = command.metadata.questionSubType,
                     difficulty = command.metadata.difficulty,
                 ),
 

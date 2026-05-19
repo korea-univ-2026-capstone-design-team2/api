@@ -3,6 +3,7 @@ package com.examhelper.api.question.adapter.persistence
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.adapter.persistence.converter.PassageTopicConverter
@@ -43,6 +44,10 @@ class QuestionEntity(
     val questionType: QuestionType,
 
     @Enumerated(EnumType.STRING)
+    @Column
+    val questionSubType: QuestionSubType?,
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val difficulty: DifficultyLevel,
 
@@ -80,6 +85,7 @@ class QuestionEntity(
                 generationId = domain.generationId.value,
                 subject = domain.metadata.subject,
                 questionType = domain.metadata.questionType,
+                questionSubType = domain.metadata.questionSubType,
                 difficulty = domain.metadata.difficulty,
                 status = domain.status,
                 sharedContext = SharedQuestionContextRecord.fromDomain(domain.sharedContext),
@@ -110,6 +116,7 @@ class QuestionEntity(
         metadata = QuestionMetadata(
             subject = subject,
             questionType = questionType,
+            questionSubType = questionSubType,
             difficulty = difficulty,
             passageTopic = passageTopic?.toDomain(),
         ),
