@@ -4,12 +4,15 @@ import com.examhelper.api.infrastructure.web.ApiResponse
 import com.examhelper.api.question.adapter.web.request.CreateQuestionReqDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
+import com.examhelper.api.question.port.inbound.GetQuestionDetailUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionPaperUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionReviewUseCase
-import com.examhelper.api.question.port.inbound.query.GetQuestionItemPaperQuery
-import com.examhelper.api.question.port.inbound.query.GetQuestionItemReviewQuery
-import com.examhelper.api.question.port.inbound.view.QuestionItemPaperView
-import com.examhelper.api.question.port.inbound.view.QuestionItemReviewView
+import com.examhelper.api.question.port.inbound.query.GetQuestionDetailQuery
+import com.examhelper.api.question.port.inbound.query.GetQuestionPaperQuery
+import com.examhelper.api.question.port.inbound.query.GetQuestionReviewQuery
+import com.examhelper.api.question.port.inbound.view.QuestionDetailView
+import com.examhelper.api.question.port.inbound.view.QuestionPaperView
+import com.examhelper.api.question.port.inbound.view.QuestionReviewView
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -33,7 +36,8 @@ import org.springframework.web.bind.annotation.RestController
 class QuestionController(
     private val createQuestionUseCase: CreateQuestionUseCase,
     private val getQuestionPaperUseCase: GetQuestionPaperUseCase,
-    private val getQuestionReviewUseCase: GetQuestionReviewUseCase
+    private val getQuestionReviewUseCase: GetQuestionReviewUseCase,
+    private val getQuestionDetailUseCase: GetQuestionDetailUseCase
 ) {
     // ── 생성 ──────────────────────────────────────────────
     @PostMapping
@@ -45,34 +49,37 @@ class QuestionController(
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.Success(CreateQuestionResDto.fromResult(result)))
     }
-/*
+
     // ── 문제 풀이용 조회 ───────────────────────────────────
-    @GetMapping("/{groupId}/paper")
-    fun getQuestionGroupPaper(
-        @PathVariable groupId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionGroupPaperView>> {
-        val view = getQuestionGroupPaperUseCase.execute(GetQuestionGroupPaperQuery(groupId))
+    @GetMapping("/{questionId}/paper")
+    @GetQuestionPaperDocs
+    fun getQuestionPaper(
+        @PathVariable questionId: Long,
+    ): ResponseEntity<ApiResponse.Success<QuestionPaperView>> {
+        val view = getQuestionPaperUseCase.execute(GetQuestionPaperQuery(questionId))
         return ResponseEntity.ok(ApiResponse.Success(view))
     }
 
     // ── 해설지 조회 ────────────────────────────────────────
-    @GetMapping("/{groupId}/review")
-    fun getQuestionGroupReview(
-        @PathVariable groupId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionGroupReviewView>> {
-        val view = getQuestionGroupReviewUseCase.execute(GetQuestionGroupReviewQuery(groupId))
+    @GetMapping("/{questionId}/review")
+    @GetQuestionReviewDocs
+    fun getQuestionReview(
+        @PathVariable questionId: Long,
+    ): ResponseEntity<ApiResponse.Success<QuestionReviewView>> {
+        val view = getQuestionReviewUseCase.execute(GetQuestionReviewQuery(questionId))
         return ResponseEntity.ok(ApiResponse.Success(view))
     }
 
     // ── 관리용 상세 조회 ───────────────────────────────────
-    @GetMapping("/{groupId}/detail")
+    @GetMapping("/{questionId}/detail")
+    @GetQuestionDetailDocs
     fun getQuestionGroupDetail(
-        @PathVariable groupId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionGroupDetailView>> {
-        val view = getQuestionGroupDetailUseCase.execute(GetQuestionGroupDetailQuery(groupId))
+        @PathVariable questionId: Long,
+    ): ResponseEntity<ApiResponse.Success<QuestionDetailView>> {
+        val view = getQuestionDetailUseCase.execute(GetQuestionDetailQuery(questionId))
         return ResponseEntity.ok(ApiResponse.Success(view))
     }
-
+/*
     // ── 목록 조회 ──────────────────────────────────────────
     @GetMapping
     fun getQuestionGroups(
@@ -83,24 +90,4 @@ class QuestionController(
     }
 
  */
-
-    // ── 문제 조회 ───────────────────────────────────────────────
-    @GetMapping("/{questionId}/paper")
-    @GetQuestionPaperDocs
-    fun getQuestionForPaper(
-        @PathVariable questionId: Long
-    ): ResponseEntity<ApiResponse.Success<QuestionItemPaperView>> {
-        val view = getQuestionPaperUseCase.execute(GetQuestionItemPaperQuery(questionId))
-        return ResponseEntity.ok(ApiResponse.Success(view))
-    }
-
-    // ── 답지 조회 ───────────────────────────────────────────────
-    @GetMapping("/{questionId}/review")
-    @GetQuestionReviewDocs
-    fun getQuestionForReview(
-        @PathVariable questionId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionItemReviewView>> {
-        val view = getQuestionReviewUseCase.execute(GetQuestionItemReviewQuery(questionId))
-        return ResponseEntity.ok(ApiResponse.Success(view))
-    }
 }
