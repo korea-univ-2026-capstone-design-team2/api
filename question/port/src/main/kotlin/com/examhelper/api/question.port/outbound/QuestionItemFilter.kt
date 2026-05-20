@@ -1,13 +1,16 @@
 package com.examhelper.api.question.port.outbound
 
 import com.examhelper.api.kernel.type.DifficultyLevel
+import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
 
-data class QuestionFilter(
+data class QuestionItemFilter(
     val subject: Subject?,
     val questionType: QuestionType?,
+    val questionSubType: QuestionSubType?,
     val difficulty: DifficultyLevel?,
+    val questionId: Long?,
     val page: Int,
     val size: Int
 ) {
