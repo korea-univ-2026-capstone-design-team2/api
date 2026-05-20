@@ -11,9 +11,9 @@ sealed class QuestionException(
         "DRAFT 상태가 아닌 그룹은 수정할 수 없습니다. 현재 상태: $status"
     )
 
-    class QuestionAlreadyIn(questionId: Long) : QuestionException(
+    class QuestionAlreadyIn(questionItemId: Long) : QuestionException(
         "QUESTION_GROUP_QUESTION_ALREADY_EXISTS",
-        "이미 그룹에 포함된 문제입니다. questionId: $questionId"
+        "이미 그룹에 포함된 문제입니다. questionId: $questionItemId"
     )
 
     class StatusTransitionNotAllowed(from: String, to: String) : QuestionException(

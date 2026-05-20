@@ -3,10 +3,12 @@ package com.examhelper.api.question.adapter.persistence.converter
 import com.examhelper.api.question.adapter.persistence.record.SharedQuestionContextRecord
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
+import org.springframework.stereotype.Component
 import tools.jackson.databind.ObjectMapper
 import kotlin.jvm.java
 
 @Converter
+@Component
 class SharedQuestionContextConverter(private val objectMapper: ObjectMapper) : AttributeConverter<SharedQuestionContextRecord, String> {
     override fun convertToDatabaseColumn(attribute: SharedQuestionContextRecord?): String? =
         attribute?.let { objectMapper.writeValueAsString(it) }

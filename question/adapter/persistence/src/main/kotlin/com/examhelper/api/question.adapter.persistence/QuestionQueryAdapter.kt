@@ -94,7 +94,7 @@ class QuestionQueryAdapter(
 private fun QuestionEntity.toPaperView(
     items: List<QuestionItemEntity>,
 ): QuestionPaperView {
-    val orderedItems = items.sortedBy { items.indexOf(it) }
+    val orderedItems = items.sortedBy { it.id }
     val (contextContent, contextDescription) = sharedContext.toContentPair()
     return QuestionPaperView(
         questionId = id,

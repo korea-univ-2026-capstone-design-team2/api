@@ -20,6 +20,6 @@ class QuestionPersistenceAdapter(
     }
 
     override fun loadById(id: QuestionId): Question? {
-        return jpaStore.findById(id.value).orElse(null).toDomain()
+        return jpaStore.findById(id.value).orElse(null)?.toDomain()
     }
 }

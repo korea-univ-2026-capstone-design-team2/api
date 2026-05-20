@@ -38,7 +38,7 @@ data class CreateQuestionReqDto(
     data class QuestionGroupMetadataReqDto(
         val subject: Subject,
         val questionType: QuestionType,
-        val questionSubType: QuestionSubType,
+        val questionSubType: QuestionSubType?,
         val difficulty: DifficultyLevel,
         val passageTopicCategory: String?,
         val passageTopicKeyword: String?,
