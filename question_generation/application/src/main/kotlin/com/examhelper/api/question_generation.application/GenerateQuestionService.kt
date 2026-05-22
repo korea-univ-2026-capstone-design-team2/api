@@ -23,7 +23,6 @@ import com.examhelper.api.question_generation.port.outbound.command.QuestionCrea
 import com.examhelper.api.question_generation.port.outbound.command.QuestionCreationMetadata
 import com.examhelper.api.question_generation.port.outbound.query.FrameSearchQuery
 import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
-import com.examhelper.api.question_generation.port.outbound.result.LlmGenerationResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -101,18 +100,18 @@ class GenerateQuestionService(
             val results: List<Result<QuestionId>> = coroutineScope {
                 (0 until generation.request.quantity).map { index ->
                     async {
-                        generateSingleQuestion(
+                        generateQuestionGroup(
                             generation = generation,
                             frames = frames,
                             referenceFrame = framePerSlot[index],
-                            index = index
+                            index = index,
                         )
                     }
                 }.awaitAll()
             }
 
             // ── Finalize ───────────────────────────────────────────
-            val createdQuestionIds = results.mapNotNull { it.getOrNull() }
+            val createdGroupIds = results.mapNotNull { it.getOrNull() }
             val failures = results.filter { it.isFailure }
 
             logger.info { "문제 생성 완료: total=${generation.request.quantity}, failed=${failures.size}" }
@@ -127,8 +126,8 @@ class GenerateQuestionService(
 
             return GenerateQuestionResult(
                 questionGenerationId = generation.id,
-                questionIds = createdQuestionIds,
-                successCount = createdQuestionIds.size,
+                questionIds = createdGroupIds,
+                successCount = createdGroupIds.size,
                 failCount = failures.size,
                 status = generation.status
             )
@@ -138,7 +137,7 @@ class GenerateQuestionService(
     }
 
     // ── 단일 문제 생성 파이프라인 ──────────────────────────────────
-    private suspend fun generateSingleQuestion(
+    private suspend fun generateQuestionGroup(
         generation: QuestionGeneration,
         frames: List<FrameSearchResult>,
         referenceFrame: FrameSearchResult,
@@ -147,11 +146,11 @@ class GenerateQuestionService(
         val llmResult = runWithLog(
             generationId = generation.id,
             step = QuestionGenerationStep.LLM_CALL,
-            detail = "index=$index"
+            detail = "index=$index",
         ) {
             llmGenerationPort.generate(LlmGenerationCommand(generation.request, frames))
         }.getOrElse {
-            logger.error(it) { "Llm 생성과정 실패: generationId=${generation.id}, index=$index" }
+            logger.error(it) { "LLM 생성 실패: generationId=${generation.id}, index=$index" }
             return Result.failure(it)
         }
 
@@ -172,12 +171,12 @@ class GenerateQuestionService(
                         topicCategory = generation.request.topic.category,
                         topicKeyword = generation.request.topic.keyword,
                         frameId = referenceFrame.frameId,
-                        similarityScore = referenceFrame.similarityScore
+                        similarityScore = referenceFrame.similarityScore,
                     )
                 )
             ).questionId
         }.onFailure {
-            logger.error(it) { "문제 생성 실패: generationId=${generation.id}, index=$index" }
+            logger.error(it) { "문제 묶음 생성 실패: generationId=${generation.id}, index=$index" }
         }
     }
 

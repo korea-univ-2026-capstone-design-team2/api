@@ -1,7 +1,7 @@
 package com.examhelper.api.question.domain.vo
 
 import com.examhelper.api.kernel.type.PropositionLabel
-import com.examhelper.api.question.domain.exception.QuestionAssertionException
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 
 sealed class AnswerChoice {
     abstract val number: Int
@@ -16,10 +16,10 @@ sealed class AnswerChoice {
 
         private fun validate() {
             require(number in 1..5) {
-                throw QuestionAssertionException.ChoiceNumberOutOfRange(number)
+                throw QuestionItemAssertionException.ChoiceNumberOutOfRange(number)
             }
             require(content.isNotBlank()) {
-                throw QuestionAssertionException.ChoiceContentBlank()
+                throw QuestionItemAssertionException.ChoiceContentBlank()
             }
         }
     }
@@ -33,10 +33,10 @@ sealed class AnswerChoice {
 
         private fun validate() {
             require(number in 1..5) {
-                throw QuestionAssertionException.ChoiceNumberOutOfRange(number)
+                throw QuestionItemAssertionException.ChoiceNumberOutOfRange(number)
             }
             require(labels.isNotEmpty()) {
-                throw QuestionAssertionException.PropositionLabelEmpty()
+                throw QuestionItemAssertionException.PropositionLabelEmpty()
             }
         }
     }

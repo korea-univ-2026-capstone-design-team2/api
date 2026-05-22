@@ -4,12 +4,12 @@ import com.examhelper.api.question.domain.vo.AnswerSheet
 
 class AnswerSheetRecord(
     val type: String,
-    val correctNumber: Int?,
+    val correctNumber: Int,
     val choices: List<AnswerChoiceRecord>?,
 ) {
     fun toDomain(): AnswerSheet = when (type) {
         "MULTIPLE_CHOICE" -> AnswerSheet.MultipleChoiceSheet(
-            correctNumber = requireNotNull(correctNumber) { "MultipleChoiceSheet.correctNumber must not be null" },
+            correctNumber = correctNumber,
             choices = requireNotNull(choices) { "MultipleChoiceSheet.choices must not be null" }
                 .map { it.toDomain() },
         )

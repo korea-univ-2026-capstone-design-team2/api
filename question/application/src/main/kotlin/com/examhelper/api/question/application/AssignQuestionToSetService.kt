@@ -1,15 +1,5 @@
 package com.examhelper.api.question.application
 
-import com.examhelper.api.kernel.identifier.QuestionId
-import com.examhelper.api.kernel.identifier.QuestionSetId
-import com.examhelper.api.question.domain.exception.QuestionException
-import com.examhelper.api.question.port.inbound.AssignQuestionToSetUseCase
-import com.examhelper.api.question.port.inbound.command.AssignQuestionToSetCommand
-import com.examhelper.api.question.port.inbound.result.AssignQuestionToSetResult
-import com.examhelper.api.question.port.outbound.QuestionStore
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-
 /*
 @Service
 class AssignQuestionToSetService(

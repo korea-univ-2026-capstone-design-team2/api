@@ -3,8 +3,7 @@ package com.examhelper.api.question.adapter.web
 import com.examhelper.api.question.adapter.web.response.AssignQualityScoreResDto
 import com.examhelper.api.question.adapter.web.response.AssignQuestionToSetResDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
-import com.examhelper.api.question.adapter.web.response.PublishQuestionResDto
-import com.examhelper.api.question.adapter.web.response.RejectQuestionResDto
+import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionPaperView
 import com.examhelper.api.question.port.inbound.view.QuestionReviewView
 import io.swagger.v3.oas.annotations.Operation
@@ -34,53 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 )
 annotation class CreateQuestionDocs
 
-// ── 출제 ──────────────────────────────────────────────────
-
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@Operation(
-    summary = "문제 출제",
-    description = """
-        DRAFT 상태의 문제를 PUBLISHED로 전환합니다.
-        - 품질 점수(qualityScore)가 기준(0.75) 이상이어야 합니다.
-        - 이미 출제된 문제는 다시 출제할 수 없습니다.
-    """,
-)
-@ApiResponses(
-    ApiResponse(
-        responseCode = "200",
-        description = "출제 성공",
-        content = [Content(schema = Schema(implementation = PublishQuestionResDto::class))],
-    ),
-    ApiResponse(responseCode = "400", description = "품질 점수 미달 또는 상태 전이 불가", content = [Content(schema = Schema(hidden = true))]),
-    ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
-)
-annotation class PublishQuestionDocs
-
-// ── 반려 ──────────────────────────────────────────────────
-
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@Operation(
-    summary = "문제 반려",
-    description = """
-        DRAFT 상태의 문제를 REJECTED로 전환합니다.
-        - DRAFT 상태에서만 반려할 수 있습니다.
-    """,
-)
-@ApiResponses(
-    ApiResponse(
-        responseCode = "200",
-        description = "반려 성공",
-        content = [Content(schema = Schema(implementation = RejectQuestionResDto::class))],
-    ),
-    ApiResponse(responseCode = "400", description = "상태 전이 불가", content = [Content(schema = Schema(hidden = true))]),
-    ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
-)
-annotation class RejectQuestionDocs
-
 // ── 품질 점수 부여 ─────────────────────────────────────────
-
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Operation(
@@ -104,7 +57,6 @@ annotation class RejectQuestionDocs
 annotation class AssignQualityScoreDocs
 
 // ── 세트 편입 ──────────────────────────────────────────────
-
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Operation(
@@ -127,7 +79,6 @@ annotation class AssignQualityScoreDocs
 annotation class AssignQuestionToSetDocs
 
 // ── 문제지용 조회 ──────────────────────────────────────────
-
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Operation(
@@ -149,7 +100,6 @@ annotation class AssignQuestionToSetDocs
 annotation class GetQuestionPaperDocs
 
 // ── 풀이 확인용 조회 ───────────────────────────────────────
-
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Operation(
@@ -169,3 +119,23 @@ annotation class GetQuestionPaperDocs
     ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
 )
 annotation class GetQuestionReviewDocs
+
+// ── 문제 상세 정보 조회(관리용) ───────────────────────────────────────
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "문제 상세 정보 조회(관리용)",
+    description = """
+        문제에 대한 전체 데이터를 반환합니다.
+        - 모든 데이터를 반환합니다.
+    """,
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "조회 성공",
+        content = [Content(schema = Schema(implementation = QuestionDetailView::class))],
+    ),
+    ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
+)
+annotation class GetQuestionDetailDocs
