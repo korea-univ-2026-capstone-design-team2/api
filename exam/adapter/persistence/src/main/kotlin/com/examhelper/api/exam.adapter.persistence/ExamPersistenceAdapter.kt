@@ -2,6 +2,7 @@ package com.examhelper.api.exam.adapter.persistence
 
 import com.examhelper.api.exam.domain.Exam
 import com.examhelper.api.exam.port.outbound.ExamStore
+import com.examhelper.api.kernel.identifier.ExamId
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -18,7 +19,7 @@ class ExamPersistenceAdapter(
         examJpaRepository.saveAll(entities)
     }
 
-    override fun loadById(examId: String): Exam? {
-        return examJpaRepository.findById(examId.toLong()).orElse(null)?.toDomain()
+    override fun loadById(examId: ExamId): Exam? {
+        return examJpaRepository.findById(examId.value).orElse(null)?.toDomain()
     }
 }

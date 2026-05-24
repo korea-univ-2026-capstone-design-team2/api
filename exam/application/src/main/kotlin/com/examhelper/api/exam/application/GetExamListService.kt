@@ -1,4 +1,4 @@
-package com.examhelper.api.question.application
+package com.examhelper.api.exam.application
 
 import com.examhelper.api.exam.port.inbound.GetExamListUseCase
 import com.examhelper.api.exam.port.inbound.query.ExamFilter

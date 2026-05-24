@@ -18,7 +18,7 @@ import java.time.Instant
     name = "exam_items",
     indexes = [
         Index(name = "idx_exam_items_exam_id", columnList = "exam_id"),
-        Index(name = "idx_exam_items_question_item_id", columnList = "question_item_id"),
+        Index(name = "idx_exam_items_question_id", columnList = "question_id"),
     ]
 )
 class ExamItemEntity(

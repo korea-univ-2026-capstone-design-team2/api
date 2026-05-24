@@ -24,7 +24,6 @@ class Exam private constructor(
     val createdAt: Instant,
     updatedAt: Instant,
 ) : AggregateRoot<ExamId>(id) {
-
     var status: ExamStatus = status
         private set
 
@@ -38,12 +37,12 @@ class Exam private constructor(
         private set
 
     // ── 문항 편입 ──────────────────────────────────────────────
-
     fun addItem(item: ExamItem) {
-        check(status == ExamStatus.GENERATING) {
+        if (status != ExamStatus.GENERATING) {
             throw ExamException.CannotModifyItems(status.name)
         }
-        check(_items.none { it.id == item.id }) {
+
+        if (_items.any { it.id == item.id }) {
             throw ExamException.ItemAlreadyExists(item.id.value)
         }
 
@@ -52,7 +51,6 @@ class Exam private constructor(
     }
 
     // ── 상태 전이 ──────────────────────────────────────────────
-
     fun completeGeneration(result: ExamGenerationResult) {
         check(status == ExamStatus.GENERATING) {
             throw ExamException.StatusTransitionNotAllowed(status.name, ExamStatus.READY.name)
@@ -91,26 +89,19 @@ class Exam private constructor(
     }
 
     // ── 도메인 검증 ────────────────────────────────────────────
-
     private fun validate() {
         require(_items.size == _items.distinctBy { it.id }.size) {
             throw ExamAssertionException.DuplicateItemIds()
         }
     }
 
-    // ── 조회 ───────────────────────────────────────────────────
-
-    val questionCount: Int get() = _items.size
-
     // ── 내부 ───────────────────────────────────────────────────
-
     private fun transitionTo(next: ExamStatus) {
         status = next
         updatedAt = Instant.now()
     }
 
     // ── 팩토리 ─────────────────────────────────────────────────
-
     companion object {
         fun create(
             id: ExamId,

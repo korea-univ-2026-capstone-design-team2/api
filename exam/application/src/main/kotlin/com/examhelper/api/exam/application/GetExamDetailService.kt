@@ -1,4 +1,4 @@
-package com.examhelper.api.question.application
+package com.examhelper.api.exam.application
 
 import com.examhelper.api.exam.domain.exception.ExamException
 import com.examhelper.api.exam.port.inbound.GetExamDetailUseCase

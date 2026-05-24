@@ -1,4 +1,4 @@
-package com.examhelper.api.question.application
+package com.examhelper.api.exam.application
 
 import com.examhelper.api.exam.domain.Exam
 import com.examhelper.api.exam.domain.entity.ExamItem
@@ -54,18 +54,37 @@ class GenerateExamService(
             )
         }
 
-        // 3. 생성된 QuestionItem을 ExamItem으로 변환하여 편입
+        // 3. 전체 생성 실패 처리
+        if (generationResult.successCount == 0) {
+
+            exam.failGeneration(
+                "Failed to generate all questions"
+            )
+
+            examStore.save(exam)
+
+            return GenerateExamResult(
+                examId = exam.id,
+                generationId = generationResult.generationId,
+                status = ExamStatus.FAILED,
+                successCount = 0,
+                failCount = generationResult.failCount,
+            )
+        }
+
+        // 4. 생성된 Question을 ExamItem으로 편입
         generationResult.questionIds.forEachIndexed { index, questionId ->
+
             exam.addItem(
                 ExamItem(
                     id = ExamItemId(idGenerator.generateId()),
                     questionId = questionId,
-                    ordering = index + 1
+                    ordering = index + 1,
                 )
             )
         }
 
-        // 4. 생성 완료 처리 — READY 전이 + 이벤트 발행
+        // 5. 생성 완료 처리
         exam.completeGeneration(
             ExamGenerationResult(
                 generationId = generationResult.generationId,
@@ -73,6 +92,7 @@ class GenerateExamService(
                 failCount = generationResult.failCount,
             )
         )
+
         examStore.save(exam)
 
         return GenerateExamResult(
