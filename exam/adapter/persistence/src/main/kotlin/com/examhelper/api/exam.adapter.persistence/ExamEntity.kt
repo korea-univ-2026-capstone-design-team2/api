@@ -5,7 +5,6 @@ import com.examhelper.api.exam.domain.type.ExamStatus
 import com.examhelper.api.exam.domain.type.ExamTopic
 import com.examhelper.api.exam.domain.vo.ExamGenerationResult
 import com.examhelper.api.exam.domain.vo.ExamMetadata
-import com.examhelper.api.exam.domain.vo.ExamPolicy
 import com.examhelper.api.kernel.identifier.ExamId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.type.DifficultyLevel
