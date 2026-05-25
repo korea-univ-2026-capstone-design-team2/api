@@ -1,7 +1,9 @@
 package com.examhelper.api.member.adapter.persistence
 
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.type.AuthType
 import com.examhelper.api.kernel.type.QuestionType
+import com.examhelper.api.member.Member
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -34,6 +36,24 @@ class MemberEntity(
 
     @Column(nullable = false)
     val updatedAt: Instant,
-){ // 이 괄호 안에는 무엇을 넣어야 하는가?
-
+){
+    companion object {
+        fun fromDomain(domain: Member): MemberEntity = MemberEntity(
+            id=domain.id.value,
+            nickname=domain.nickname,
+            email=domain.email,
+            authType=domain.authType,
+            createdAt=domain.createdAt,
+            updatedAt=domain.updatedAt
+        )
+    }
+    /* this.id, this.nickname 처럼 this를 붙여야 한다? */
+    fun toDomain(): Member = Member.of(
+        id = MemberId(id),
+        nickname = nickname,
+        email = email,
+        authType = authType,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
 }

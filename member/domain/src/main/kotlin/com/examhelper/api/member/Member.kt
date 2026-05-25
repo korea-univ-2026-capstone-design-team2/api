@@ -9,7 +9,7 @@ class Member private constructor(
     id: MemberId,
     nickname: String,
     email: String,
-    authType: AuthType, // 로그인 타입. ENUM 으로 하는게 좋을까요?
+    authType: AuthType,
     val createdAt: Instant,
     updatedAt: Instant
 ) : AggregateRoot<MemberId>(id) {
@@ -25,5 +25,39 @@ class Member private constructor(
     fun changeNickname(newNickname: String) {
         this.nickname = newNickname
         this.updatedAt= Instant.now()
+    }
+    /* 팩토리 */
+    companion object {
+        fun create(
+            id: MemberId,
+            nickname: String,
+            email: String,
+            authType: AuthType
+        ): Member {
+            val now=Instant.now()
+            return Member(
+                id = id,
+                nickname = nickname,
+                email = email,
+                authType = authType,
+                createdAt = now,
+                updatedAt = now
+            )
+        }
+        fun of(
+            id: MemberId,
+            nickname: String,
+            email: String,
+            authType: AuthType,
+            createdAt: Instant,
+            updatedAt: Instant
+        ): Member = Member(
+            id = id,
+            nickname = nickname,
+            email = email,
+            authType = authType,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
     }
 }
