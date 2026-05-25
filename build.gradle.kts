@@ -77,7 +77,7 @@ subprojects {
 	group = when {
 		path.startsWith(":question:") -> "com.examhelper.api.question"
 		path.startsWith(":question_generation:") -> "com.examhelper.api.question_generation"
-		path.startsWith(":user:") -> "com.examhelper.api.user"
+		path.startsWith(":member:") -> "com.examhelper.api.member"
 		path.startsWith(":auth:") -> "com.examhelper.api.auth"
 		else -> "com.examhelper.api.shared"
 	}
