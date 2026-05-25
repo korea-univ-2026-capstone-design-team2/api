@@ -20,6 +20,15 @@ include(":question_generation:adapter:persistence")
 include(":question_generation:adapter:ai")
 include(":question_generation:adapter:domain_connector")
 
+// exam
+include(":exam:domain")
+include(":exam:port")
+include(":exam:application")
+include(":exam:adapter:web")
+include(":exam:adapter:persistence")
+include(":exam:adapter:domain_connector")
+
+
 // auth
 include(":auth")
 

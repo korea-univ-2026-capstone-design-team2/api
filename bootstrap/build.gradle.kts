@@ -19,6 +19,12 @@ dependencies {
     implementation(project(":question_generation:adapter:domain_connector"))
     implementation(project(":question_generation:adapter:persistence"))
 
+    // Question
+    implementation(project(":exam:application"))
+    implementation(project(":exam:adapter:web"))
+    implementation(project(":exam:adapter:persistence"))
+    implementation(project(":exam:adapter:domain_connector"))
+
     // Auth
     implementation(project(":auth"))
 
