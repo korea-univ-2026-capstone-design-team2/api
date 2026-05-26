@@ -28,6 +28,12 @@ include(":exam:adapter:web")
 include(":exam:adapter:persistence")
 include(":exam:adapter:domain_connector")
 
+// question
+include(":token_usage:domain")
+include(":token_usage:port")
+include(":token_usage:application")
+include(":token_usage:adapter:web")
+include(":token_usage:adapter:persistence")
 
 // auth
 include(":auth")
