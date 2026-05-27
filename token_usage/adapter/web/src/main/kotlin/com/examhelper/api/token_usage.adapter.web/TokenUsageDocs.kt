@@ -38,3 +38,58 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
     ),
 )
 annotation class RecordTokenUsageDocs
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "토큰 사용량 목록 조회",
+    description = """
+        AI 토큰 사용량 로그를 조회합니다.
+        
+        - 모델별 필터링
+        - Provider별 필터링
+        - 상태별 필터링
+        - 기간별 조회
+        - Target 기준 조회
+    """
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "토큰 사용량 목록 조회 성공",
+    ),
+    ApiResponse(
+        responseCode = "400",
+        description = "잘못된 요청 파라미터",
+        content = [Content(schema = Schema(hidden = true))]
+    ),
+)
+annotation class GetTokenUsageListDocs
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "토큰 사용량 통계 조회",
+    description = """
+        AI 토큰 사용량 통계를 조회합니다.
+        
+        포함 데이터:
+        - 총 요청 수
+        - 총 토큰 사용량
+        - 총 비용
+        - 일별 사용량 통계
+        - 모델별 사용량 통계
+    """
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "토큰 사용량 통계 조회 성공",
+    ),
+    ApiResponse(
+        responseCode = "400",
+        description = "잘못된 요청 파라미터",
+        content = [Content(schema = Schema(hidden = true))]
+    ),
+)
+annotation class GetTokenUsageStatisticsDocs
