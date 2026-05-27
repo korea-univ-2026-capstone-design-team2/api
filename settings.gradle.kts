@@ -28,7 +28,7 @@ include(":exam:adapter:web")
 include(":exam:adapter:persistence")
 include(":exam:adapter:domain_connector")
 
-// question
+// token_usage
 include(":token_usage:domain")
 include(":token_usage:port")
 include(":token_usage:application")
