@@ -24,8 +24,8 @@ import java.util.Currency
 @Table(
     name = "token_usages",
     indexes = [
-        Index(name = "idx_token_usage_member_id", columnList = "memberId"),
-        Index(name = "idx_token_usage_target", columnList = "targetType,targetReferenceId"),
+        //Index(name = "idx_token_usage_member_id", columnList = "memberId"),
+        Index(name = "idx_token_usage_target", columnList = "targetDomain,targetReferenceId"),
         Index(name = "idx_token_usage_model", columnList = "model"),
         Index(name = "idx_token_usage_created_at", columnList = "createdAt"),
     ]
