@@ -3,6 +3,7 @@ package com.examhelper.api.token_usage.domain
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.TokenUsageId
 import com.examhelper.api.token_usage.domain.event.TokenUsageRecordedEvent
+import com.examhelper.api.token_usage.domain.exception.TokenUsageAssertionException
 import com.examhelper.api.token_usage.domain.exception.TokenUsageException
 import com.examhelper.api.token_usage.domain.type.AiModel
 import com.examhelper.api.token_usage.domain.type.AiProvider
@@ -32,6 +33,15 @@ class TokenUsage private constructor(
         }
 
         status = TokenUsageStatus.FAILED
+    }
+
+    private fun validate() {
+        require(model.provider == provider) {
+            throw TokenUsageAssertionException.ProviderMismatch(
+                provider = provider,
+                model = model,
+            )
+        }
     }
 
     companion object {
