@@ -27,7 +27,8 @@ import java.util.Currency
         //Index(name = "idx_token_usage_member_id", columnList = "memberId"),
         Index(name = "idx_token_usage_target_created", columnList = "targetDomain,targetReferenceId,createdAt"),
         Index(name = "idx_token_usage_model_created", columnList = "model,createdAt"),
-        Index(name = "idx_token_usage_status_created", columnList = "status,createdAt")
+        Index(name = "idx_token_usage_status_created", columnList = "status,createdAt"),
+        Index(name = "idx_token_usage_created_at", columnList = "createdAt")
     ]
 )
 class TokenUsageEntity(

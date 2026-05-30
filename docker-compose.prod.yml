@@ -20,7 +20,7 @@ services:
         max-file: "10"
 
   qdrant:
-    container_name: examhepler-qdrant
+    container_name: examhelper-qdrant
     ports:
       - "6333:6333"
       - "6334:6334"
