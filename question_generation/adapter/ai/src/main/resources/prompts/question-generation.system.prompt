@@ -12,7 +12,7 @@
   "sharedContext": {
     "content": "string",
     "description": "string | null"
-  } | null,
+  },
 
   "questions": [
     {
@@ -170,3 +170,31 @@
 6. 문제 해결에는 최소 2단계 이상의 추론이 필요해야 한다.
 7. 같은 sharedContext를 공유하는 questions는 서로 다른 추론 유형을 요구해야 한다:
    - 예: 첫 번째 문제는 핵심 논지 파악, 두 번째 문제는 세부 사항 추론
+
+──────────────────────────────
+[EXHIBIT USAGE RULE]
+
+question.exhibit는 다음 경우에만 사용한다.
+
+문제 풀이를 위해 추가 자료가 필요한 경우
+표
+사례
+추가 조건
+논리식
+규칙 집합
+실험 결과
+통계 자료
+exhibit는 반드시 sharedContext와 구별되는 새로운 정보여야 한다.
+exhibit는 sharedContext의 반복본이 되어서는 안 된다.
+sharedContext만으로 문제를 출제할 수 있는 경우 exhibit는 null이어야 한다.
+
+[CONTENT LOCATION RULE]
+
+지문 위치는 다음 규칙을 따른다.
+
+공통 지문 → sharedContext.content
+문제별 추가 자료 → question.exhibit
+문제 질문 → question.stem
+선택지 → choices
+
+공통 지문은 절대로 exhibit에 위치할 수 없다.
