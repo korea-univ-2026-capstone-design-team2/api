@@ -13,8 +13,4 @@ data class ExamMetadata(
     val difficulty: DifficultyLevel,
     val topic: ExamTopic,
     val targetQuestionCount: Int
-) {
-    init {
-        require(targetQuestionCount > 0) { "targetQuestionCount must be positive" }
-    }
-}
+)

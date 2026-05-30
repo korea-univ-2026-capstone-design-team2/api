@@ -22,7 +22,6 @@ data class GenerateExamCommand(
 ) {
     init {
         require(title.isNotBlank()) { "title must not be blank" }
-        require(targetQuestionCount > 0) { "targetQuestionCount must be positive" }
     }
 
     fun toMetadata(): ExamMetadata = ExamMetadata(

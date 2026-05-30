@@ -55,9 +55,6 @@ class Exam private constructor(
         check(status == ExamStatus.GENERATING) {
             throw ExamException.StatusTransitionNotAllowed(status.name, ExamStatus.READY.name)
         }
-        check(_items.isNotEmpty()) {
-            throw ExamAssertionException.EmptyItemsOnComplete()
-        }
 
         generationResult = result
         transitionTo(ExamStatus.READY)

@@ -43,23 +43,23 @@ class ExamEntity(
     // ── ExamMetadata ────────────────────────────────
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    val subject: Subject,
+    val subject: com.examhelper.api.kernel.type.Subject,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "question_type", nullable = false, length = 30)
-    val questionType: QuestionType,
+    val questionType: com.examhelper.api.kernel.type.QuestionType,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "question_sub_type", length = 30)
-    val questionSubType: QuestionSubType?,
+    val questionSubType: com.examhelper.api.kernel.type.QuestionSubType?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    val difficulty: DifficultyLevel,
+    val difficulty: com.examhelper.api.kernel.type.DifficultyLevel,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "topic_category", nullable = false, length = 50)
-    val topicCategory: TopicCategory,
+    val topicCategory: com.examhelper.api.kernel.type.TopicCategory,
 
     @Column(length = 100)
     val topicKeyword: String?,
@@ -130,7 +130,7 @@ class ExamEntity(
     }
 
     fun toDomain(): Exam = Exam.of(
-        id = ExamId(id),
+        id = _root_ide_package_.com.examhelper.api.kernel.identifier.ExamId(id),
         title = title,
         metadata = ExamMetadata(
             subject = subject,
@@ -154,7 +154,7 @@ class ExamEntity(
     private fun toGenerationResult(): ExamGenerationResult? {
         val genId = generationId ?: return null
         return ExamGenerationResult(
-            generationId = QuestionGenerationId(genId),
+            generationId = _root_ide_package_.com.examhelper.api.kernel.identifier.QuestionGenerationId(genId),
             successCount = requireNotNull(generationSuccessCount),
             failCount = requireNotNull(generationFailCount),
         )

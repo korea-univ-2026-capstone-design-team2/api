@@ -26,15 +26,36 @@ class GenerateExamService(
     override fun execute(command: GenerateExamCommand): GenerateExamResult {
         val metadata = command.toMetadata()
 
-        // 1. Exam Aggregate 생성 — GENERATING 상태로 즉시 시작
         val exam = Exam.create(
             id = ExamId(idGenerator.generateId()),
             title = command.title,
             metadata = metadata,
         )
+
         examStore.save(exam)
 
-        // 2. Question 생성 위임 (AI RAG 호출)
+        // 빈 모의고사 생성
+        if (metadata.targetQuestionCount == 0) {
+
+            exam.completeGeneration(
+                ExamGenerationResult(
+                    generationId = null,
+                    successCount = 0,
+                    failCount = 0,
+                )
+            )
+
+            examStore.save(exam)
+
+            return GenerateExamResult(
+                examId = exam.id,
+                generationId = null,
+                status = exam.status,
+                successCount = 0,
+                failCount = 0,
+            )
+        }
+
         val generationResult = runCatching {
             generateExamQuestionsPort.generate(
                 GenerateExamQuestionsCommand(
@@ -45,6 +66,7 @@ class GenerateExamService(
         }.getOrElse { ex ->
             exam.failGeneration(ex.message ?: "Unknown generation error")
             examStore.save(exam)
+
             return GenerateExamResult(
                 examId = exam.id,
                 generationId = null,
@@ -54,27 +76,7 @@ class GenerateExamService(
             )
         }
 
-        // 3. 전체 생성 실패 처리
-        if (generationResult.successCount == 0) {
-
-            exam.failGeneration(
-                "Failed to generate all questions"
-            )
-
-            examStore.save(exam)
-
-            return GenerateExamResult(
-                examId = exam.id,
-                generationId = generationResult.generationId,
-                status = ExamStatus.FAILED,
-                successCount = 0,
-                failCount = generationResult.failCount,
-            )
-        }
-
-        // 4. 생성된 Question을 ExamItem으로 편입
         generationResult.questionIds.forEachIndexed { index, questionId ->
-
             exam.addItem(
                 ExamItem(
                     id = ExamItemId(idGenerator.generateId()),
@@ -84,7 +86,6 @@ class GenerateExamService(
             )
         }
 
-        // 5. 생성 완료 처리
         exam.completeGeneration(
             ExamGenerationResult(
                 generationId = generationResult.generationId,
