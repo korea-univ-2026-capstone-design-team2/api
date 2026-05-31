@@ -3,7 +3,7 @@ dependencies {
     implementation(project(":shared:infrastructure"))
 
     implementation(project(":member:domain"))
-    //implementation(project(":question:port"))
+    implementation(project(":member:port"))
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
