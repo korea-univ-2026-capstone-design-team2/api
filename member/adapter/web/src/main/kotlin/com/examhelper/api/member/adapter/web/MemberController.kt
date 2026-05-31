@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController(
     private val registerMemberUseCase: RegisterMemberUseCase
 ) {
-    @PostMapping("/register")
+    @PostMapping("/register") // 멤버 등록하기
     fun registerMember(
         @RequestBody request: RegisterMemberReqDto
     ) : ResponseEntity<ApiResponse.Success<RegisterMemberResDto>> {
