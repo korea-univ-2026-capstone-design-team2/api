@@ -43,8 +43,9 @@ dependencies {
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     // Spring AI
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
+    // implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
+    // implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-qdrant")
 
     // Swagger

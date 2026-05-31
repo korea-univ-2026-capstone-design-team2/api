@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
 	kotlin("jvm") version "2.3.10"
 	kotlin("plugin.spring") version "2.3.10"
-	id("org.springframework.boot") version "4.0.5" apply false
+	id("org.springframework.boot") version "4.0.6" apply false
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "2.3.10" apply false
 	kotlin("kapt") version "2.3.10" apply false
@@ -26,9 +26,9 @@ subprojects {
 
 	dependencyManagement {
 		imports {
-			mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.5")
-			mavenBom("tools.jackson:jackson-bom:3.1.2")
-			mavenBom("org.springframework.ai:spring-ai-bom:1.1.5")
+			mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.6")
+			mavenBom("tools.jackson:jackson-bom:3.1.3")
+			mavenBom("org.springframework.ai:spring-ai-bom:2.0.0-M8")
 			//mavenBom("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0")
 		}
 	}
