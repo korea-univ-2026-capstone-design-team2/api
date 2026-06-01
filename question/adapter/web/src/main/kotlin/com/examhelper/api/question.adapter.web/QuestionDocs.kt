@@ -1,7 +1,5 @@
 package com.examhelper.api.question.adapter.web
 
-import com.examhelper.api.question.adapter.web.response.AssignQualityScoreResDto
-import com.examhelper.api.question.adapter.web.response.AssignQuestionToSetResDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionPaperView
@@ -112,7 +110,7 @@ annotation class GetQuestionDetailDocs
     ApiResponse(
         responseCode = "200",
         description = "조회 성공",
-        content = [Content(array = ArraySchema(Schema(QuestionPaperView::class)))]
+        content = [Content(array = ArraySchema(schema = Schema(QuestionPaperView::class)))]
     ),
 )
 annotation class GetQuestionPapersDocs
@@ -134,7 +132,7 @@ annotation class GetQuestionPapersDocs
     ApiResponse(
         responseCode = "200",
         description = "조회 성공",
-        content = [Content(array = ArraySchema(Schema(QuestionReviewView::class)))],
+        content = [Content(array = ArraySchema(schema = Schema(QuestionReviewView::class)))],
     ),
 )
 annotation class GetQuestionReviewsDocs

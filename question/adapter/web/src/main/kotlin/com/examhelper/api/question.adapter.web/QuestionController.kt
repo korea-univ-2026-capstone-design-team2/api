@@ -89,12 +89,11 @@ class QuestionController(
     }
 
     // ── 문제지 목록 조회 ───────────────────────────────────
-    @PostMapping("/papers")
+    @GetMapping("/papers")
     @GetQuestionPapersDocs
     fun getQuestionPapers(
         @RequestBody request: GetQuestionPapersReqDto,
     ): ResponseEntity<ApiResponse.Success<List<QuestionPaperView>>> {
-
         val views = getQuestionPapersUseCase.execute(
             GetQuestionPapersQuery(request.questionIds)
         )
@@ -103,7 +102,7 @@ class QuestionController(
     }
 
     // ── 해설지 목록 조회 ──────────────────────────────────────
-    @PostMapping("/reviews")
+    @GetMapping("/reviews")
     @GetQuestionReviewsDocs
     fun getQuestionReviews(
         @RequestBody request: GetQuestionReviewsReqDto,
