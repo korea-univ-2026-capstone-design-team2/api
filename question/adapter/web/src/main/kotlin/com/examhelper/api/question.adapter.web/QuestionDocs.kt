@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Operation(
-    summary = "PSAT 문제 생성",
+    summary = "PSAT 문제 생성(로직 테스트용)",
     description = """
         RAG 기반으로 5급 PSAT 유형의 문제를 생성합니다.
         - 과거 10년 기출 데이터에서 논리 프레임 추출
@@ -33,51 +33,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
     ApiResponse(responseCode = "503", description = "AI 서비스 일시 불가", content = [Content(schema = Schema(hidden = true))]),
 )
 annotation class CreateQuestionDocs
-
-// ── 품질 점수 부여 ─────────────────────────────────────────
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@Operation(
-    summary = "품질 점수 부여",
-    description = """
-        품질 평가 AI 파이프라인이 산출한 점수를 문제에 반영합니다.
-        - 점수 범위: 0.0 ~ 1.0
-        - 0.75 이상이면 출제(Publish) 가능 상태가 됩니다.
-        - 추후 이벤트 핸들러로 대체될 수 있습니다.
-    """,
-)
-@ApiResponses(
-    ApiResponse(
-        responseCode = "200",
-        description = "점수 부여 성공",
-        content = [Content(schema = Schema(implementation = AssignQualityScoreResDto::class))],
-    ),
-    ApiResponse(responseCode = "400", description = "유효하지 않은 점수 범위", content = [Content(schema = Schema(hidden = true))]),
-    ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
-)
-annotation class AssignQualityScoreDocs
-
-// ── 세트 편입 ──────────────────────────────────────────────
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-@Operation(
-    summary = "문제 세트 편입",
-    description = """
-        독립 문제를 문제 세트에 편입합니다.
-        - 이미 세트에 편입된 문제는 다른 세트로 이동할 수 없습니다.
-        - 세트당 최대 5개 문제까지 편입 가능합니다.
-    """,
-)
-@ApiResponses(
-    ApiResponse(
-        responseCode = "200",
-        description = "세트 편입 성공",
-        content = [Content(schema = Schema(implementation = AssignQuestionToSetResDto::class))],
-    ),
-    ApiResponse(responseCode = "400", description = "세트 정원 초과 또는 이미 편입된 문제", content = [Content(schema = Schema(hidden = true))]),
-    ApiResponse(responseCode = "404", description = "문제 또는 세트를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
-)
-annotation class AssignQuestionToSetDocs
 
 // ── 문제지용 조회 ──────────────────────────────────────────
 @Target(AnnotationTarget.FUNCTION)

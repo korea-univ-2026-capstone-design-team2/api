@@ -6,6 +6,7 @@ import com.examhelper.api.question_generation.adapter.web.request.IngestFrameReq
 import com.examhelper.api.question_generation.adapter.web.response.GenerateQuestionResDto
 import com.examhelper.api.question_generation.port.inbound.GenerateQuestionUseCase
 import com.examhelper.api.question_generation.port.inbound.IngestFrameUseCase
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/question-generations")
+@Tag(name = "QuestionGeneration", description = "문제 생성 API")
 class QuestionGenerationController(
     private val generateQuestionUseCase: GenerateQuestionUseCase,
     private val ingestFrameUseCase: IngestFrameUseCase
