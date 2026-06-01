@@ -12,7 +12,9 @@ import com.examhelper.api.question.port.inbound.view.QuestionSummaryView
 interface QuestionReader {
     // ── Group 단위 ─────────────────────────────────────────
     fun findPaperById(id: Long): QuestionPaperView?
+    fun findPapersByIds(ids: List<Long>): List<QuestionPaperView>
     fun findReviewById(id: Long): QuestionReviewView?
+    fun findReviewsByIds(ids: List<Long>): List<QuestionReviewView>
     fun findDetailById(id: Long): QuestionDetailView?
     fun findAll(filter: QuestionFilter): List<QuestionSummaryView>
     fun count(filter: QuestionFilter): Long

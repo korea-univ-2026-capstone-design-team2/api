@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @Operation(
-    summary = "AI 토큰 사용량 기록(임시)",
+    summary = "AI 토큰 사용량 기록(로직 테스트용)",
     description = """
         AI 모델 호출에 대한 토큰 사용량 및 비용 정보를 기록합니다.
         

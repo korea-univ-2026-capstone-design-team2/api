@@ -12,6 +12,7 @@ import com.examhelper.api.question_generation.port.outbound.query.FrameSearchQue
 import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import org.springframework.ai.document.Document
 import org.springframework.ai.vectorstore.SearchRequest
 import org.springframework.ai.vectorstore.VectorStore

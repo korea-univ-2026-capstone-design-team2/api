@@ -33,10 +33,34 @@ class QuestionQueryAdapter(
         return question.toPaperView(items)
     }
 
+    override fun findPapersByIds(ids: List<Long>): List<QuestionPaperView> {
+        if (ids.isEmpty()) return emptyList()
+
+        val questionsById = questionJpaReader.findAllByIdIn(ids).associateBy { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(ids).groupBy { it.question.id }
+
+        return ids.mapNotNull {
+            val question = questionsById[it] ?: return@mapNotNull null
+            question.toPaperView(itemsByQuestionId[it] ?: emptyList())
+        }
+    }
+
     override fun findReviewById(id: Long): QuestionReviewView? {
         val question = questionJpaReader.findEntityById(id) ?: return null
         val items = questionItemJpaReader.findAllByQuestionId(id)
         return question.toReviewView(items)
+    }
+
+    override fun findReviewsByIds(ids: List<Long>): List<QuestionReviewView> {
+        if (ids.isEmpty()) return emptyList()
+
+        val questionsById = questionJpaReader.findAllByIdIn(ids).associateBy { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(ids).groupBy { it.question.id }
+
+        return ids.mapNotNull {
+            val question = questionsById[it] ?: return@mapNotNull null
+            question.toReviewView(itemsByQuestionId[it] ?: emptyList())
+        }
     }
 
     override fun findDetailById(id: Long): QuestionDetailView? {

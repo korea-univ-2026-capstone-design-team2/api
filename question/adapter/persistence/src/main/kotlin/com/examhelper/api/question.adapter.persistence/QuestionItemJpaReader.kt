@@ -11,10 +11,18 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface QuestionItemJpaReader : JpaRepository<QuestionItemEntity, Long> {
-
     fun findEntityById(id: Long): QuestionItemEntity?
-
     fun findAllByQuestionId(questionId: Long): List<QuestionItemEntity>
+
+    @Query("""
+        SELECT qi
+        FROM QuestionItemEntity qi
+        WHERE qi.question.id IN :questionIds
+        ORDER BY qi.question.id ASC, qi.id ASC
+    """)
+    fun findAllByQuestionIds(
+        @Param("questionIds") questionIds: List<Long>
+    ): List<QuestionItemEntity>
 
     @Query("""
         SELECT new com.examhelper.api.question.port.inbound.view.QuestionItemSummaryView(

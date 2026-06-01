@@ -27,10 +27,7 @@ import java.time.Instant
 
 @RestController
 @RequestMapping("/token-usages")
-@Tag(
-    name = "TokenUsage",
-    description = "AI 토큰 사용량 기록 API"
-)
+@Tag(name = "TokenUsage", description = "AI 토큰 사용량 기록 API")
 class TokenUsageController(
     private val recordTokenUsageUseCase: RecordTokenUsageUseCase,
     private val getTokenUsageListUseCase: GetTokenUsageListUseCase,

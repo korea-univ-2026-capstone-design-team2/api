@@ -19,6 +19,16 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
   ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        model: ${OPENAI_CHAT_MODEL}
+        max-completion-tokens: ${OPENAI_MAX_COMPLETION_TOKENS:4096}
+      embedding:
+        api-key: ${OPENAI_API_KEY}
+        model: ${OPENAI_TEXT_EMBEDDING_MODEL}
+        dimensions: ${OPENAI_TEXT_EMBEDDING_DIMENSIONS}
+
     google:
       genai:
         api-key: ${GOOGLE_GENAI_API_KEY}
@@ -37,7 +47,7 @@ spring:
           location: ${GOOGLE_GENAI_LOCATION}
           api-key: ${GOOGLE_GENAI_API_KEY}
 
-    vectorstore:
+    vector-store:
       qdrant:
         host: ${QDRANT_HOST:localhost}
         port: ${QDRANT_PORT:6334}
@@ -46,7 +56,7 @@ spring:
         initialize-schema: false
 
 frame-search:
-  score-threshold: 0.60
+  score-threshold: 0.00
   post-filter-multiplier: 3
 
 snowflake:
