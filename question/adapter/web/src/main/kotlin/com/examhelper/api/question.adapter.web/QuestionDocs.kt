@@ -7,6 +7,7 @@ import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionPaperView
 import com.examhelper.api.question.port.inbound.view.QuestionReviewView
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -139,3 +140,46 @@ annotation class GetQuestionReviewDocs
     ApiResponse(responseCode = "404", description = "문제를 찾을 수 없음", content = [Content(schema = Schema(hidden = true))]),
 )
 annotation class GetQuestionDetailDocs
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "문제지 다건 조회",
+    description = """
+        여러 문제의 문제지 데이터를 반환합니다.
+        
+        - 정답(correctNumber, isCorrect)은 포함되지 않습니다.
+        - stem, passage, exhibit, choices(정답 제외)를 포함합니다.
+        - 시험지 생성 시 사용됩니다.
+    """,
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "조회 성공",
+        content = [Content(array = ArraySchema(Schema(QuestionPaperView::class)))]
+    ),
+)
+annotation class GetQuestionPapersDocs
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "해설지 다건 조회",
+    description = """
+        여러 문제의 해설지 데이터를 반환합니다.
+        
+        - 정답(correctNumber)을 포함합니다.
+        - 보기별 정오답 정보(isCorrect)를 포함합니다.
+        - 정답 해설(correctReason)을 포함합니다.
+        - 시험 결과 확인 시 사용됩니다.
+    """,
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "조회 성공",
+        content = [Content(array = ArraySchema(Schema(QuestionReviewView::class)))],
+    ),
+)
+annotation class GetQuestionReviewsDocs

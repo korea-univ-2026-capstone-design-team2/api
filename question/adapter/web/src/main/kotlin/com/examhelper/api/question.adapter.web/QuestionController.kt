@@ -2,14 +2,20 @@ package com.examhelper.api.question.adapter.web
 
 import com.examhelper.api.infrastructure.web.ApiResponse
 import com.examhelper.api.question.adapter.web.request.CreateQuestionReqDto
+import com.examhelper.api.question.adapter.web.request.GetQuestionPapersReqDto
+import com.examhelper.api.question.adapter.web.request.GetQuestionReviewsReqDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionDetailUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionPaperUseCase
+import com.examhelper.api.question.port.inbound.GetQuestionPapersUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionReviewUseCase
+import com.examhelper.api.question.port.inbound.GetQuestionReviewsUseCase
 import com.examhelper.api.question.port.inbound.query.GetQuestionDetailQuery
 import com.examhelper.api.question.port.inbound.query.GetQuestionPaperQuery
+import com.examhelper.api.question.port.inbound.query.GetQuestionPapersQuery
 import com.examhelper.api.question.port.inbound.query.GetQuestionReviewQuery
+import com.examhelper.api.question.port.inbound.query.GetQuestionReviewsQuery
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionPaperView
 import com.examhelper.api.question.port.inbound.view.QuestionReviewView
@@ -37,7 +43,9 @@ class QuestionController(
     private val createQuestionUseCase: CreateQuestionUseCase,
     private val getQuestionPaperUseCase: GetQuestionPaperUseCase,
     private val getQuestionReviewUseCase: GetQuestionReviewUseCase,
-    private val getQuestionDetailUseCase: GetQuestionDetailUseCase
+    private val getQuestionDetailUseCase: GetQuestionDetailUseCase,
+    private val getQuestionPapersUseCase: GetQuestionPapersUseCase,
+    private val getQuestionReviewsUseCase: GetQuestionReviewsUseCase
 ) {
     // ── 생성 ──────────────────────────────────────────────
     @PostMapping
@@ -78,6 +86,34 @@ class QuestionController(
     ): ResponseEntity<ApiResponse.Success<QuestionDetailView>> {
         val view = getQuestionDetailUseCase.execute(GetQuestionDetailQuery(questionId))
         return ResponseEntity.ok(ApiResponse.Success(view))
+    }
+
+    // ── 문제지 목록 조회 ───────────────────────────────────
+    @PostMapping("/papers")
+    @GetQuestionPapersDocs
+    fun getQuestionPapers(
+        @RequestBody request: GetQuestionPapersReqDto,
+    ): ResponseEntity<ApiResponse.Success<List<QuestionPaperView>>> {
+
+        val views = getQuestionPapersUseCase.execute(
+            GetQuestionPapersQuery(request.questionIds)
+        )
+
+        return ResponseEntity.ok(ApiResponse.Success(views))
+    }
+
+    // ── 해설지 목록 조회 ──────────────────────────────────────
+    @PostMapping("/reviews")
+    @GetQuestionReviewsDocs
+    fun getQuestionReviews(
+        @RequestBody request: GetQuestionReviewsReqDto,
+    ): ResponseEntity<ApiResponse.Success<List<QuestionReviewView>>> {
+
+        val views = getQuestionReviewsUseCase.execute(
+            GetQuestionReviewsQuery(request.questionIds)
+        )
+
+        return ResponseEntity.ok(ApiResponse.Success(views))
     }
 /*
     // ── 목록 조회 ──────────────────────────────────────────
