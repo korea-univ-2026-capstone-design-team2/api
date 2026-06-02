@@ -89,7 +89,7 @@ class QuestionController(
     }
 
     // ── 문제지 목록 조회 ───────────────────────────────────
-    @GetMapping("/papers")
+    @PostMapping("/papers")
     @GetQuestionPapersDocs
     fun getQuestionPapers(
         @RequestBody request: GetQuestionPapersReqDto,
@@ -102,7 +102,7 @@ class QuestionController(
     }
 
     // ── 해설지 목록 조회 ──────────────────────────────────────
-    @GetMapping("/reviews")
+    @PostMapping("/reviews")
     @GetQuestionReviewsDocs
     fun getQuestionReviews(
         @RequestBody request: GetQuestionReviewsReqDto,
