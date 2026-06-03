@@ -1,12 +1,12 @@
 package com.examhelper.api.question.domain.vo
 
-import com.examhelper.api.question.domain.exception.QuestionAssertionException
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 
 @JvmInline
 value class QualityScore(val value: Double) {
     init {
         require(value in 0.0..1.0) {
-            throw QuestionAssertionException.QualityScoreOutOfRange(value)
+            throw QuestionItemAssertionException.QualityScoreOutOfRange(value)
         }
     }
 

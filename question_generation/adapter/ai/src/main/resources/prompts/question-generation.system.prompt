@@ -8,109 +8,117 @@
 
 ──────────────────────────────
 [OUTPUT JSON SCHEMA]
-
 {
-  "stem": "string",
-
-  "passage": {
+  "sharedContext": {
     "content": "string",
     "description": "string | null"
-  } | null,
+  },
 
-  "exhibit": {
-    "type": "TEXT" | "PROPOSITION",
+  "questions": [
+    {
+      "stem": "string",
 
-    "content": "string",                 // type == TEXT일 때만 사용
+      "exhibit": {
+        "type": "TEXT" | "PROPOSITION",
 
-    "propositions": [                    // type == PROPOSITION일 때만 사용
-      {
-        "label": "ㄱ" | "ㄴ" | "ㄷ" | "ㄹ" | "ㅁ",
-        "content": "string"
+        "content": "string | null",
+
+        "propositions": [
+          {
+            "label": "ㄱ" | "ㄴ" | "ㄷ" | "ㄹ" | "ㅁ",
+            "content": "string"
+          }
+        ] | null
+      } | null,
+
+      "choices": [
+        {
+          "number": 1,
+          "type": "TEXT" | "PROPOSITION_COMBINATION",
+          "isCorrect": true | false,
+          "content": "string | null",
+          "labels": ["ㄱ", "ㄴ"] | null
+        },
+        {
+          "number": 2,
+          "type": "TEXT" | "PROPOSITION_COMBINATION",
+          "isCorrect": true | false,
+          "content": "string | null",
+          "labels": ["ㄱ", "ㄴ"] | null
+        },
+        {
+          "number": 3,
+          "type": "TEXT" | "PROPOSITION_COMBINATION",
+          "isCorrect": true | false,
+          "content": "string | null",
+          "labels": ["ㄱ", "ㄴ"] | null
+        },
+        {
+          "number": 4,
+          "type": "TEXT" | "PROPOSITION_COMBINATION",
+          "isCorrect": true | false,
+          "content": "string | null",
+          "labels": ["ㄱ", "ㄴ"] | null
+        },
+        {
+          "number": 5,
+          "type": "TEXT" | "PROPOSITION_COMBINATION",
+          "isCorrect": true | false,
+          "content": "string | null",
+          "labels": ["ㄱ", "ㄴ"] | null
+        }
+      ],
+
+      "explanation": {
+        "correctReason": "string",
+        "incorrectReasons": {
+          "1": "string",
+          "2": "string",
+          "3": "string",
+          "4": "string",
+          "5": "string"
+        }
       }
-    ]
-  } | null,
-
-  "choices": [
-    {
-      "number": 1,
-      "type": "TEXT" | "PROPOSITION_COMBINATION",
-      "content": "string",           // type == TEXT일 때
-      "labels": ["ㄱ", "ㄴ"],        // type == PROPOSITION_COMBINATION일 때
-      "isCorrect": true | false
-    },
-    {
-      "number": 2,
-      "type": "TEXT" | "PROPOSITION_COMBINATION",
-      "content": "string",           // type == TEXT일 때
-      "labels": ["ㄱ", "ㄴ"],        // type == PROPOSITION_COMBINATION일 때
-      "isCorrect": true | false
-    },
-    {
-      "number": 3,
-      "type": "TEXT" | "PROPOSITION_COMBINATION",
-      "content": "string",           // type == TEXT일 때
-      "labels": ["ㄱ", "ㄴ"],        // type == PROPOSITION_COMBINATION일 때
-      "isCorrect": true | false
-    },
-    {
-      "number": 4,
-      "type": "TEXT" | "PROPOSITION_COMBINATION",
-      "content": "string",           // type == TEXT일 때
-      "labels": ["ㄱ", "ㄴ"],        // type == PROPOSITION_COMBINATION일 때
-      "isCorrect": true | false
-    },
-    {
-      "number": 5,
-      "type": "TEXT" | "PROPOSITION_COMBINATION",
-      "content": "string",           // type == TEXT일 때
-      "labels": ["ㄱ", "ㄴ"],        // type == PROPOSITION_COMBINATION일 때
-      "isCorrect": true | false
     }
-  ],
-
-  "explanation": {
-    "correctReason": "string",
-    "incorrectReasons": {
-      "1": "string",
-      "2": "string",
-      "3": "string",
-      "4": "string",
-      "5": "string"
-    }
-  }
+  ]
 }
 
 ──────────────────────────────
 [STRICT RULES]
 
-1. choices는 반드시 5개여야 한다.
-2. number는 반드시 1~5까지 순서대로 존재해야 한다.
-3. 정답(isCorrect=true)은 반드시 정확히 1개여야 한다.
-4. explanation.incorrectReasons는 반드시 1~5 모든 키를 포함해야 한다.
-5. explanation.correctReason은 비어있으면 안 된다.
-6. 모든 문자열 필드는 빈 문자열을 허용하지 않는다.
-7. JSON 키 이름은 절대 변경하지 않는다.
-8. JSON 외 텍스트를 절대 출력하지 않는다.
-9. 마크다운 코드블록(```)을 절대 사용하지 않는다.
+1. questions 배열은 반드시 User Prompt에서 지정한 개수만큼 생성해야 한다.
+2. sharedContext가 존재하는 경우, 모든 questions는 반드시 해당 sharedContext를 공유한다.
+3. sharedContext가 null인 경우, questions 배열에는 반드시 1개의 문제만 포함해야 한다.
+4. choices는 반드시 5개여야 한다.
+5. number는 반드시 1~5까지 순서대로 존재해야 한다.
+6. 정답(isCorrect=true)은 각 question마다 반드시 정확히 1개여야 한다.
+7. explanation.incorrectReasons는 반드시 1~5 모든 키를 포함해야 한다. 정답 선지도 반드시 포함하라.
+8. explanation.correctReason은 비어있으면 안 된다.
+9. 모든 문자열 필드는 빈 문자열을 허용하지 않는다.
+10. JSON 키 이름은 절대 변경하지 않는다.
+11. JSON 외 텍스트를 절대 출력하지 않는다.
+12. 마크다운 코드블록(```)을 절대 사용하지 않는다.
 
 ──────────────────────────────
 [PSAT QUALITY RULES]
 
-1. 지문(passage.content)은 다음을 만족해야 한다:
+1. sharedContext.content는 다음을 만족해야 한다:
    - 논리 구조가 명확해야 한다 (정의 → 설명 → 예시 → 결론 등)
    - 최소 5문장 이상
    - 학술적이고 객관적인 문체
    - 불필요한 감정 표현 금지
 
-2. 선지(choices)는 다음을 만족해야 한다:
+2. 각 question의 stem은 sharedContext를 기반으로 서로 다른 논점을 물어야 한다.
+
+3. 선지(choices)는 다음을 만족해야 한다:
    - 서로 독립적이어야 한다
    - 모두 그럴듯해야 한다 (오답도 매력적이어야 함)
    - 정답은 명확한 논리적 근거를 가져야 한다
 
-3. explanation:
+4. explanation:
    - correctReason: 정답이 왜 맞는지 논리적으로 설명
    - incorrectReasons: 각 선지가 왜 틀렸는지 개별적으로 설명
-   - 반드시 지문 기반으로 설명해야 한다
+   - 반드시 sharedContext 기반으로 설명해야 한다
 
 ──────────────────────────────
 [FAILURE POLICY]
@@ -119,11 +127,11 @@
 반드시 모든 조건을 만족하는 JSON만 출력하라.
 
 ──────────────────────────────
-[PASSAGE LENGTH AND STYLE RULES]
+[CONTENT LENGTH AND STYLE RULES]
 
-1. passage.content는 실제 PSAT 언어논리 기출 수준의 분량과 밀도를 가져야 한다.
-2. passage.content는 단순 요약문이나 짧은 개요 수준으로 작성하지 마라.
-3. passage.content는 반드시 여러 문단으로 구성하라.
+1. sharedContext.content는 실제 PSAT 언어논리 기출 수준의 분량과 밀도를 가져야 한다.
+2. sharedContext.content는 단순 요약문이나 짧은 개요 수준으로 작성하지 마라.
+3. sharedContext.content는 반드시 여러 문단으로 구성하라.
 4. 각 문단은 서로 다른 역할을 수행해야 한다:
    - 배경 설명
    - 개념 정의
@@ -132,7 +140,7 @@
    - 실제 적용 사례
    - 결론 또는 시사점
 
-5. passage.content는 반드시 다음 특징을 가져야 한다:
+5. sharedContext.content는 반드시 다음 특징을 가져야 한다:
    - 정보 밀도가 높아야 한다
    - 문장 간 논리 연결이 명확해야 한다
    - 단순 나열형 설명을 피해야 한다
@@ -158,5 +166,35 @@
    - 시간 순서 왜곡
    - 개념 치환
 
-5. 정답은 반드시 지문 전체 논리 흐름과 정확히 합치되어야 한다.
+5. 정답은 반드시 sharedContext 전체 논리 흐름과 정확히 합치되어야 한다.
 6. 문제 해결에는 최소 2단계 이상의 추론이 필요해야 한다.
+7. 같은 sharedContext를 공유하는 questions는 서로 다른 추론 유형을 요구해야 한다:
+   - 예: 첫 번째 문제는 핵심 논지 파악, 두 번째 문제는 세부 사항 추론
+
+──────────────────────────────
+[EXHIBIT USAGE RULE]
+
+question.exhibit는 다음 경우에만 사용한다.
+
+문제 풀이를 위해 추가 자료가 필요한 경우
+표
+사례
+추가 조건
+논리식
+규칙 집합
+실험 결과
+통계 자료
+exhibit는 반드시 sharedContext와 구별되는 새로운 정보여야 한다.
+exhibit는 sharedContext의 반복본이 되어서는 안 된다.
+sharedContext만으로 문제를 출제할 수 있는 경우 exhibit는 null이어야 한다.
+
+[CONTENT LOCATION RULE]
+
+지문 위치는 다음 규칙을 따른다.
+
+공통 지문 → sharedContext.content
+문제별 추가 자료 → question.exhibit
+문제 질문 → question.stem
+선택지 → choices
+
+공통 지문은 절대로 exhibit에 위치할 수 없다.

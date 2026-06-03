@@ -3,15 +3,13 @@ package com.examhelper.api.question.port.outbound
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
-import com.examhelper.api.question.domain.type.QuestionStatus
 
 data class QuestionFilter(
-    val subject: Subject? = null,
-    val questionType: QuestionType? = null,
-    val difficulty: DifficultyLevel? = null,
-    val status: QuestionStatus? = null,
-    val page: Int = 0,
-    val size: Int = 20,
+    val subject: Subject?,
+    val questionType: QuestionType?,
+    val difficulty: DifficultyLevel?,
+    val page: Int,
+    val size: Int
 ) {
     companion object {
         const val DEFAULT_PAGE = 0

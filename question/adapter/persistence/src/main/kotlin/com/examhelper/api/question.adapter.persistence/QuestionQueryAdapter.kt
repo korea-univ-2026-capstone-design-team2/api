@@ -1,15 +1,21 @@
 package com.examhelper.api.question.adapter.persistence
 
 import com.examhelper.api.question.adapter.persistence.record.AnswerChoiceRecord
-import com.examhelper.api.question.domain.exception.QuestionException
+import com.examhelper.api.question.adapter.persistence.record.SharedQuestionContextRecord
+import com.examhelper.api.question.domain.exception.QuestionItemException
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceView
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceViewWithAnswer
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
+import com.examhelper.api.question.port.inbound.view.QuestionItemDetailView
+import com.examhelper.api.question.port.inbound.view.QuestionItemPaperView
+import com.examhelper.api.question.port.inbound.view.QuestionItemPropositionView
+import com.examhelper.api.question.port.inbound.view.QuestionItemReviewView
+import com.examhelper.api.question.port.inbound.view.QuestionItemSummaryView
 import com.examhelper.api.question.port.inbound.view.QuestionPaperView
-import com.examhelper.api.question.port.inbound.view.QuestionPropositionView
 import com.examhelper.api.question.port.inbound.view.QuestionReviewView
 import com.examhelper.api.question.port.inbound.view.QuestionSummaryView
 import com.examhelper.api.question.port.outbound.QuestionFilter
+import com.examhelper.api.question.port.outbound.QuestionItemFilter
 import com.examhelper.api.question.port.outbound.QuestionReader
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Repository
@@ -17,23 +23,57 @@ import org.springframework.stereotype.Repository
 @Repository
 class QuestionQueryAdapter(
     private val questionJpaReader: QuestionJpaReader,
+    private val questionItemJpaReader: QuestionItemJpaReader,
 ) : QuestionReader {
-    // ── QuestionReader 구현 ────────────────────────────────
-    override fun findPaperById(id: Long): QuestionPaperView? =
-        questionJpaReader.findEntityById(id)?.toPaperView()
 
-    override fun findReviewById(id: Long): QuestionReviewView? =
-        questionJpaReader.findEntityById(id)?.toReviewView()
+    // ── Question 단위 ──────────────────────────────────────
+    override fun findPaperById(id: Long): QuestionPaperView? {
+        val question = questionJpaReader.findEntityById(id) ?: return null
+        val items = questionItemJpaReader.findAllByQuestionId(id)
+        return question.toPaperView(items)
+    }
 
-    override fun findDetailById(id: Long): QuestionDetailView? =
-        questionJpaReader.findEntityById(id)?.toDetailView()
+    override fun findPapersByIds(ids: List<Long>): List<QuestionPaperView> {
+        if (ids.isEmpty()) return emptyList()
+
+        val questionsById = questionJpaReader.findAllByIdIn(ids).associateBy { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(ids).groupBy { it.question.id }
+
+        return ids.mapNotNull {
+            val question = questionsById[it] ?: return@mapNotNull null
+            question.toPaperView(itemsByQuestionId[it] ?: emptyList())
+        }
+    }
+
+    override fun findReviewById(id: Long): QuestionReviewView? {
+        val question = questionJpaReader.findEntityById(id) ?: return null
+        val items = questionItemJpaReader.findAllByQuestionId(id)
+        return question.toReviewView(items)
+    }
+
+    override fun findReviewsByIds(ids: List<Long>): List<QuestionReviewView> {
+        if (ids.isEmpty()) return emptyList()
+
+        val questionsById = questionJpaReader.findAllByIdIn(ids).associateBy { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(ids).groupBy { it.question.id }
+
+        return ids.mapNotNull {
+            val question = questionsById[it] ?: return@mapNotNull null
+            question.toReviewView(itemsByQuestionId[it] ?: emptyList())
+        }
+    }
+
+    override fun findDetailById(id: Long): QuestionDetailView? {
+        val question = questionJpaReader.findEntityById(id) ?: return null
+        val items = questionItemJpaReader.findAllByQuestionId(id)
+        return question.toDetailView(items)
+    }
 
     override fun findAll(filter: QuestionFilter): List<QuestionSummaryView> =
         questionJpaReader.findSummaries(
             subject = filter.subject,
             questionType = filter.questionType,
             difficulty = filter.difficulty,
-            status = filter.status,
             pageable = PageRequest.of(filter.page, filter.size),
         )
 
@@ -41,60 +81,131 @@ class QuestionQueryAdapter(
         questionJpaReader.countByFilter(
             subject = filter.subject,
             questionType = filter.questionType,
+            difficulty = filter.difficulty
+        )
+
+    // ── QuestionItem 단위 ──────────────────────────────────
+    override fun findItemPaperById(id: Long): QuestionItemPaperView? =
+        questionItemJpaReader.findEntityById(id)?.toItemPaperView()
+
+    override fun findItemReviewById(id: Long): QuestionItemReviewView? =
+        questionItemJpaReader.findEntityById(id)?.toItemReviewView()
+
+    override fun findItemDetailById(id: Long): QuestionItemDetailView? =
+        questionItemJpaReader.findEntityById(id)?.toItemDetailView()
+
+    override fun findAllItems(filter: QuestionItemFilter): List<QuestionItemSummaryView> =
+        questionItemJpaReader.findSummaries(
+            subject = filter.subject,
+            questionType = filter.questionType,
+            questionSubType = filter.questionSubType,
             difficulty = filter.difficulty,
-            status = filter.status,
+            questionId = filter.questionId,
+            pageable = PageRequest.of(filter.page, filter.size),
+        )
+
+    override fun countItems(filter: QuestionItemFilter): Long =
+        questionItemJpaReader.countByFilter(
+            subject = filter.subject,
+            questionType = filter.questionType,
+            questionSubType = filter.questionSubType,
+            difficulty = filter.difficulty,
+            questionId = filter.questionId,
         )
 }
 
-// ── Entity → PaperView (정답/해설 제외) ───────────────────
-private fun QuestionEntity.toPaperView(): QuestionPaperView {
+// ── QuestionEntity → PaperView ────────────────────────────
+private fun QuestionEntity.toPaperView(
+    items: List<QuestionItemEntity>,
+): QuestionPaperView {
+    val orderedItems = items.sortedBy { it.id }
+    val (contextContent, contextDescription) = sharedContext.toContentPair()
     return QuestionPaperView(
         questionId = id,
-        questionSetId = questionSetId,
+        generationId = generationId,
         subject = subject,
         questionType = questionType,
-        questionSubType = questionSubType,
         difficulty = difficulty,
-        stem = content.stem,
-        passageType = content.passage?.type,
-        passageContent = content.passage?.content,
-        exhibitType = content.exhibit?.type,
-        exhibitContent = content.exhibit?.content,
-        propositions = content.exhibit?.propositions?.map {
-            QuestionPropositionView(
-                label = it.label,
-                content = it.content
-            )
-        },
-        answerSheetType = answerSheet.type,
-        choices = answerSheet.choices?.map {
-            AnswerChoiceView(
-                number = it.number,
-                text = it.toDisplayText()
-            )
-        } ?: emptyList(),
+        sharedContextContent = contextContent,
+        sharedContextDescription = contextDescription,
+        items = orderedItems.map { it.toItemPaperView() },
     )
 }
 
-// ── Entity → ReviewView (정답 + 해설 포함) ────────────────
-private fun QuestionEntity.toReviewView(): QuestionReviewView {
+// ── QuestionEntity → ReviewView ───────────────────────────
+private fun QuestionEntity.toReviewView(
+    items: List<QuestionItemEntity>,
+): QuestionReviewView {
+    val orderedItems = items.sortedBy { items.indexOf(it) }
+    val (contextContent, contextDescription) = sharedContext.toContentPair()
     return QuestionReviewView(
         questionId = id,
-        questionSetId = questionSetId,
+        generationId = generationId,
+        subject = subject,
+        questionType = questionType,
+        difficulty = difficulty,
+        sharedContextContent = contextContent,
+        sharedContextDescription = contextDescription,
+        items = orderedItems.map { it.toItemReviewView() },
+    )
+}
+
+// ── QuestionEntity → DetailView ───────────────────────────
+private fun QuestionEntity.toDetailView(
+    items: List<QuestionItemEntity>,
+): QuestionDetailView {
+    val orderedItems = items.sortedBy { items.indexOf(it) }
+    val (contextContent, contextDescription) = sharedContext.toContentPair()
+    return QuestionDetailView(
+        questionId = id,
+        generationId = generationId,
+        subject = subject,
+        questionType = questionType,
+        difficulty = difficulty,
+        status = status,
+        passageTopicCategory = passageTopic?.category,
+        passageTopicKeyword = passageTopic?.keyword,
+        sharedContextContent = contextContent,
+        sharedContextDescription = contextDescription,
+        items = orderedItems.map { it.toItemDetailView() },
+    )
+}
+
+// ── QuestionItemEntity → ItemPaperView ────────────────────
+private fun QuestionItemEntity.toItemPaperView(): QuestionItemPaperView =
+    QuestionItemPaperView(
+        questionItemId = id,
+        questionId = question.id,
         subject = subject,
         questionType = questionType,
         questionSubType = questionSubType,
         difficulty = difficulty,
         stem = content.stem,
-        passageType = content.passage?.type,
-        passageContent = content.passage?.content,
         exhibitType = content.exhibit?.type,
         exhibitContent = content.exhibit?.content,
         propositions = content.exhibit?.propositions?.map {
-            QuestionPropositionView(
-                label = it.label,
-                content = it.content
-            )
+            QuestionItemPropositionView(label = it.label, content = it.content)
+        },
+        answerSheetType = answerSheet.type,
+        choices = answerSheet.choices?.map {
+            AnswerChoiceView(number = it.number, text = it.toDisplayText())
+        } ?: emptyList(),
+    )
+
+// ── QuestionItemEntity → ItemReviewView ───────────────────
+private fun QuestionItemEntity.toItemReviewView(): QuestionItemReviewView =
+    QuestionItemReviewView(
+        questionItemId = id,
+        questionId = question.id,
+        subject = subject,
+        questionType = questionType,
+        questionSubType = questionSubType,
+        difficulty = difficulty,
+        stem = content.stem,
+        exhibitType = content.exhibit?.type,
+        exhibitContent = content.exhibit?.content,
+        propositions = content.exhibit?.propositions?.map {
+            QuestionItemPropositionView(label = it.label, content = it.content)
         },
         answerSheetType = answerSheet.type,
         correctNumber = answerSheet.correctNumber,
@@ -108,32 +219,24 @@ private fun QuestionEntity.toReviewView(): QuestionReviewView {
         correctReason = explanation.correctReason,
         incorrectReasons = explanation.incorrectReasons,
     )
-}
 
-// ── Entity → DetailView (내부 관리용, 전체 포함) ──────────
-private fun QuestionEntity.toDetailView(): QuestionDetailView {
-    return QuestionDetailView(
-        questionId = id,
+// ── QuestionItemEntity → ItemDetailView ───────────────────
+private fun QuestionItemEntity.toItemDetailView(): QuestionItemDetailView =
+    QuestionItemDetailView(
+        questionItemId = id,
+        questionId = question.id,
         generationId = generationId,
-        questionSetId = questionSetId,
         subject = subject,
         questionType = questionType,
         questionSubType = questionSubType,
         difficulty = difficulty,
         status = status,
         qualityScore = qualityScore,
-        passageTopicCategory = passageTopic?.category,
-        passageTopicKeyword = passageTopic?.keyword,
         stem = content.stem,
-        passageType = content.passage?.type,
-        passageContent = content.passage?.content,
         exhibitType = content.exhibit?.type,
         exhibitContent = content.exhibit?.content,
         propositions = content.exhibit?.propositions?.map {
-            QuestionPropositionView(
-                label = it.label,
-                content = it.content
-            )
+            QuestionItemPropositionView(label = it.label, content = it.content)
         },
         answerSheetType = answerSheet.type,
         correctNumber = answerSheet.correctNumber,
@@ -146,15 +249,19 @@ private fun QuestionEntity.toDetailView(): QuestionDetailView {
         } ?: emptyList(),
         correctReason = explanation.correctReason,
         incorrectReasons = explanation.incorrectReasons,
-        frameId = sourceFrame.frameId,
-        similarityScore = sourceFrame.similarityScore,
-        frameType = sourceFrame.frameType,
     )
+
+// ── 공통 ─────────────────────────────────────────────────
+private fun SharedQuestionContextRecord?.toContentPair(): Pair<String?, String?> {
+    if (this == null) return null to null
+    return when (this) {
+        is SharedQuestionContextRecord.Text -> this.content to this.description
+    }
 }
 
 private fun AnswerChoiceRecord.toDisplayText(): String = when (type) {
-    "TEXT" -> content ?: throw QuestionException.AnswerChoiceBlank()
+    "TEXT" -> content ?: throw QuestionItemException.AnswerChoiceBlank()
     "PROPOSITION_COMBINATION" ->
-        labels?.joinToString(", ") { it } ?: throw QuestionException.AnswerChoiceBlank()
+        labels?.joinToString(", ") ?: throw QuestionItemException.AnswerChoiceBlank()
     else -> error("Unknown AnswerChoice type: $type")
 }

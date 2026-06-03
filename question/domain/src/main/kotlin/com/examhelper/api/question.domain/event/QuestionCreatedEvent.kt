@@ -8,15 +8,13 @@ class QuestionCreatedEvent(
     val questionId: Long,
     val generationId: Long,
     val subject: String,
-    val questionType: String,
-    val questionSubType: String?,
     val difficulty: String,
     val occurredAt: Instant,
 ) : DomainEvent(
     aggregateId = questionId.toString(),
-    aggregateType = "Question",
+    aggregateType = "QuestionGroup",
     channel = EventChannel.INTERNAL,
 ) {
-    override val eventType: String = "QuestionCreated"
-    override fun topic(): String = "question.created"
+    override val eventType: String = "QuestionGroupCreated"
+    override fun topic(): String = "question-group.created"
 }

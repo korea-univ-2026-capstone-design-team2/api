@@ -3,9 +3,11 @@ package com.examhelper.api.question.application
 import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
+import com.examhelper.api.kernel.identifier.QuestionItemId
+import com.examhelper.api.question.domain.QuestionItem
 import com.examhelper.api.question.domain.Question
-import com.examhelper.api.question.domain.vo.QuestionContent
-import com.examhelper.api.question.domain.vo.QuestionMetadata
+import com.examhelper.api.question.domain.vo.QuestionItemContent
+import com.examhelper.api.question.domain.vo.QuestionItemMetadata
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
 import com.examhelper.api.question.port.inbound.command.CreateQuestionCommand
 import com.examhelper.api.question.port.inbound.result.CreateQuestionResult
@@ -24,29 +26,53 @@ class CreateQuestionService(
 ) : CreateQuestionUseCase {
 
     @Transactional
-    override fun execute(command: CreateQuestionCommand): CreateQuestionResult {
+    override fun execute(
+        command: CreateQuestionCommand
+    ): CreateQuestionResult {
+
+        // ── Aggregate 생성 ─────────────────────────────
+        val questionId = QuestionId(idGenerator.generateId())
+
         val question = Question.create(
-            id = QuestionId(idGenerator.generateId()),
+            id = questionId,
             generationId = QuestionGenerationId(command.generationId),
-            content = QuestionContent(
-                stem = command.stem,
-                passage = command.passage,
-                exhibit = command.exhibit,
-            ),
-            answerSheet = command.answerSheet,
-            metadata = QuestionMetadata(
-                subject = command.subject,
-                questionType = command.questionType,
-                questionSubType = command.questionSubType,
-                difficulty = command.difficulty,
-                passageTopic = command.passageTopic,
-            ),
-            explanation = command.explanation,
-            sourceFrame = command.sourceFrame,
+            sharedContext = command.sharedContext,
+            metadata = command.metadata,
         )
+
+        // ── QuestionItems 생성 및 aggregate 편입 ───────
+        command.questions.forEach { q ->
+
+            val questionItem = QuestionItem.create(
+                id = QuestionItemId(idGenerator.generateId()),
+                generationId = QuestionGenerationId(command.generationId),
+
+                content = QuestionItemContent(
+                    stem = q.stem,
+                    exhibit = q.exhibit,
+                ),
+
+                answerSheet = q.answerSheet,
+
+                metadata = QuestionItemMetadata(
+                    subject = command.metadata.subject,
+                    questionType = command.metadata.questionType,
+                    questionSubType = command.metadata.questionSubType,
+                    difficulty = command.metadata.difficulty,
+                ),
+
+                explanation = q.explanation,
+            )
+
+            question.addItem(questionItem)
+        }
 
         questionStore.save(question)
 
-        return CreateQuestionResult(questionId = question.id.value)
+        // ── 결과 반환 ──────────────────────────────────
+        return CreateQuestionResult(
+            questionId = question.id.value,
+            questionItemIds = question.items.map { it.id.value }
+        )
     }
 }

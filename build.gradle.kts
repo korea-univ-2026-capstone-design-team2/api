@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
 	kotlin("jvm") version "2.3.10"
 	kotlin("plugin.spring") version "2.3.10"
-	id("org.springframework.boot") version "4.0.5" apply false
+	id("org.springframework.boot") version "4.0.6" apply false
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "2.3.10" apply false
 	kotlin("kapt") version "2.3.10" apply false
@@ -22,13 +22,13 @@ subprojects {
 	apply(plugin = "org.jetbrains.kotlin.jvm")
 	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
 	apply(plugin = "io.spring.dependency-management")
-	apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 
 	dependencyManagement {
 		imports {
-			mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.5")
-			mavenBom("tools.jackson:jackson-bom:3.1.2")
-			mavenBom("org.springframework.ai:spring-ai-bom:1.1.5")
+			mavenBom("org.springframework.boot:spring-boot-dependencies:4.0.6")
+			mavenBom("tools.jackson:jackson-bom:3.1.3")
+			mavenBom("org.springframework.ai:spring-ai-bom:2.0.0-M8")
+			//mavenBom("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0")
 		}
 	}
 
@@ -77,7 +77,9 @@ subprojects {
 	group = when {
 		path.startsWith(":question:") -> "com.examhelper.api.question"
 		path.startsWith(":question_generation:") -> "com.examhelper.api.question_generation"
-		path.startsWith(":member:") -> "com.examhelper.api.member"
+		path.startsWith(":exam:") -> "com.examhelper.api.exam"
+		path.startsWith(":token_usage:") -> "com.examhelper.api.token_usage"
+		path.startsWith(":user:") -> "com.examhelper.api.user"
 		path.startsWith(":auth:") -> "com.examhelper.api.auth"
 		else -> "com.examhelper.api.shared"
 	}

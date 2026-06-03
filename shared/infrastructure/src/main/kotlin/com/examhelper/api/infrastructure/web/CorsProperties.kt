@@ -4,5 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "cors")
 data class CorsProperties(
-    val allowedOrigins: List<String> = listOf("http://localhost:*"),
+    val allowedOrigins: List<String> = listOf(
+        "http://localhost:*",
+        "https://web-inky-zeta-18.vercel.app"
+    ),
 )

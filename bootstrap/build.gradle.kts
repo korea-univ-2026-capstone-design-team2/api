@@ -1,6 +1,7 @@
 plugins {
     id("org.springframework.boot")
     kotlin("kapt")
+    kotlin("plugin.jpa")
 }
 
 dependencies {
@@ -19,10 +20,16 @@ dependencies {
     implementation(project(":question_generation:adapter:domain_connector"))
     implementation(project(":question_generation:adapter:persistence"))
 
-    // Member
-    implementation(project(":member:application"))
-    implementation(project(":member:adapter:web"))
-    implementation(project(":member:adapter:persistence"))
+    // Exam
+    implementation(project(":exam:application"))
+    implementation(project(":exam:adapter:web"))
+    implementation(project(":exam:adapter:persistence"))
+    implementation(project(":exam:adapter:domain_connector"))
+
+    // Token Usage
+    implementation(project(":token_usage:application"))
+    implementation(project(":token_usage:adapter:web"))
+    implementation(project(":token_usage:adapter:persistence"))
 
     // Auth
     implementation(project(":auth"))
@@ -37,8 +44,9 @@ dependencies {
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     // Spring AI
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
+    // implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
+    // implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-qdrant")
 
     // Swagger
@@ -54,4 +62,11 @@ dependencies {
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // Kotlin Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 }

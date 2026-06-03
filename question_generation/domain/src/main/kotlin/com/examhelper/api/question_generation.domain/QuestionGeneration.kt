@@ -2,9 +2,11 @@ package com.examhelper.api.question_generation.domain
 
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
+import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question_generation.domain.event.GenerationCompletedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationFailedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationRequestedEvent
+import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
 import com.examhelper.api.question_generation.domain.exception.GenerationException
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
@@ -29,8 +31,17 @@ class QuestionGeneration private constructor(
         private set
 
     // ── 상태 전이 ─────────────────────────────────────────────
+    fun markQuestionGenerated(questionId: QuestionId) {
+        addDomainEvent(
+            QuestionGeneratedEvent(
+                generationId = id.value,
+                questionId = questionId.value,
+                occurredAt = Instant.now(),
+            )
+        )
+    }
 
-    fun complete(): QuestionGeneration {
+    fun complete(successCount: Int, failureCount: Int): QuestionGeneration {
         checkPending()
         status    = QuestionGenerationStatus.COMPLETED
         updatedAt = Instant.now()
@@ -38,6 +49,8 @@ class QuestionGeneration private constructor(
             GenerationCompletedEvent(
                 generationId = id.value,
                 occurredAt = updatedAt,
+                successCount = successCount,
+                failureCount = failureCount
             )
         )
         return this

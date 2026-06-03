@@ -1,6 +1,6 @@
 package com.examhelper.api.question.domain.vo
 
-import com.examhelper.api.question.domain.exception.QuestionAssertionException
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 
 sealed class Passage {
     data class TextPassage(
@@ -8,7 +8,7 @@ sealed class Passage {
         val description: String? = null,
     ) : Passage() {
         init {
-            if (content.isBlank()) throw QuestionAssertionException.PassageContentBlank()
+            if (content.isBlank()) throw QuestionItemAssertionException.PassageContentBlank()
         }
     }
 

@@ -5,5 +5,6 @@ import com.examhelper.api.question.domain.Question
 
 interface QuestionStore {
     fun save(question: Question)
+    fun saveAll(questions: List<Question>)
     fun loadById(id: QuestionId): Question?
 }

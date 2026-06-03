@@ -1,32 +1,33 @@
 package com.examhelper.api.question.domain.exception
 
-import com.examhelper.api.kernel.core.exception.DomainBusinessException
-import com.examhelper.api.kernel.core.exception.ErrorStatus
+import com.examhelper.api.kernel.core.exception.DomainException
 
 sealed class QuestionException(
     code: String,
     message: String,
-    status: ErrorStatus,
-) : DomainBusinessException(code, message, status) {
-    class NotFound(id: String) : QuestionException(
-        "Q001", "문제를 찾을 수 없습니다: $id", ErrorStatus.NOT_FOUND
+) : DomainException(code, message) {
+    class CannotModifyNonDraft(status: String) : QuestionException(
+        "QUESTION_GROUP_CANNOT_MODIFY_NON_DRAFT",
+        "DRAFT 상태가 아닌 그룹은 수정할 수 없습니다. 현재 상태: $status"
     )
-    class AlreadyPublished(id: String) : QuestionException(
-        "Q002", "이미 출제된 문제입니다: $id", ErrorStatus.CONFLICT
+
+    class QuestionAlreadyIn(questionItemId: Long) : QuestionException(
+        "QUESTION_GROUP_QUESTION_ALREADY_EXISTS",
+        "이미 그룹에 포함된 문제입니다. questionId: $questionItemId"
     )
+
     class StatusTransitionNotAllowed(from: String, to: String) : QuestionException(
-        "Q003", "상태 전이가 허용되지 않습니다: $from -> $to", ErrorStatus.BAD_REQUEST
+        "QUESTION_GROUP_STATUS_TRANSITION_NOT_ALLOWED",
+        "허용되지 않는 상태 전이입니다. $from → $to"
     )
-    class QualityScoreTooLowToPublish(score: Double) : QuestionException(
-        "Q004", "품질 점수가 출제 기준 미달입니다: $score", ErrorStatus.BAD_REQUEST
+
+    class CannotPublishEmpty : QuestionException(
+        "QUESTION_GROUP_CANNOT_PUBLISH_EMPTY",
+        "문제가 없는 그룹은 출제할 수 없습니다"
     )
-    class QualityScoreNotAssigned : QuestionException(
-        "Q005", "품질 점수가 부여되지 않았습니다", ErrorStatus.BAD_REQUEST
-    )
-    class QuestionSetAlreadyAssigned(questionSetId: Long) : QuestionException(
-        "Q006", "이미 세트에 편입된 문제입니다: set=$questionSetId", ErrorStatus.CONFLICT
-    )
-    class AnswerChoiceBlank : QuestionException(
-        "Q007", "선지는 비어 있을 수 없습니다.", ErrorStatus.BAD_REQUEST
+
+    class NotFound(questionId: Long) : QuestionException(
+        "QUESTION_NOT_FOUND",
+        "questionId: $questionId 에 해당하는 문제를 찾을 수 없습니다."
     )
 }

@@ -6,6 +6,8 @@ import java.time.Instant
 
 class GenerationCompletedEvent(
     val generationId: Long,
+    val successCount: Int,
+    val failureCount: Int,
     val occurredAt: Instant,
 ) : DomainEvent(
     aggregateId   = generationId.toString(),

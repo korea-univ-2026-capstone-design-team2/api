@@ -1,6 +1,6 @@
 package com.examhelper.api.question.domain.vo
 
-import com.examhelper.api.question.domain.exception.QuestionAssertionException
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 
 sealed class AnswerSheet {
 
@@ -20,34 +20,34 @@ sealed class AnswerSheet {
 
         private fun validateChoiceSize() {
             require(choices.size == 5) {
-                throw QuestionAssertionException.ChoiceSizeMismatch(choices.size)
+                throw QuestionItemAssertionException.ChoiceSizeMismatch(choices.size)
             }
         }
 
         private fun validateChoiceNumberUniqueness() {
             val numbers = choices.map { it.number }
             require(numbers.distinct().size == numbers.size) {
-                throw QuestionAssertionException.ChoiceNumberDuplicated()
+                throw QuestionItemAssertionException.ChoiceNumberDuplicated()
             }
         }
 
         private fun validateCorrectNumber() {
             require(correctNumber in 1..5) {
-                throw QuestionAssertionException.CorrectNumberOutOfRange(correctNumber)
+                throw QuestionItemAssertionException.CorrectNumberOutOfRange(correctNumber)
             }
         }
 
         private fun validateCorrectAnswerCount() {
             val correctCount = choices.count { it.isCorrect }
             require(correctCount == 1) {
-                throw QuestionAssertionException.CorrectAnswerCountMismatch(correctCount)
+                throw QuestionItemAssertionException.CorrectAnswerCountMismatch(correctCount)
             }
         }
 
         private fun validateCorrectNumberChoiceConsistency() {
             val markedChoice = choices.find { it.number == correctNumber }
             require(markedChoice != null && markedChoice.isCorrect) {
-                throw QuestionAssertionException.CorrectNumberChoiceMismatch(correctNumber)
+                throw QuestionItemAssertionException.CorrectNumberChoiceMismatch(correctNumber)
             }
         }
     }

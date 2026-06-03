@@ -1,7 +1,7 @@
 package com.examhelper.api.question.application
 
-import com.examhelper.api.kernel.identifier.QuestionId
-import com.examhelper.api.question.domain.exception.QuestionException
+import com.examhelper.api.kernel.identifier.QuestionItemId
+import com.examhelper.api.question.domain.exception.QuestionItemException
 import com.examhelper.api.question.port.inbound.AssignQualityScoreUseCase
 import com.examhelper.api.question.port.inbound.command.AssignQualityScoreCommand
 import com.examhelper.api.question.port.inbound.result.AssignQualityScoreResult
@@ -9,7 +9,7 @@ import com.examhelper.api.question.port.outbound.QuestionStore
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-
+/*
 @Service
 class AssignQualityScoreService(
     private val questionStore: QuestionStore,
@@ -17,8 +17,8 @@ class AssignQualityScoreService(
 
     @Transactional
     override fun execute(command: AssignQualityScoreCommand): AssignQualityScoreResult {
-        val question = questionStore.loadById(QuestionId(command.questionId))
-            ?: throw QuestionException.NotFound(command.questionId.toString())
+        val question = questionStore.loadById(QuestionItemId(command.questionId))
+            ?: throw QuestionItemException.NotFound(command.questionId.toString())
 
         question.assignQualityScore(command.score)
         questionStore.save(question)
@@ -30,3 +30,4 @@ class AssignQualityScoreService(
         )
     }
 }
+*/

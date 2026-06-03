@@ -9,9 +9,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     // Spring Ai
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
-    implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
+    // implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
+    // implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
 
     // Protobuf
     implementation("com.google.protobuf:protobuf-java:4.34.1")
+
+    // Kotlin Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 }
