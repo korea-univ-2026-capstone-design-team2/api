@@ -33,7 +33,7 @@ class QuestionGenerationSseEventListener(
     }
 
     @EventListener
-    fun handle(event: GenerationFailedEvent, ) {
+    fun handle(event: GenerationFailedEvent) {
         registry.send(
             generationId = event.generationId,
             eventName = "generation-failed",
