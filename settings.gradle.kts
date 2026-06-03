@@ -40,3 +40,10 @@ include(":auth")
 
 //member
 include(":member")
+include("member:domain")
+include("member:application")
+include("member:application")
+include("member:adapter")
+include("member:adapter:persistence")
+include("member:adapter:web")
+include("member:port")
