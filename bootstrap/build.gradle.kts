@@ -4,8 +4,6 @@ plugins {
     kotlin("plugin.jpa")
 }
 
-apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
-
 dependencies {
     implementation(project(":shared:kernel"))
     implementation(project(":shared:infrastructure"))
