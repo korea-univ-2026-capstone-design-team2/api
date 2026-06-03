@@ -64,8 +64,7 @@ snowflake:
   worker-id: 10
 
 cors:
-  allowed-origins:
-    - http://localhost:*
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
 
 springdoc:
   api-docs:
