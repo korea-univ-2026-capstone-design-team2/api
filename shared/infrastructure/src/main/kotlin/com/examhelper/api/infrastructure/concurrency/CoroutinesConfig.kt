@@ -1,5 +1,6 @@
 package com.examhelper.api.infrastructure.concurrency
 
+import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,11 +12,18 @@ import java.util.concurrent.Executors
 
 @Configuration
 class CoroutinesConfig {
+    private val applicationJob = SupervisorJob()
+
     @Bean
     fun questionGenerationDispatcher(): CoroutineDispatcher =
         Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
 
     @Bean
     fun applicationScope(): CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        CoroutineScope(applicationJob + Dispatchers.IO)
+
+    @PreDestroy
+    fun destroy() {
+        applicationJob.cancel()
+    }
 }
