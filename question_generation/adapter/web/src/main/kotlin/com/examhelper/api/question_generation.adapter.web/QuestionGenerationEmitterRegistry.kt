@@ -15,7 +15,7 @@ class QuestionGenerationEmitterRegistry {
         emitter.onTimeout { emitters.remove(generationId) }
         emitter.onError { emitters.remove(generationId) }
 
-        emitters[generationId] = emitter
+        emitters.put(generationId, emitter)?.let { runCatching { it.complete() } }
 
         return emitter
     }
@@ -33,6 +33,11 @@ class QuestionGenerationEmitterRegistry {
                     .name(eventName)
                     .data(data)
             )
+
+            if (eventName == "generation-completed" || eventName == "generation-failed") {
+                emitters.remove(generationId)
+                runCatching { emitter.complete() }
+            }
         } catch (_: Exception) {
             emitters.remove(generationId)
         }
