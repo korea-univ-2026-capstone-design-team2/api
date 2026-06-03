@@ -1,7 +1,10 @@
 plugins {
     id("org.springframework.boot")
     kotlin("kapt")
+    kotlin("plugin.jpa")
 }
+
+apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 
 dependencies {
     implementation(project(":shared:kernel"))
