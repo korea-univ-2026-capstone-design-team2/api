@@ -1,10 +1,14 @@
 package com.examhelper.api.question_generation.application
 
+import com.examhelper.api.kernel.core.DomainEventPublisher
 import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionGenerationStepLogId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question_generation.domain.QuestionGeneration
+import com.examhelper.api.question_generation.domain.event.GenerationCompletedEvent
+import com.examhelper.api.question_generation.domain.event.GenerationFailedEvent
+import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStep
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStepStatus
@@ -24,9 +28,11 @@ import com.examhelper.api.question_generation.port.outbound.command.QuestionCrea
 import com.examhelper.api.question_generation.port.outbound.query.FrameSearchQuery
 import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
@@ -41,27 +47,38 @@ class GenerateQuestionService(
     private val questionCreationPort: QuestionCreationPort,
     private val idGenerator: IdGenerator,
     private val metricsPort: QuestionGenerationMetricsPort,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val applicationScope: CoroutineScope,
+    private val domainEventPublisher: DomainEventPublisher
 ) : GenerateQuestionUseCase {
     private val logger = KotlinLogging.logger {}
 
-    override fun execute(command: GenerateQuestionCommand): GenerateQuestionResult =
-        runBlocking(dispatcher) {
-            executeInternal(command)
+    override fun execute(command: GenerateQuestionCommand): GenerateQuestionResult {
+        val generation = QuestionGeneration.create(
+            id = QuestionGenerationId(idGenerator.generateId()),
+            request = command.toGenerationRequest(),
+        )
+        questionGenerationStore.save(generation)
+
+        logger.info { "문제 생성 시작: generationId=${generation.id}, quantity=${generation.request.quantity}" }
+
+        applicationScope.launch(dispatcher) {
+            executeInternal(generation)
         }
 
-    private suspend fun executeInternal(command: GenerateQuestionCommand): GenerateQuestionResult {
+        return GenerateQuestionResult(
+            questionGenerationId = generation.id,
+            questionIds = emptyList(),
+            successCount = 0,
+            failCount = 0,
+            status = QuestionGenerationStatus.PENDING,
+        )
+    }
+
+    private suspend fun executeInternal(generation: QuestionGeneration) {
         val start = System.currentTimeMillis()
 
         try {
-            val generation = QuestionGeneration.create(
-                id = QuestionGenerationId(idGenerator.generateId()),
-                request = command.toGenerationRequest(),
-            )
-            questionGenerationStore.save(generation)
-
-            logger.info { "문제 생성 시작: generationId=${generation.id}, quantity=${generation.request.quantity}" }
-
             // ── FrameSearch ────────────────────────────────────────
             val frames = runWithLog(generation.id, QuestionGenerationStep.FRAME_SEARCH) {
                 frameSearchPort.search(FrameSearchQuery.from(generation.request))
@@ -71,27 +88,18 @@ class GenerateQuestionService(
                 generation.fail(message)
                 questionGenerationStore.save(generation)
 
-                return GenerateQuestionResult(
-                    questionGenerationId = generation.id,
-                    questionIds = emptyList(),
-                    successCount = 0,
-                    failCount = generation.request.quantity,
-                    status = QuestionGenerationStatus.FAILED
-                )
+                domainEventPublisher.publishFrom(generation)
+                return
             }
 
             if (frames.isEmpty()) {
+                val message = "프레임을 찾지 못했습니다.: ${generation.request.topic.category}"
                 logger.warn { "프레임 검색 결과가 없습니다.: generationId=${generation.id}, category=${generation.request.topic.category}" }
-                generation.fail("프레임을 찾지 못했습니다.: ${generation.request.topic.category}")
+                generation.fail(message)
                 questionGenerationStore.save(generation)
 
-                return GenerateQuestionResult(
-                    questionGenerationId = generation.id,
-                    questionIds = emptyList(),
-                    successCount = 0,
-                    failCount = generation.request.quantity,
-                    status = QuestionGenerationStatus.FAILED
-                )
+                domainEventPublisher.publishFrom(generation)
+                return
             }
 
             // ── 병렬 문제 생성 ─────────────────────────────────────
@@ -117,20 +125,27 @@ class GenerateQuestionService(
             logger.info { "문제 생성 완료: total=${generation.request.quantity}, failed=${failures.size}" }
 
             if (failures.isNotEmpty()) {
-                generation.fail("${failures.size}/${generation.request.quantity} 문제 생성 실패")
-            } else {
-                generation.complete()
-            }
+                val message = "${failures.size}/${generation.request.quantity} 문제 생성 실패"
+                generation.fail(message)
+                questionGenerationStore.save(generation)
 
+                domainEventPublisher.publishFrom(generation)
+            } else {
+                generation.complete(
+                    successCount = createdGroupIds.size,
+                    failureCount = 0
+                )
+                questionGenerationStore.save(generation)
+
+                domainEventPublisher.publishFrom(generation)
+            }
+        } catch (e: Exception) {
+            val message = "예기치 않은 오류: ${e.message}"
+            logger.error(e) { "문제 생성 중 예외 발생: generationId=${generation.id}" }
+            generation.fail(message)
             questionGenerationStore.save(generation)
 
-            return GenerateQuestionResult(
-                questionGenerationId = generation.id,
-                questionIds = createdGroupIds,
-                successCount = createdGroupIds.size,
-                failCount = failures.size,
-                status = generation.status
-            )
+            domainEventPublisher.publishFrom(generation)
         } finally {
             metricsPort.recordTotalDuration(System.currentTimeMillis() - start)
         }
@@ -159,7 +174,7 @@ class GenerateQuestionService(
             step = QuestionGenerationStep.QUESTION_CREATION,
             detail = "index=$index",
         ) {
-            questionCreationPort.create(
+            val questionId = questionCreationPort.create(
                 QuestionCreationCommand(
                     result = llmResult,
                     generationId = generation.id,
@@ -175,6 +190,16 @@ class GenerateQuestionService(
                     )
                 )
             ).questionId
+
+            domainEventPublisher.publish(
+                QuestionGeneratedEvent(
+                    generationId = generation.id.value,
+                    questionId = questionId.value,
+                    occurredAt = Instant.now(),
+                )
+            )
+
+            questionId
         }.onFailure {
             logger.error(it) { "문제 묶음 생성 실패: generationId=${generation.id}, index=$index" }
         }

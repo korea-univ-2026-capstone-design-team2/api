@@ -1,3 +1,7 @@
+plugins {
+    kotlin("plugin.jpa")
+}
+
 dependencies {
     implementation(project(":shared:kernel"))
     implementation(project(":shared:infrastructure"))

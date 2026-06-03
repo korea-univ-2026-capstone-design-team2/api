@@ -12,6 +12,7 @@ class SecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
+            .cors {  }
             .csrf { it.disable() }
             .authorizeHttpRequests { it.anyRequest().permitAll() }  // 실험용 전체 허용
         return http.build()

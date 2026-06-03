@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.http.MediaType
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
@@ -50,3 +51,39 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
     ),
 )
 annotation class GenerateQuestionDocs
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "PSAT 문제 생성 상태 실시간 구독 (SSE)",
+    description = """
+        지정한 `generationId`에 해당하는 문제 생성 프로세스의 진행 상황을 실시간 스트림(SSE)으로 구독합니다.
+        
+        **클라이언트 연결 방식**
+        - URL: `/api/v1/questions/{generationId}/events`
+        - Content-Type: `text/event-stream`
+        
+        **주요 발생 이벤트 목록 (`eventName`)**
+        1. `generation-progress` : 문제 생성 진행 중 (예: RAG 검색 완료, 초안 작성 중 등)
+        2. `generation-completed` : **[최종]** 문제 생성 완료 (이 이벤트 이후 연결이 종료됩니다)
+        3. `generation-failed` : **[최종]** 문제 생성 실패 (이 이벤트 이후 연결이 종료됩니다)
+    """
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "실시간 스트림 연결 성공",
+        content = [
+            Content(
+                mediaType = MediaType.TEXT_EVENT_STREAM_VALUE,
+                schema = Schema(description = "실시간 이벤트 스트림 데이터")
+            )
+        ]
+    ),
+    ApiResponse(
+        responseCode = "404",
+        description = "존재하지 않거나 만료된 Generation ID",
+        content = [Content(schema = Schema(hidden = true))]
+    )
+)
+annotation class ConnectQuestionEventsDocs

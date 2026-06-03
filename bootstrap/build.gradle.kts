@@ -1,6 +1,7 @@
 plugins {
     id("org.springframework.boot")
     kotlin("kapt")
+    kotlin("plugin.jpa")
 }
 
 dependencies {
