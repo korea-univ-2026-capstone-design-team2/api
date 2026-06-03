@@ -50,7 +50,8 @@ class GenerateQuestionService(
     private val dispatcher: CoroutineDispatcher,
     private val applicationScope: CoroutineScope,
     private val domainEventPublisher: DomainEventPublisher
-) : GenerateQuestionUseCase {    private val logger = KotlinLogging.logger {}
+) : GenerateQuestionUseCase {
+    private val logger = KotlinLogging.logger {}
 
     override fun execute(command: GenerateQuestionCommand): GenerateQuestionResult {
         val generation = QuestionGeneration.create(
@@ -87,13 +88,7 @@ class GenerateQuestionService(
                 generation.fail(message)
                 questionGenerationStore.save(generation)
 
-                domainEventPublisher.publish(
-                    GenerationFailedEvent(
-                        generationId = generation.id.value,
-                        reason = message,
-                        occurredAt = Instant.now(),
-                    )
-                )
+                domainEventPublisher.publishFrom(generation)
                 return
             }
 
@@ -103,13 +98,7 @@ class GenerateQuestionService(
                 generation.fail(message)
                 questionGenerationStore.save(generation)
 
-                domainEventPublisher.publish(
-                    GenerationFailedEvent(
-                        generationId = generation.id.value,
-                        reason = message,
-                        occurredAt = Instant.now(),
-                    )
-                )
+                domainEventPublisher.publishFrom(generation)
                 return
             }
 
@@ -140,13 +129,7 @@ class GenerateQuestionService(
                 generation.fail(message)
                 questionGenerationStore.save(generation)
 
-                domainEventPublisher.publish(
-                    GenerationFailedEvent(
-                        generationId = generation.id.value,
-                        reason = message,
-                        occurredAt = Instant.now(),
-                    )
-                )
+                domainEventPublisher.publishFrom(generation)
             } else {
                 generation.complete(
                     successCount = createdGroupIds.size,

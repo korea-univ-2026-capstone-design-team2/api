@@ -48,10 +48,10 @@ class QuestionGenerationController(
     ): SseEmitter {
         val emitter = registry.connect(generationId)
 
-        emitter.send(
-            SseEmitter.event()
-                .name("connected")
-                .data("connected")
+        registry.send(
+            generationId = generationId,
+            eventName = "connected",
+            data = "connected",
         )
 
         return emitter
