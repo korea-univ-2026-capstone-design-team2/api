@@ -28,7 +28,11 @@ class QuestionGenerationSseEventListener(
         registry.send(
             generationId = event.generationId,
             eventName = "generation-completed",
-            data = event
+            data = mapOf(
+                "generationId" to event.generationId,
+                "successCount" to event.successCount,
+                "failureCount" to event.failureCount,
+            )
         )
     }
 
@@ -37,7 +41,10 @@ class QuestionGenerationSseEventListener(
         registry.send(
             generationId = event.generationId,
             eventName = "generation-failed",
-            data = event
+            data = mapOf(
+                "generationId" to event.generationId,
+                "reason" to event.reason,
+            )
         )
     }
 }
