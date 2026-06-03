@@ -79,7 +79,7 @@ subprojects {
 		path.startsWith(":question_generation:") -> "com.examhelper.api.question_generation"
 		path.startsWith(":exam:") -> "com.examhelper.api.exam"
 		path.startsWith(":token_usage:") -> "com.examhelper.api.token_usage"
-		path.startsWith(":user:") -> "com.examhelper.api.user"
+		path.startsWith(":member:") -> "com.examhelper.api.member"
 		path.startsWith(":auth:") -> "com.examhelper.api.auth"
 		else -> "com.examhelper.api.shared"
 	}
