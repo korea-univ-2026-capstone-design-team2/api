@@ -21,7 +21,7 @@ class StartExamAttemptService(
     @Transactional
     override fun execute(command: StartExamAttemptCommand): StartExamAttemptResult {
         // ── 시험 존재 확인 ─────────────────────────────
-        require(examExistencePort.existsById(command.examId)) { "Exam not found: ${command.examId}" }
+        require(examExistencePort.existsById(command.examId)) { throw ExamAttemptException.ExamNotFound(command.examId.value) }
 
         // ── 진행중 응시 확인 ───────────────────────────
         val existingAttempt = examAttemptStore.loadInProgressByExamIdAndMemberId(
