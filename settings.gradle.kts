@@ -28,6 +28,13 @@ include(":exam:adapter:web")
 include(":exam:adapter:persistence")
 include(":exam:adapter:domain_connector")
 
+// exam_attempt
+include(":exam_attempt:domain")
+include(":exam_attempt:port")
+include(":exam_attempt:application")
+include(":exam_attempt:adapter:web")
+include(":exam_attempt:adapter:persistence")
+
 // token_usage
 include(":token_usage:domain")
 include(":token_usage:port")
