@@ -36,7 +36,7 @@ class ExamAttemptEntity(
         cascade = [CascadeType.ALL],
         orphanRemoval = true,
     )
-    private val answers: MutableList<ExamAttemptAnswerEntity>,
+    private val answers: MutableList<ExamAttemptAnswerEntity> = mutableListOf(),
 
     @Column(nullable = false, updatable = false)
     val startedAt: Instant,

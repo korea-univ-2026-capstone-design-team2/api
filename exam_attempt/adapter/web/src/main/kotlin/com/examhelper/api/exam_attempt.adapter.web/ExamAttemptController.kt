@@ -38,7 +38,7 @@ class ExamAttemptController(
         return ResponseEntity.ok(ApiResponse.Success(StartExamAttemptResDto.fromResult(result)))
     }
 
-    @PatchMapping("/exam-attempts/{attemptId}/answers")
+    @PatchMapping("/{attemptId}/answers")
     @SaveExamAttemptAnswersDocs
     fun saveAnswers(
 //        @AuthMember memberId: Long,

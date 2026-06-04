@@ -1,6 +1,7 @@
 package com.examhelper.api.exam_attempt.adapter.web.dto.request
 
 import com.examhelper.api.exam_attempt.port.inbound.command.SubmitExamAttemptAnswerCommand
+import com.examhelper.api.kernel.identifier.QuestionItemId
 
 data class SubmitExamAttemptAnswerReqDto(
     val questionItemId: Long,
@@ -11,7 +12,7 @@ data class SubmitExamAttemptAnswerReqDto(
 ) {
     fun toCommand(): SubmitExamAttemptAnswerCommand {
         return SubmitExamAttemptAnswerCommand(
-            questionItemId = questionItemId,
+            questionItemId = QuestionItemId(questionItemId),
             selectedNumber = selectedNumber,
             timeSpentSeconds = timeSpentSeconds,
             markedUnknown = markedUnknown,

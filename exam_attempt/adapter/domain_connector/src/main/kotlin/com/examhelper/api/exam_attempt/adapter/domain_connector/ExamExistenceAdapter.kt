@@ -1,4 +1,4 @@
-package com.examhelper.api.domain_connector
+package com.examhelper.api.exam_attempt.adapter.domain_connector
 
 import com.examhelper.api.exam.port.inbound.CheckExamExistsUseCase
 import com.examhelper.api.exam.port.inbound.query.CheckExamExistsQuery

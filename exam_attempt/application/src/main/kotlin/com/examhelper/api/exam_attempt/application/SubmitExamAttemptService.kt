@@ -25,7 +25,7 @@ class SubmitExamAttemptService(
         command.answers.forEach { answer ->
             attempt.saveAnswer(
                 ExamAttemptAnswer(
-                    questionItemId = QuestionItemId(answer.questionItemId),
+                    questionItemId = answer.questionItemId,
                     selectedNumber = answer.selectedNumber,
                     timeSpentSeconds = answer.timeSpentSeconds,
                     markedUnknown = answer.markedUnknown,
