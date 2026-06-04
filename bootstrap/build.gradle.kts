@@ -13,6 +13,11 @@ dependencies {
     implementation(project(":question:adapter:web"))
     implementation(project(":question:adapter:persistence"))
 
+    // Member
+    implementation(project(":member:application"))
+    implementation(project(":member:adapter:web"))
+    implementation(project(":member:adapter:persistence"))
+
     // Question Generation
     implementation(project(":question_generation:application"))
     implementation(project(":question_generation:adapter:web"))
