@@ -8,4 +8,5 @@ interface ExamReader {
     fun findDetailById(examId: Long): ExamDetailView?
     fun findSummaries(filter: ExamFilter): List<ExamSummaryView>
     fun count(filter: ExamFilter): Long
+    fun existsById(examId: Long): Boolean
 }

@@ -78,6 +78,7 @@ subprojects {
 		path.startsWith(":question:") -> "com.examhelper.api.question"
 		path.startsWith(":question_generation:") -> "com.examhelper.api.question_generation"
 		path.startsWith(":exam:") -> "com.examhelper.api.exam"
+		path.startsWith(":exam_attempt:") -> "com.examhelper.api.exam_attempt"
 		path.startsWith(":token_usage:") -> "com.examhelper.api.token_usage"
 		path.startsWith(":member:") -> "com.examhelper.api.member"
 		path.startsWith(":auth:") -> "com.examhelper.api.auth"

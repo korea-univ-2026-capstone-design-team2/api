@@ -6,8 +6,8 @@ dependencies {
     implementation(project(":shared:kernel"))
     implementation(project(":shared:infrastructure"))
 
-    implementation(project(":member:domain"))
-    implementation(project(":member:port"))
+    implementation(project(":exam_attempt:domain"))
+    implementation(project(":exam_attempt:port"))
 
     // Database
     compileOnly("jakarta.persistence:jakarta.persistence-api")

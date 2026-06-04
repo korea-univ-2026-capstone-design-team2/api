@@ -31,6 +31,10 @@ class ExamQueryAdapter(
             difficulty = filter.difficulty,
             status = filter.status,
         )
+
+    override fun existsById(examId: Long): Boolean {
+        return examJpaReader.existsById(examId)
+    }
 }
 
 // ── ExamEntity → DetailView ───────────────────────────────────
