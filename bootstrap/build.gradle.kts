@@ -26,6 +26,12 @@ dependencies {
     implementation(project(":exam:adapter:persistence"))
     implementation(project(":exam:adapter:domain_connector"))
 
+    // Exam Attempt
+    implementation(project(":exam_attempt:application"))
+    implementation(project(":exam_attempt:adapter:web"))
+    implementation(project(":exam_attempt:adapter:persistence"))
+    implementation(project(":exam_attempt:adapter:domain_connector"))
+
     // Token Usage
     implementation(project(":token_usage:application"))
     implementation(project(":token_usage:adapter:web"))

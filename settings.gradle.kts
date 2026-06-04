@@ -34,6 +34,8 @@ include(":exam_attempt:port")
 include(":exam_attempt:application")
 include(":exam_attempt:adapter:web")
 include(":exam_attempt:adapter:persistence")
+include(":exam_attempt:adapter:domain_connector")
+
 
 // token_usage
 include(":token_usage:domain")
