@@ -39,9 +39,6 @@ dependencies {
     // Auth
     implementation(project(":auth"))
 
-    // Member
-    implementation(project(":member"))
-
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
