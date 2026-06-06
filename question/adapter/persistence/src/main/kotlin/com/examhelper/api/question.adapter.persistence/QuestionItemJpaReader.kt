@@ -4,6 +4,8 @@ import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
+import com.examhelper.api.question.adapter.persistence.projection.CorrectAnswerProjection
+import com.examhelper.api.question.port.inbound.view.CorrectAnswerView
 import com.examhelper.api.question.port.inbound.view.QuestionItemSummaryView
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -50,6 +52,15 @@ interface QuestionItemJpaReader : JpaRepository<QuestionItemEntity, Long> {
         @Param("questionId") questionId: Long?,
         pageable: Pageable,
     ): List<QuestionItemSummaryView>
+
+    @Query("""
+        SELECT 
+            qi.id AS questionItemId,
+            CAST(JSON_UNQUOTE(JSON_EXTRACT(qi.answer_sheet, '$.correctNumber')) AS SIGNED) AS correctNumber
+        FROM question_items qi
+        WHERE qi.id IN :ids
+    """, nativeQuery = true)
+    fun findCorrectAnswersByIds(ids: List<Long>): List<CorrectAnswerProjection>
 
     @Query("""
         SELECT COUNT(qi)
