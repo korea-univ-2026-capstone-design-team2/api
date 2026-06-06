@@ -43,7 +43,11 @@ dependencies {
     implementation(project(":token_usage:adapter:persistence"))
 
     // Auth
-    implementation(project(":auth"))
+    implementation(project(":auth:application"))
+    implementation(project(":auth:adapter:web"))
+    implementation(project(":auth:adapter:persistence"))
+    implementation(project(":auth:adapter:oauth"))
+    implementation(project(":auth:adapter:jwt"))
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
