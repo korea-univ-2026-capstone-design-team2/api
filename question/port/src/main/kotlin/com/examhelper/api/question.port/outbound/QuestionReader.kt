@@ -1,5 +1,6 @@
 package com.examhelper.api.question.port.outbound
 
+import com.examhelper.api.question.port.inbound.view.CorrectAnswerView
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionItemDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionItemPaperView
@@ -25,4 +26,5 @@ interface QuestionReader {
     fun findItemDetailById(id: Long): QuestionItemDetailView?
     fun findAllItems(filter: QuestionItemFilter): List<QuestionItemSummaryView>
     fun countItems(filter: QuestionItemFilter): Long
+    fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView>
 }

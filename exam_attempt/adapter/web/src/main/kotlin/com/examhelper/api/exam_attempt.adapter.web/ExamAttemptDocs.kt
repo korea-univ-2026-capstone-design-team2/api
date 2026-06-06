@@ -149,3 +149,40 @@ annotation class SaveExamAttemptAnswersDocs
     )
 )
 annotation class SubmitExamAttemptDocs
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@Operation(
+    summary = "시험 채점 결과 조회",
+    description = """
+        제출된 시험 응시의 채점 결과를 조회합니다.
+        
+        응답에는 다음 정보가 포함됩니다.
+        
+        - 총 문항 수
+        - 정답 수
+        - 점수
+        - 정답률
+        - 총 풀이 시간
+        - 문항별 정오답 결과
+        
+        제출되지 않은 응시는 조회할 수 없습니다.
+    """
+)
+@ApiResponses(
+    ApiResponse(
+        responseCode = "200",
+        description = "채점 결과 조회 성공"
+    ),
+    ApiResponse(
+        responseCode = "403",
+        description = "본인의 응시 결과가 아님",
+        content = [Content(schema = Schema(hidden = true))]
+    ),
+    ApiResponse(
+        responseCode = "404",
+        description = "응시를 찾을 수 없음",
+        content = [Content(schema = Schema(hidden = true))]
+    )
+)
+annotation class GetExamAttemptResultDocs

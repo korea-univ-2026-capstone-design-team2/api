@@ -6,12 +6,16 @@ import com.examhelper.api.exam_attempt.adapter.web.dto.request.SubmitExamAttempt
 import com.examhelper.api.exam_attempt.adapter.web.dto.response.SaveExamAttemptAnswersResDto
 import com.examhelper.api.exam_attempt.adapter.web.dto.response.StartExamAttemptResDto
 import com.examhelper.api.exam_attempt.adapter.web.dto.response.SubmitExamAttemptResDto
+import com.examhelper.api.exam_attempt.port.inbound.GetExamAttemptResultUseCase
 import com.examhelper.api.exam_attempt.port.inbound.SaveExamAttemptAnswersUseCase
 import com.examhelper.api.exam_attempt.port.inbound.StartExamAttemptUseCase
 import com.examhelper.api.exam_attempt.port.inbound.SubmitExamAttemptUseCase
+import com.examhelper.api.exam_attempt.port.inbound.query.GetExamAttemptResultQuery
+import com.examhelper.api.exam_attempt.port.inbound.view.ExamAttemptResultView
 import com.examhelper.api.infrastructure.web.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,7 +29,8 @@ import org.springframework.web.bind.annotation.RestController
 class ExamAttemptController(
     private val startExamAttemptUseCase: StartExamAttemptUseCase,
     private val saveExamAttemptAnswersUseCase: SaveExamAttemptAnswersUseCase,
-    private val submitExamAttemptUseCase: SubmitExamAttemptUseCase
+    private val submitExamAttemptUseCase: SubmitExamAttemptUseCase,
+    private val getExamAttemptResultUseCase: GetExamAttemptResultUseCase
 ) {
     @PostMapping
     @StartExamAttemptDocs
@@ -73,5 +78,23 @@ class ExamAttemptController(
         )
 
         return ResponseEntity.ok(ApiResponse.Success(SubmitExamAttemptResDto.from(result)))
+    }
+
+
+    @GetMapping("/{attemptId}/result")
+    @GetExamAttemptResultDocs
+    fun getResult(
+        //@AuthenticationPrincipal member: MemberPrincipal,
+        @PathVariable attemptId: Long,
+    ): ResponseEntity<ApiResponse.Success<ExamAttemptResultView>> {
+
+        val result = getExamAttemptResultUseCase.execute(
+            GetExamAttemptResultQuery(
+                attemptId = attemptId,
+                memberId = 1L
+            )
+        )
+
+        return ResponseEntity.ok(ApiResponse.Success(result))
     }
 }

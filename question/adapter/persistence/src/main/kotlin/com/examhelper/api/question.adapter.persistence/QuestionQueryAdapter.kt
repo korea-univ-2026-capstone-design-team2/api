@@ -1,10 +1,12 @@
 package com.examhelper.api.question.adapter.persistence
 
+import com.examhelper.api.question.adapter.persistence.projection.CorrectAnswerProjection
 import com.examhelper.api.question.adapter.persistence.record.AnswerChoiceRecord
 import com.examhelper.api.question.adapter.persistence.record.SharedQuestionContextRecord
 import com.examhelper.api.question.domain.exception.QuestionItemException
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceView
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceViewWithAnswer
+import com.examhelper.api.question.port.inbound.view.CorrectAnswerView
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionItemDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionItemPaperView
@@ -112,6 +114,10 @@ class QuestionQueryAdapter(
             difficulty = filter.difficulty,
             questionId = filter.questionId,
         )
+
+    override fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView> {
+        return questionItemJpaReader.findCorrectAnswersByIds(questionItemIds).map { it.toView() }
+    }
 }
 
 // ── QuestionEntity → PaperView ────────────────────────────
@@ -265,3 +271,9 @@ private fun AnswerChoiceRecord.toDisplayText(): String = when (type) {
         labels?.joinToString(", ") ?: throw QuestionItemException.AnswerChoiceBlank()
     else -> error("Unknown AnswerChoice type: $type")
 }
+
+private fun CorrectAnswerProjection.toView(): CorrectAnswerView =
+    CorrectAnswerView(
+        questionItemId = questionItemId,
+        correctNumber = correctNumber
+    )
