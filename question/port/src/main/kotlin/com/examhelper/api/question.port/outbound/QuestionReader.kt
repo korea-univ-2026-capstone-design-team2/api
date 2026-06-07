@@ -3,6 +3,7 @@ package com.examhelper.api.question.port.outbound
 import com.examhelper.api.question.port.inbound.view.CorrectAnswerView
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionItemDetailView
+import com.examhelper.api.question.port.inbound.view.QuestionItemMetadataView
 import com.examhelper.api.question.port.inbound.view.QuestionItemPaperView
 import com.examhelper.api.question.port.inbound.view.QuestionItemReviewView
 import com.examhelper.api.question.port.inbound.view.QuestionItemSummaryView
@@ -21,9 +22,10 @@ interface QuestionReader {
     fun count(filter: QuestionFilter): Long
 
     // ── Item 단위 ──────────────────────────────────────────
-    fun findItemPaperById(id: Long): QuestionItemPaperView?
-    fun findItemReviewById(id: Long): QuestionItemReviewView?
-    fun findItemDetailById(id: Long): QuestionItemDetailView?
+    fun findItemPaperById(questionItemId: Long): QuestionItemPaperView?
+    fun findItemReviewById(questionItemId: Long): QuestionItemReviewView?
+    fun findItemDetailById(questionItemId: Long): QuestionItemDetailView?
+    fun findItemSummaries(questionItemIds: List<Long>): List<QuestionItemMetadataView>
     fun findAllItems(filter: QuestionItemFilter): List<QuestionItemSummaryView>
     fun countItems(filter: QuestionItemFilter): Long
     fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView>

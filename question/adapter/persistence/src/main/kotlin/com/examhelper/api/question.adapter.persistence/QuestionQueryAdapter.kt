@@ -1,6 +1,7 @@
 package com.examhelper.api.question.adapter.persistence
 
 import com.examhelper.api.question.adapter.persistence.projection.CorrectAnswerProjection
+import com.examhelper.api.question.adapter.persistence.projection.QuestionItemSummaryProjection
 import com.examhelper.api.question.adapter.persistence.record.AnswerChoiceRecord
 import com.examhelper.api.question.adapter.persistence.record.SharedQuestionContextRecord
 import com.examhelper.api.question.domain.exception.QuestionItemException
@@ -9,6 +10,7 @@ import com.examhelper.api.question.port.inbound.view.AnswerChoiceViewWithAnswer
 import com.examhelper.api.question.port.inbound.view.CorrectAnswerView
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import com.examhelper.api.question.port.inbound.view.QuestionItemDetailView
+import com.examhelper.api.question.port.inbound.view.QuestionItemMetadataView
 import com.examhelper.api.question.port.inbound.view.QuestionItemPaperView
 import com.examhelper.api.question.port.inbound.view.QuestionItemPropositionView
 import com.examhelper.api.question.port.inbound.view.QuestionItemReviewView
@@ -71,6 +73,9 @@ class QuestionQueryAdapter(
         return question.toDetailView(items)
     }
 
+    override fun findItemSummaries(questionItemIds: List<Long>): List<QuestionItemMetadataView> =
+        questionItemJpaReader.findItemSummaries(questionItemIds).map { it.toView() }
+
     override fun findAll(filter: QuestionFilter): List<QuestionSummaryView> =
         questionJpaReader.findSummaries(
             subject = filter.subject,
@@ -87,14 +92,14 @@ class QuestionQueryAdapter(
         )
 
     // ── QuestionItem 단위 ──────────────────────────────────
-    override fun findItemPaperById(id: Long): QuestionItemPaperView? =
-        questionItemJpaReader.findEntityById(id)?.toItemPaperView()
+    override fun findItemPaperById(questionItemId: Long): QuestionItemPaperView? =
+        questionItemJpaReader.findEntityById(questionItemId)?.toItemPaperView()
 
-    override fun findItemReviewById(id: Long): QuestionItemReviewView? =
-        questionItemJpaReader.findEntityById(id)?.toItemReviewView()
+    override fun findItemReviewById(questionItemId: Long): QuestionItemReviewView? =
+        questionItemJpaReader.findEntityById(questionItemId)?.toItemReviewView()
 
-    override fun findItemDetailById(id: Long): QuestionItemDetailView? =
-        questionItemJpaReader.findEntityById(id)?.toItemDetailView()
+    override fun findItemDetailById(questionItemId: Long): QuestionItemDetailView? =
+        questionItemJpaReader.findEntityById(questionItemId)?.toItemDetailView()
 
     override fun findAllItems(filter: QuestionItemFilter): List<QuestionItemSummaryView> =
         questionItemJpaReader.findSummaries(
@@ -276,4 +281,13 @@ private fun CorrectAnswerProjection.toView(): CorrectAnswerView =
     CorrectAnswerView(
         questionItemId = questionItemId,
         correctNumber = correctNumber
+    )
+
+private fun QuestionItemSummaryProjection.toView() =
+    QuestionItemMetadataView(
+        questionItemId = questionItemId,
+        generationId = generationId,
+        subject = subject,
+        questionType = questionType,
+        difficulty = difficulty
     )
