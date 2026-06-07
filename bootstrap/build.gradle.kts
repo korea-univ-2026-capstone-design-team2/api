@@ -42,6 +42,11 @@ dependencies {
     implementation(project(":token_usage:adapter:web"))
     implementation(project(":token_usage:adapter:persistence"))
 
+    // Learning Statistics
+    implementation(project(":learning_statistics:application"))
+    implementation(project(":learning_statistics:adapter:web"))
+    implementation(project(":learning_statistics:adapter:persistence"))
+
     // Auth
     implementation(project(":auth:application"))
     implementation(project(":auth:adapter:web"))

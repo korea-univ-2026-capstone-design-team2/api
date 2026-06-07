@@ -5,6 +5,7 @@ import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.question.adapter.persistence.projection.CorrectAnswerProjection
+import com.examhelper.api.question.adapter.persistence.projection.QuestionItemSummaryProjection
 import com.examhelper.api.question.port.inbound.view.CorrectAnswerView
 import com.examhelper.api.question.port.inbound.view.QuestionItemSummaryView
 import org.springframework.data.domain.Pageable
@@ -78,4 +79,20 @@ interface QuestionItemJpaReader : JpaRepository<QuestionItemEntity, Long> {
         @Param("difficulty") difficulty: DifficultyLevel?,
         @Param("questionId") questionId: Long?
     ): Long
+
+    @Query("""
+        SELECT
+            qi.id as questionItemId,
+            qi.generationId as generationId,
+            qi.subject as subject,
+            qi.questionType as questionType,
+            qi.difficulty as difficulty,
+            qi.status as status
+        FROM QuestionItemEntity qi
+        JOIN qi.question q
+        WHERE qi.id IN :questionItemIds
+    """)
+    fun findItemSummaries(
+        @Param("questionItemIds") questionItemIds: List<Long>,
+    ): List<QuestionItemSummaryProjection>
 }

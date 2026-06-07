@@ -1,4 +1,4 @@
-package com.examhelper.api.exam_attempt.domain.event
+package com.examhelper.api.kernel.event
 
 import com.examhelper.api.kernel.core.DomainEvent
 import com.examhelper.api.kernel.core.EventChannel
@@ -8,7 +8,8 @@ class ExamAttemptSubmittedEvent(
     val attemptId: Long,
     val examId: Long,
     val memberId: Long,
-    val occurredAt: Instant
+    val submittedAt: Instant,
+    val items: List<ExamAttemptSubmittedItem>
 ) : DomainEvent(
     aggregateId = attemptId.toString(),
     aggregateType = "ExamAttempt",

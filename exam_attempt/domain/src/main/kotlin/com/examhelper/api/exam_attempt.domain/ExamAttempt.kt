@@ -2,7 +2,6 @@ package com.examhelper.api.exam_attempt.domain
 
 import com.examhelper.api.exam_attempt.domain.entity.ExamAttemptAnswer
 import com.examhelper.api.exam_attempt.domain.event.ExamAttemptStartedEvent
-import com.examhelper.api.exam_attempt.domain.event.ExamAttemptSubmittedEvent
 import com.examhelper.api.exam_attempt.domain.exception.ExamAttemptAssertionException
 import com.examhelper.api.exam_attempt.domain.exception.ExamAttemptException
 import com.examhelper.api.exam_attempt.domain.type.ExamAttemptStatus
@@ -62,15 +61,6 @@ class ExamAttempt private constructor(
         status = ExamAttemptStatus.SUBMITTED
         this.submittedAt = submittedAt
         updatedAt = submittedAt
-
-        addDomainEvent(
-            ExamAttemptSubmittedEvent(
-                attemptId = id.value,
-                examId = examId.value,
-                memberId = memberId.value,
-                occurredAt = submittedAt,
-            )
-        )
     }
 
     private fun validate() {

@@ -36,13 +36,19 @@ include(":exam_attempt:adapter:web")
 include(":exam_attempt:adapter:persistence")
 include(":exam_attempt:adapter:domain_connector")
 
-
 // token_usage
 include(":token_usage:domain")
 include(":token_usage:port")
 include(":token_usage:application")
 include(":token_usage:adapter:web")
 include(":token_usage:adapter:persistence")
+
+// learning_statistics
+include(":learning_statistics:domain")
+include(":learning_statistics:port")
+include(":learning_statistics:application")
+include(":learning_statistics:adapter:web")
+include(":learning_statistics:adapter:persistence")
 
 // auth
 include(":auth")
