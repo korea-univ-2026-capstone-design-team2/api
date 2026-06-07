@@ -1,5 +1,8 @@
 package com.examhelper.api.auth.adapter.web.request
 
+import com.examhelper.api.auth.domain.OAuthProvider
+import com.examhelper.api.auth.port.inbound.command.OAuthLoginCommand
+
 // [요청 DTO] 프론트엔드가 보내주는 데이터
 data class OAuthLoginReqDto(
     val provider: String, // 예: "GOOGLE", "KAKAO"

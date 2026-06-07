@@ -3,40 +3,42 @@ package com.examhelper.api.auth.adapter.jwt
 import com.examhelper.api.auth.port.outbound.JwtTokenProviderPort
 import com.examhelper.api.auth.port.outbound.JwtTokenSet
 import com.examhelper.api.kernel.identifier.MemberId
+import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import io.jsonwebtoken.security.Keys
+import io.jsonwebtoken.security.SignatureAlgorithm
+import java.util.Date
+import javax.crypto.SecretKey
 
 @Repository // 🟢 Spring Bean으로 등록하여 Service에 주입되게 합니다.
 class JwtTokenProviderAdapter(
-    // application.yml에서 비밀키와 만료시간을 가져옵니다.
     @Value("\${jwt.secret}") private val secretString: String,
     @Value("\${jwt.access-token-validity-in-ms}") private val accessTokenValidityInMs: Long,
     @Value("\${jwt.refresh-token-validity-in-ms}") private val refreshTokenValidityInMs: Long
-) : JwtTokenProviderPort { // 🟢 우리가 정의한 포트를 상속받습니다!
+) : JwtTokenProviderPort {
 
-    // 비밀키 세팅 (HMAC-SHA 알고리즘 사용)
-    private val key = Keys.hmacShaKeyFor(secretString.toByteArray())
+    // 💡 1. Key 생성: UTF-8 인코딩을 명시하여 안전하게 SecretKey를 생성합니다.
+    private val key: SecretKey = Keys.hmacShaKeyFor(secretString.toByteArray(Charsets.UTF_8))
 
     override fun generateTokens(memberId: MemberId): JwtTokenSet {
         val now = Date()
         val accessValidity = Date(now.time + accessTokenValidityInMs)
         val refreshValidity = Date(now.time + refreshTokenValidityInMs)
 
-        // 1. Access Token 생성 (회원 ID 포함)
+        // 💡 2. 최신 빌더 패턴: 'set'이 모두 사라지고 코드가 직관적으로 변했습니다.
         val accessToken = Jwts.builder()
-            .setSubject(memberId.value) // 토큰의 주인을 MemberId로 설정
-            .setIssuedAt(now)
-            .setExpiration(accessValidity)
-            .signWith(key, SignatureAlgorithm.HS256)
+            .subject(memberId.value.toString())     // setSubject -> subject
+            .issuedAt(now)               // setIssuedAt -> issuedAt
+            .expiration(accessValidity)  // setExpiration -> expiration
+            .signWith(key)               // 💡 3. 알고리즘(HS256) 자동 추론
             .compact()
 
-        // 2. Refresh Token 생성 (보안상 페이로드 최소화)
         val refreshToken = Jwts.builder()
-            .setSubject(memberId.value)
-            .setIssuedAt(now)
-            .setExpiration(refreshValidity)
-            .signWith(key, SignatureAlgorithm.HS256)
+            .subject(memberId.value.toString())
+            .issuedAt(now)
+            .expiration(refreshValidity)
+            .signWith(key)               // 여기도 key만 넘기면 끝!
             .compact()
 
         return JwtTokenSet(accessToken, refreshToken)

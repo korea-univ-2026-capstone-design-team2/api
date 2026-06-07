@@ -1,5 +1,7 @@
 package com.examhelper.api.auth.adapter.web.response
 
+import com.examhelper.api.auth.port.inbound.result.OAuthLoginResult
+
 data class TokenResDto(
     val accessToken: String,
     val refreshToken: String
