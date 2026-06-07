@@ -50,8 +50,9 @@ class SwaggerConfig {
         )
 
     private fun servers(activeProfile: String) = when (activeProfile) {
-        "prod" -> listOf(
-            Server().url("https://api.yourapp.com").description("Production"),
+        "dev" -> listOf(
+            Server().url("https://api.passfinder.site").description("Production"),
+            Server().url("https://passfinder.site").description("Front"),
             Server().url("http://localhost:8080").description("Local"),
         )
         else -> listOf(
