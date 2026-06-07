@@ -1,5 +1,6 @@
 package com.examhelper.api.auth.application
 
+import com.examhelper.api.auth.domain.OAuthCredential
 import com.examhelper.api.auth.port.inbound.OAuthLoginUseCase
 import com.examhelper.api.auth.port.inbound.command.OAuthLoginCommand
 import com.examhelper.api.auth.port.inbound.result.OAuthLoginResult
@@ -7,13 +8,16 @@ import com.examhelper.api.auth.port.outbound.JwtTokenProviderPort
 import com.examhelper.api.auth.port.outbound.OAuthClientPort
 import com.examhelper.api.auth.port.outbound.OAuthCredentialStore
 import com.examhelper.api.kernel.core.IdGenerator
+import com.examhelper.api.kernel.identifier.CredentialId
 import com.examhelper.api.kernel.identifier.MemberId
+import com.examhelper.api.kernel.type.AuthType
+import com.examhelper.api.member.Member
+import com.examhelper.api.member.port.outbound.MemberStore
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OAuthLoginService(
-    // [아웃바운드 포트들] 동료가 만든 adapter 폴더들의 인터페이스들입니다!
     private val oauthClientPort: OAuthClientPort,           // oauth 폴더에서 구현
     private val oauthCredentialStore: OAuthCredentialStore, // persistence 폴더에서 구현
     private val memberStore: MemberStore,                   // persistence 폴더에서 구현
@@ -45,7 +49,7 @@ class OAuthLoginService(
                 id = memberId,
                 nickname = oauthProfile.name ?: "Unknown", // 구글에서 받은 이름
                 email = oauthProfile.email,
-                authType = AuthType.OAUTH
+                authType = AuthType.GOOGLE
             )
             memberStore.save(newMember)
 
