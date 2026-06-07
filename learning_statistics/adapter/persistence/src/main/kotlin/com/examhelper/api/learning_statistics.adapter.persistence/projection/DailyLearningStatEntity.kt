@@ -25,8 +25,7 @@ import java.time.LocalDate
             columnNames = [
                 "member_id",
                 "study_date",
-                "subject",
-                "question_sub_type",
+                "subject"
             ]
         )
     ],
@@ -55,10 +54,6 @@ class DailyLearningStatEntity(
     @Column(nullable = false, updatable = false)
     val subject: Subject,
 
-    @Enumerated(EnumType.STRING)
-    @Column
-    val questionSubType: QuestionSubType?,
-
     @Column(nullable = false)
     val questionCount: Int,
 
@@ -82,7 +77,6 @@ class DailyLearningStatEntity(
                 memberId = domain.memberId.value,
                 studyDate = domain.date,
                 subject = domain.subject,
-                questionSubType = domain.questionSubType,
                 questionCount = domain.questionCount,
                 correctCount = domain.correctCount,
                 studySeconds = domain.studySeconds,
@@ -97,7 +91,6 @@ class DailyLearningStatEntity(
             memberId = MemberId(memberId),
             date = studyDate,
             subject = subject,
-            questionSubType = questionSubType,
             questionCount = questionCount,
             correctCount = correctCount,
             studySeconds = studySeconds,

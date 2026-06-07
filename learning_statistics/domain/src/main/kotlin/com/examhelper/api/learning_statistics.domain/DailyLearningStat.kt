@@ -14,7 +14,6 @@ class DailyLearningStat private constructor(
     val memberId: MemberId,
     val date: LocalDate,
     val subject: Subject,
-    val questionSubType: QuestionSubType?,
     questionCount: Int,
     correctCount: Int,
     studySeconds: Long,
@@ -64,7 +63,6 @@ class DailyLearningStat private constructor(
             memberId: MemberId,
             date: LocalDate,
             subject: Subject,
-            questionSubType: QuestionSubType?
         ): DailyLearningStat {
             val now = Instant.now()
             return DailyLearningStat(
@@ -72,7 +70,6 @@ class DailyLearningStat private constructor(
                 memberId = memberId,
                 date = date,
                 subject = subject,
-                questionSubType = questionSubType,
                 questionCount = 0,
                 correctCount = 0,
                 studySeconds = 0L,
@@ -86,7 +83,6 @@ class DailyLearningStat private constructor(
             memberId: MemberId,
             date: LocalDate,
             subject: Subject,
-            questionSubType: QuestionSubType?,
             questionCount: Int,
             correctCount: Int,
             studySeconds: Long,
@@ -97,7 +93,6 @@ class DailyLearningStat private constructor(
             memberId = memberId,
             date = date,
             subject = subject,
-            questionSubType = questionSubType,
             questionCount = questionCount,
             correctCount = correctCount,
             studySeconds = studySeconds,
