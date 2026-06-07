@@ -3,7 +3,11 @@ package com.examhelper.api.auth.application
 import com.examhelper.api.auth.port.inbound.OAuthLoginUseCase
 import com.examhelper.api.auth.port.inbound.command.OAuthLoginCommand
 import com.examhelper.api.auth.port.inbound.result.OAuthLoginResult
+import com.examhelper.api.auth.port.outbound.JwtTokenProviderPort
+import com.examhelper.api.auth.port.outbound.OAuthClientPort
+import com.examhelper.api.auth.port.outbound.OAuthCredentialStore
 import com.examhelper.api.kernel.core.IdGenerator
+import com.examhelper.api.kernel.identifier.MemberId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
