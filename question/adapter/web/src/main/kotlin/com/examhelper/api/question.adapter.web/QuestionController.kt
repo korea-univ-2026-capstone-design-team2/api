@@ -5,6 +5,9 @@ import com.examhelper.api.question.adapter.web.request.CreateQuestionReqDto
 import com.examhelper.api.question.adapter.web.request.GetQuestionPapersReqDto
 import com.examhelper.api.question.adapter.web.request.GetQuestionReviewsReqDto
 import com.examhelper.api.question.adapter.web.response.CreateQuestionResDto
+import com.examhelper.api.question.adapter.web.response.QuestionDetailResDto
+import com.examhelper.api.question.adapter.web.response.QuestionPaperResDto
+import com.examhelper.api.question.adapter.web.response.QuestionReviewResDto
 import com.examhelper.api.question.port.inbound.CreateQuestionUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionDetailUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionPaperUseCase
@@ -13,12 +16,8 @@ import com.examhelper.api.question.port.inbound.GetQuestionReviewUseCase
 import com.examhelper.api.question.port.inbound.GetQuestionReviewsUseCase
 import com.examhelper.api.question.port.inbound.query.GetQuestionDetailQuery
 import com.examhelper.api.question.port.inbound.query.GetQuestionPaperQuery
-import com.examhelper.api.question.port.inbound.query.GetQuestionPapersQuery
 import com.examhelper.api.question.port.inbound.query.GetQuestionReviewQuery
-import com.examhelper.api.question.port.inbound.query.GetQuestionReviewsQuery
 import com.examhelper.api.question.port.inbound.view.QuestionDetailView
-import com.examhelper.api.question.port.inbound.view.QuestionPaperView
-import com.examhelper.api.question.port.inbound.view.QuestionReviewView
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -63,9 +62,9 @@ class QuestionController(
     @GetQuestionPaperDocs
     fun getQuestionPaper(
         @PathVariable questionId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionPaperView>> {
+    ): ResponseEntity<ApiResponse.Success<QuestionPaperResDto>> {
         val view = getQuestionPaperUseCase.execute(GetQuestionPaperQuery(questionId))
-        return ResponseEntity.ok(ApiResponse.Success(view))
+        return ResponseEntity.ok(ApiResponse.Success(QuestionPaperResDto.fromView(view)))
     }
 
     // ── 해설지 조회 ────────────────────────────────────────
@@ -73,9 +72,9 @@ class QuestionController(
     @GetQuestionReviewDocs
     fun getQuestionReview(
         @PathVariable questionId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionReviewView>> {
+    ): ResponseEntity<ApiResponse.Success<QuestionReviewResDto>> {
         val view = getQuestionReviewUseCase.execute(GetQuestionReviewQuery(questionId))
-        return ResponseEntity.ok(ApiResponse.Success(view))
+        return ResponseEntity.ok(ApiResponse.Success(QuestionReviewResDto.fromView(view)))
     }
 
     // ── 관리용 상세 조회 ───────────────────────────────────
@@ -83,9 +82,9 @@ class QuestionController(
     @GetQuestionDetailDocs
     fun getQuestionGroupDetail(
         @PathVariable questionId: Long,
-    ): ResponseEntity<ApiResponse.Success<QuestionDetailView>> {
+    ): ResponseEntity<ApiResponse.Success<QuestionDetailResDto>> {
         val view = getQuestionDetailUseCase.execute(GetQuestionDetailQuery(questionId))
-        return ResponseEntity.ok(ApiResponse.Success(view))
+        return ResponseEntity.ok(ApiResponse.Success(QuestionDetailResDto.fromView(view)))
     }
 
     // ── 문제지 목록 조회 ───────────────────────────────────
@@ -93,12 +92,9 @@ class QuestionController(
     @GetQuestionPapersDocs
     fun getQuestionPapers(
         @RequestBody request: GetQuestionPapersReqDto,
-    ): ResponseEntity<ApiResponse.Success<List<QuestionPaperView>>> {
-        val views = getQuestionPapersUseCase.execute(
-            GetQuestionPapersQuery(request.questionIds)
-        )
-
-        return ResponseEntity.ok(ApiResponse.Success(views))
+    ): ResponseEntity<ApiResponse.Success<List<QuestionPaperResDto>>> {
+        val views = getQuestionPapersUseCase.execute(request.toQuery())
+        return ResponseEntity.ok(ApiResponse.Success(views.map(QuestionPaperResDto::fromView)))
     }
 
     // ── 해설지 목록 조회 ──────────────────────────────────────
@@ -106,13 +102,9 @@ class QuestionController(
     @GetQuestionReviewsDocs
     fun getQuestionReviews(
         @RequestBody request: GetQuestionReviewsReqDto,
-    ): ResponseEntity<ApiResponse.Success<List<QuestionReviewView>>> {
-
-        val views = getQuestionReviewsUseCase.execute(
-            GetQuestionReviewsQuery(request.questionIds)
-        )
-
-        return ResponseEntity.ok(ApiResponse.Success(views))
+    ): ResponseEntity<ApiResponse.Success<List<QuestionReviewResDto>>> {
+        val views = getQuestionReviewsUseCase.execute(request.toQuery())
+        return ResponseEntity.ok(ApiResponse.Success(views.map(QuestionReviewResDto::fromView)))
     }
 /*
     // ── 목록 조회 ──────────────────────────────────────────
