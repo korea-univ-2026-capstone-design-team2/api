@@ -44,12 +44,12 @@ class QuestionGenerationController(
         produces = [MediaType.TEXT_EVENT_STREAM_VALUE]
     )
     fun subscribe(
-        @PathVariable generationId: Long,
+        @PathVariable generationId: String,
     ): SseEmitter {
-        val emitter = registry.connect(generationId)
+        val emitter = registry.connect(generationId.toLong())
 
         registry.send(
-            generationId = generationId,
+            generationId = generationId.toLong(),
             eventName = "connected",
             data = "connected",
         )
