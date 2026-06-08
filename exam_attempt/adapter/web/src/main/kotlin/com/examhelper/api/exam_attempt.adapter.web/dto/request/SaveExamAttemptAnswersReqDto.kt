@@ -7,10 +7,10 @@ import com.examhelper.api.kernel.identifier.MemberId
 data class SaveExamAttemptAnswersReqDto(
     val answers: List<SaveExamAttemptAnswerReqDto>
 ) {
-    fun toCommand(attemptId: Long, memberId: Long): SaveExamAttemptAnswersCommand {
+    fun toCommand(attemptId: String, memberId: String): SaveExamAttemptAnswersCommand {
         return SaveExamAttemptAnswersCommand(
-            attemptId = ExamAttemptId(attemptId),
-            memberId = MemberId(memberId),
+            attemptId = ExamAttemptId(attemptId.toLong()),
+            memberId = MemberId(memberId.toLong()),
             answers = answers.map { it.toCommand() }
         )
     }

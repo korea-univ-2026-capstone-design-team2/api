@@ -7,8 +7,8 @@ data class GetDailyLearningSummaryReqDto(
     val from: LocalDate,
     val to: LocalDate
 ) {
-    fun toQuery(memberId: Long) = GetDailyLearningSummaryQuery(
-        memberId = memberId,
+    fun toQuery(memberId: String) = GetDailyLearningSummaryQuery(
+        memberId = memberId.toLong(),
         from = from,
         to = to
     )

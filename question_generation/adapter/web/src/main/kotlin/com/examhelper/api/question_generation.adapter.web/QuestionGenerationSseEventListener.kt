@@ -17,8 +17,8 @@ class QuestionGenerationSseEventListener(
             generationId = event.generationId,
             eventName = "question-generated",
             data = QuestionGeneratedSseResponse(
-                generationId = event.generationId,
-                questionId = event.questionId
+                generationId = event.generationId.toString(),
+                questionId = event.questionId.toString()
             )
         )
     }
@@ -29,7 +29,7 @@ class QuestionGenerationSseEventListener(
             generationId = event.generationId,
             eventName = "generation-completed",
             data = mapOf(
-                "generationId" to event.generationId,
+                "generationId" to event.generationId.toString(),
                 "successCount" to event.successCount,
                 "failureCount" to event.failureCount,
             )
@@ -42,7 +42,7 @@ class QuestionGenerationSseEventListener(
             generationId = event.generationId,
             eventName = "generation-failed",
             data = mapOf(
-                "generationId" to event.generationId,
+                "generationId" to event.generationId.toString(),
                 "reason" to event.reason,
             )
         )
