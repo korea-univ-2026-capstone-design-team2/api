@@ -4,7 +4,7 @@ import com.examhelper.api.exam_attempt.port.inbound.result.SubmitExamAttemptResu
 import java.time.Instant
 
 data class SubmitExamAttemptResDto(
-    val attemptId: Long,
+    val attemptId: String,
     val examId: Long,
     val status: String,
     val submittedAt: Instant
@@ -12,7 +12,7 @@ data class SubmitExamAttemptResDto(
     companion object {
         fun from(result: SubmitExamAttemptResult): SubmitExamAttemptResDto {
             return SubmitExamAttemptResDto(
-                attemptId = result.attemptId,
+                attemptId = result.attemptId.toString(),
                 examId = result.examId,
                 status = result.status,
                 submittedAt = result.submittedAt,

@@ -10,12 +10,12 @@ data class SubmitExamAttemptReqDto(
     val answers: List<SubmitExamAttemptAnswerReqDto>
 ) {
     fun toCommand(
-        attemptId: Long,
-        memberId: Long,
+        attemptId: String,
+        memberId: String,
     ): SubmitExamAttemptCommand {
         return SubmitExamAttemptCommand(
-            attemptId = ExamAttemptId(attemptId),
-            memberId = MemberId(memberId),
+            attemptId = ExamAttemptId(attemptId.toLong()),
+            memberId = MemberId(memberId.toLong()),
             answers = answers.map { it.toCommand() },
         )
     }

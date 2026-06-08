@@ -5,11 +5,11 @@ import com.examhelper.api.kernel.identifier.ExamId
 import com.examhelper.api.kernel.identifier.MemberId
 
 data class StartExamAttemptReqDto(
-    val examId: Long
+    val examId: String
 ) {
     fun toCommand(): StartExamAttemptCommand =
         StartExamAttemptCommand(
-            examId = ExamId(examId),
+            examId = ExamId(examId.toLong()),
             memberId = MemberId(1L)
         )
 }

@@ -4,7 +4,7 @@ import com.examhelper.api.exam_attempt.port.inbound.result.StartExamAttemptResul
 import java.time.Instant
 
 data class StartExamAttemptResDto(
-    val attemptId: Long,
+    val attemptId: String,
     val examId: Long,
     val status: String,
     val startedAt: Instant
@@ -12,7 +12,7 @@ data class StartExamAttemptResDto(
     companion object {
         fun fromResult(result: StartExamAttemptResult): StartExamAttemptResDto {
             return StartExamAttemptResDto(
-                attemptId = result.attemptId,
+                attemptId = result.attemptId.toString(),
                 examId = result.examId,
                 status = result.status,
                 startedAt = result.startedAt

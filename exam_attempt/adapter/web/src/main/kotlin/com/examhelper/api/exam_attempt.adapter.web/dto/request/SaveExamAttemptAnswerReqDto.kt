@@ -4,7 +4,7 @@ import com.examhelper.api.exam_attempt.port.inbound.command.SaveExamAttemptAnswe
 import com.examhelper.api.kernel.identifier.QuestionItemId
 
 data class SaveExamAttemptAnswerReqDto(
-    val questionItemId: Long,
+    val questionItemId: String,
     val selectedNumber: Int?,
     val timeSpentSeconds: Int,
     val markedUnknown: Boolean,
@@ -12,7 +12,7 @@ data class SaveExamAttemptAnswerReqDto(
 ) {
     fun toCommand(): SaveExamAttemptAnswerCommand {
         return SaveExamAttemptAnswerCommand(
-            questionItemId = QuestionItemId(questionItemId),
+            questionItemId = QuestionItemId(questionItemId.toLong()),
             selectedNumber = selectedNumber,
             timeSpentSeconds = timeSpentSeconds,
             markedUnknown = markedUnknown,
