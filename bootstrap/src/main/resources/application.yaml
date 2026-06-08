@@ -107,7 +107,7 @@ management:
 
 jwt:
   secret: ${JWT_SECRET:your_jwt_secret_key}
-  accss-token-validity-in-ms: 1800000
+  access-token-validity-in-ms: 1800000
   refresh-token-validity-in-ms: 604800000
 
 oauth:
