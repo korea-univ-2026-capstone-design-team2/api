@@ -104,3 +104,12 @@ management:
 
       percentiles:
         http.server.requests: 0.5,0.95,0.99
+
+jwt:
+  secret: ${JWT_SECRET:your_jwt_secret_key}
+  accss-token-validity-in-ms: 1800000
+  refresh-token-validity-in-ms: 604800000
+
+oauth:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}

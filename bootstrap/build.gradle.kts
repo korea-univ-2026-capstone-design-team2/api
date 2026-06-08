@@ -71,6 +71,7 @@ dependencies {
 
     // OAuth2
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
 
     // Database
     runtimeOnly("com.mysql:mysql-connector-j")
