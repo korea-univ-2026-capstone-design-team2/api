@@ -50,8 +50,8 @@ class ExamItemEntity(
     }
 
     fun toDomain(): ExamItem = ExamItem(
-        id = _root_ide_package_.com.examhelper.api.kernel.identifier.ExamItemId(id),
-        questionId = _root_ide_package_.com.examhelper.api.kernel.identifier.QuestionId(questionId),
+        id = ExamItemId(id),
+        questionId = QuestionId(questionId),
         ordering = ordering,
         createdAt = createdAt,
     )

@@ -10,8 +10,14 @@ class ExamPersistenceAdapter(
     private val examJpaRepository: ExamJpaStore
 ) : ExamStore {
     override fun save(exam: Exam) {
-        val entity = ExamEntity.fromDomain(exam)
-        examJpaRepository.save(entity)
+        val entity = examJpaRepository.findById(exam.id.value)
+            .orElse(null)
+
+        if (entity == null) {
+            examJpaRepository.save(ExamEntity.fromDomain(exam))
+        } else {
+            entity.update(exam)
+        }
     }
 
     override fun saveAll(exams: List<Exam>) {

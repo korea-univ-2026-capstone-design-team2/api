@@ -151,6 +151,27 @@ class ExamEntity(
         updatedAt = updatedAt,
     )
 
+    fun update(domain: Exam) {
+        status = domain.status
+        updatedAt = domain.updatedAt
+        generationId = domain.generationResult?.generationId?.value
+        generationSuccessCount = domain.generationResult?.successCount
+        generationFailCount = domain.generationResult?.failCount
+
+        // items 동기화: orphanRemoval = true이므로 clear 후 re-add
+        val existingIds = items.map { it.id }.toSet()
+        val domainIds = domain.items.map { it.id.value }.toSet()
+
+        // 삭제된 것 제거
+        items.removeIf { it.id !in domainIds }
+
+        // 새로 추가된 것만 추가
+        domain.items
+            .filter { it.id.value !in existingIds }
+            .map { ExamItemEntity.fromDomain(it, this) }
+            .forEach { items.add(it) }
+    }
+
     private fun toGenerationResult(): ExamGenerationResult? {
         val genId = generationId ?: return null
         return ExamGenerationResult(

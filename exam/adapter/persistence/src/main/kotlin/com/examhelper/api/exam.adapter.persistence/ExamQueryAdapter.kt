@@ -1,6 +1,7 @@
 package com.examhelper.api.exam.adapter.persistence
 
 import com.examhelper.api.exam.port.inbound.query.ExamFilter
+import com.examhelper.api.exam.port.inbound.view.ExamBaseView
 import com.examhelper.api.exam.port.inbound.view.ExamDetailView
 import com.examhelper.api.exam.port.inbound.view.ExamItemView
 import com.examhelper.api.exam.port.inbound.view.ExamSummaryView
@@ -23,6 +24,9 @@ class ExamQueryAdapter(
             status = filter.status,
             pageable = PageRequest.of(filter.page, filter.size),
         )
+
+    override fun findBaseById(examId: Long): ExamBaseView? =
+        examJpaReader.findEntityById(examId)?.toBaseView()
 
     override fun count(filter: ExamFilter): Long =
         examJpaReader.countByFilter(
@@ -64,3 +68,23 @@ private fun ExamItemEntity.toItemView(): ExamItemView = ExamItemView(
     questionId = questionId,
     ordering = ordering,
 )
+
+private fun ExamEntity.toBaseView(): ExamBaseView =
+    ExamBaseView(
+        examId = id,
+        title = title,
+        subject = subject,
+        questionType = questionType,
+        questionSubType = questionSubType,
+        difficulty = difficulty,
+        topicCategory = topicCategory,
+        topicKeyword = topicKeyword,
+        topicDescription = topicDescription,
+        targetQuestionCount = targetQuestionCount,
+        status = status,
+        generationId = generationId,
+        generationSuccessCount = generationSuccessCount,
+        generationFailCount = generationFailCount,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )

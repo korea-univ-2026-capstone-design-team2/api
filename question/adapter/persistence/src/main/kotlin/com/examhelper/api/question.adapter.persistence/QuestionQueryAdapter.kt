@@ -49,6 +49,27 @@ class QuestionQueryAdapter(
         }
     }
 
+    override fun findPapersByGenerationId(generationId: Long): List<QuestionPaperView> {
+        val questions = questionJpaReader.findAllByGenerationId(generationId)
+
+        if (questions.isEmpty()) {
+            return emptyList()
+        }
+
+        val questionIds = questions.map { it.id }
+
+        val itemsByQuestionId =
+            questionItemJpaReader
+                .findAllByQuestionIds(questionIds)
+                .groupBy { it.question.id }
+
+        return questions.map { question ->
+            question.toPaperView(
+                itemsByQuestionId[question.id] ?: emptyList()
+            )
+        }
+    }
+
     override fun findReviewById(id: Long): QuestionReviewView? {
         val question = questionJpaReader.findEntityById(id) ?: return null
         val items = questionItemJpaReader.findAllByQuestionId(id)
