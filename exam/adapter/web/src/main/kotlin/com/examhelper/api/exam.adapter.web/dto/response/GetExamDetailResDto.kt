@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
 data class GetExamDetailResDto(
-    @Schema(description = "시험지 ID") val examId: Long,
+    @Schema(description = "시험지 ID") val examId: String,
     @Schema(description = "시험지 제목") val title: String,
     @Schema(description = "과목") val subject: Subject,
     @Schema(description = "문제 유형") val questionType: QuestionType,
@@ -22,7 +22,7 @@ data class GetExamDetailResDto(
     @Schema(description = "주제 설명") val topicDescription: String?,
     @Schema(description = "목표 문항 수") val targetQuestionCount: Int,
     @Schema(description = "시험 상태") val status: ExamStatus,
-    @Schema(description = "문항 생성 요청 ID") val generationId: Long?,
+    @Schema(description = "문항 생성 요청 ID") val generationId: String?,
     @Schema(description = "생성 성공 문항 수") val generationSuccessCount: Int?,
     @Schema(description = "생성 실패 문항 수") val generationFailCount: Int?,
     @Schema(description = "문항 목록") val items: List<ExamItemResDto>,
@@ -31,7 +31,7 @@ data class GetExamDetailResDto(
 ) {
     companion object {
         fun fromView(view: ExamDetailView): GetExamDetailResDto = GetExamDetailResDto(
-            examId = view.examId,
+            examId = view.examId.toString(),
             title = view.title,
             subject = view.subject,
             questionType = view.questionType,
@@ -42,7 +42,7 @@ data class GetExamDetailResDto(
             topicDescription = view.topicDescription,
             targetQuestionCount = view.targetQuestionCount,
             status = view.status,
-            generationId = view.generationId,
+            generationId = view.generationId.toString(),
             generationSuccessCount = view.generationSuccessCount,
             generationFailCount = view.generationFailCount,
             items = view.items.map(ExamItemResDto::fromView),

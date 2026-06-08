@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
 data class ExamSummaryResDto(
-    @Schema(description = "시험지 ID")      val examId: Long,
+    @Schema(description = "시험지 ID")      val examId: String,
     @Schema(description = "시험지 제목")     val title: String,
     @Schema(description = "과목")           val subject: Subject,
     @Schema(description = "문제 유형")       val questionType: QuestionType,
@@ -21,7 +21,7 @@ data class ExamSummaryResDto(
 ) {
     companion object {
         fun fromView(view: ExamSummaryView): ExamSummaryResDto = ExamSummaryResDto(
-            examId              = view.examId,
+            examId              = view.examId.toString(),
             title               = view.title,
             subject             = view.subject,
             questionType        = view.questionType,
