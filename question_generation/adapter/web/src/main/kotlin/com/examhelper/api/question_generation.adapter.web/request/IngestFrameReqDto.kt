@@ -6,7 +6,6 @@ import com.examhelper.api.question_generation.port.inbound.command.IngestFrameCo
 data class IngestFrameReqDto(
     val frames: List<FrameDocumentDto>
 ) {
-    fun toCommand(): IngestFrameCommand {
-        return IngestFrameCommand(frames.map { it.toDocument() })
-    }
+    fun toCommand(): IngestFrameCommand =
+        IngestFrameCommand(frames.map { it.toDocument() })
 }

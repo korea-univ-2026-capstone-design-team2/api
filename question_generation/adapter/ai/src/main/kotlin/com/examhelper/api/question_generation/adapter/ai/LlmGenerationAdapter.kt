@@ -101,9 +101,7 @@ class LlmGenerationAdapter(
             correctChoices.isEmpty() ->
                 throw LlmGenerationException.InvalidChoice("정답(isCorrect=true)이 없습니다")
             correctChoices.size > 1 ->
-                throw LlmGenerationException.InvalidChoice(
-                    "정답이 ${correctChoices.size}개입니다. 반드시 1개여야 합니다"
-                )
+                throw LlmGenerationException.InvalidChoice("정답이 ${correctChoices.size}개입니다. 반드시 1개여야 합니다")
         }
 
         return LlmQuestionResult(

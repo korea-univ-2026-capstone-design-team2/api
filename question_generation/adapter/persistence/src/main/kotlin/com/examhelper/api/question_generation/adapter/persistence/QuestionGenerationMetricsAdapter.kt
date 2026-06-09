@@ -10,16 +10,12 @@ import java.util.concurrent.TimeUnit
 class QuestionGenerationMetricsAdapter(
     private val meterRegistry: MeterRegistry
 ) : QuestionGenerationMetricsPort {
-
-    private val timer = Timer.builder(
-        "question.generation.total.duration"
-    )
+    private val timer = Timer
+        .builder("question.generation.total.duration")
         .publishPercentileHistogram()
         .register(meterRegistry)
 
-    override fun recordTotalDuration(
-        durationMs: Long
-    ) {
+    override fun recordTotalDuration(durationMs: Long) {
         timer.record(durationMs, TimeUnit.MILLISECONDS)
     }
 }

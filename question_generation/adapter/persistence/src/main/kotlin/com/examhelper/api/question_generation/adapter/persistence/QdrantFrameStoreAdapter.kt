@@ -14,9 +14,7 @@ class QdrantFrameStoreAdapter(
         val documents = points.map {
             Document.builder()
                 .id(it.id)
-                .text(
-                    it.payload["retrieval_text"] as String
-                )
+                .text(it.payload["retrieval_text"] as String)
                 .metadata(it.payload)
                 .build()
         }

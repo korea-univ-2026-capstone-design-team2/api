@@ -7,7 +7,7 @@ import com.examhelper.api.question_generation.domain.event.GenerationCompletedEv
 import com.examhelper.api.question_generation.domain.event.GenerationFailedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationRequestedEvent
 import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
-import com.examhelper.api.question_generation.domain.exception.GenerationException
+import com.examhelper.api.question_generation.domain.exception.GenerationAssertionException
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
 import java.time.Instant
@@ -43,7 +43,7 @@ class QuestionGeneration private constructor(
 
     fun complete(successCount: Int, failureCount: Int): QuestionGeneration {
         checkPending()
-        status    = QuestionGenerationStatus.COMPLETED
+        status = QuestionGenerationStatus.COMPLETED
         updatedAt = Instant.now()
         addDomainEvent(
             GenerationCompletedEvent(
@@ -58,14 +58,14 @@ class QuestionGeneration private constructor(
 
     fun fail(reason: String): QuestionGeneration {
         checkPending()
-        status        = QuestionGenerationStatus.FAILED
+        status = QuestionGenerationStatus.FAILED
         failureReason = reason
-        updatedAt     = Instant.now()
+        updatedAt = Instant.now()
         addDomainEvent(
             GenerationFailedEvent(
-                generationId       = id.value,
-                reason             = reason,
-                occurredAt         = updatedAt,
+                generationId = id.value,
+                reason = reason,
+                occurredAt = updatedAt,
             )
         )
         return this
@@ -75,7 +75,7 @@ class QuestionGeneration private constructor(
 
     private fun checkPending() {
         check(status == QuestionGenerationStatus.PENDING) {
-            throw GenerationException.AlreadyTerminated(id.value, status.name)
+            throw GenerationAssertionException.AlreadyTerminated(id.value, status.name)
         }
     }
 
@@ -88,20 +88,20 @@ class QuestionGeneration private constructor(
         ): QuestionGeneration {
             val now = Instant.now()
             return QuestionGeneration(
-                id                   = id,
-                request              = request,
-                status               = QuestionGenerationStatus.PENDING,
-                failureReason        = null,
-                createdAt            = now,
-                updatedAt            = now,
+                id = id,
+                request = request,
+                status = QuestionGenerationStatus.PENDING,
+                failureReason = null,
+                createdAt = now,
+                updatedAt = now,
             ).also {
                 it.addDomainEvent(
                     GenerationRequestedEvent(
                         generationId = id.value,
-                        subject      = request.subject.name,
+                        subject = request.subject.name,
                         questionType = request.questionType.name,
-                        quantity     = request.quantity,
-                        occurredAt   = now,
+                        quantity = request.quantity,
+                        occurredAt = now,
                     )
                 )
             }
@@ -115,12 +115,12 @@ class QuestionGeneration private constructor(
             createdAt: Instant,
             updatedAt: Instant,
         ): QuestionGeneration = QuestionGeneration(
-            id                   = id,
-            request              = request,
-            status               = status,
-            failureReason        = failureReason,
-            createdAt            = createdAt,
-            updatedAt            = updatedAt,
+            id = id,
+            request = request,
+            status = status,
+            failureReason = failureReason,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
         )
     }
 }

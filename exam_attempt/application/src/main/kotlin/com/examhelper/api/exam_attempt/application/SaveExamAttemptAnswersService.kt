@@ -18,16 +18,16 @@ class SaveExamAttemptAnswersService(
         val attempt = examAttemptStore.loadById(command.attemptId)
             ?: throw ExamAttemptException.NotFound(command.attemptId.value)
 
-        check(attempt.memberId == command.memberId) { throw ExamAttemptException.Forbidden() }
+        attempt.validateOwner(command.memberId)
 
-        command.answers.forEach { answer ->
+        command.answers.forEach {
             attempt.saveAnswer(
                 ExamAttemptAnswer(
-                    questionItemId = answer.questionItemId,
-                    selectedNumber = answer.selectedNumber,
-                    timeSpentSeconds = answer.timeSpentSeconds,
-                    markedUnknown = answer.markedUnknown,
-                    bookmarked = answer.bookmarked,
+                    questionItemId = it.questionItemId,
+                    selectedNumber = it.selectedNumber,
+                    timeSpentSeconds = it.timeSpentSeconds,
+                    markedUnknown = it.markedUnknown,
+                    bookmarked = it.bookmarked
                 )
             )
         }
@@ -37,7 +37,7 @@ class SaveExamAttemptAnswersService(
         return SaveExamAttemptAnswersResult(
             attemptId = attempt.id.value,
             savedCount = command.answers.size,
-            updatedAt = attempt.updatedAt,
+            updatedAt = attempt.updatedAt
         )
     }
 }

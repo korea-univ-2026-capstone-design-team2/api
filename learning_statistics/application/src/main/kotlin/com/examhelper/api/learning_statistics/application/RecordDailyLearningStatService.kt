@@ -18,7 +18,6 @@ class RecordDailyLearningStatService(
     private val dailyLearningStatStore: DailyLearningStatStore,
     private val idGenerator: IdGenerator
 ) : RecordDailyLearningStatUseCase {
-
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun execute(command: RecordDailyLearningStatCommand) {
         val learningDate = command.submittedAt.atZone(ZoneOffset.UTC).toLocalDate()

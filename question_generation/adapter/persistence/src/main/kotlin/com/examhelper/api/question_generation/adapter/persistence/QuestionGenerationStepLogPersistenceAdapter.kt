@@ -13,7 +13,7 @@ class QuestionGenerationStepLogPersistenceAdapter(
 ) : QuestionGenerationStepLogStore {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun save(log: QuestionGenerationStepLog) {
-        val entity = QuestionGenerationStepLogEntity.Companion.fromDomain(log)
+        val entity = QuestionGenerationStepLogEntity.fromDomain(log)
         jpaStore.save(entity)
     }
 
