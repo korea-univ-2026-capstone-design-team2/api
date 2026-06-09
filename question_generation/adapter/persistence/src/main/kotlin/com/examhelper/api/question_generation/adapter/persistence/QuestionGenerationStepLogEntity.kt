@@ -16,7 +16,7 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name    = "generation_step_logs",
+    name = "generation_step_logs",
     indexes = [
         Index(name = "idx_gsl_generation_id", columnList = "generation_id"),
     ]
@@ -25,7 +25,7 @@ class QuestionGenerationStepLogEntity(
     @Id
     val id: Long,                                   // Snowflake
 
-    @Column(name = "generation_id", nullable = false)
+    @Column(nullable = false)
     val generationId: Long,
 
     @Enumerated(EnumType.STRING)
@@ -36,25 +36,25 @@ class QuestionGenerationStepLogEntity(
     @Column(nullable = false, length = 10)
     val status: QuestionGenerationStepStatus,
 
-    @Column(name = "duration_ms")
+    @Column
     val durationMs: Long?,
 
     @Column(length = 10000)
     val detail: String?,
 
-    @Column(name = "occurred_at", nullable = false)
+    @Column(nullable = false)
     val occurredAt: Instant
 ) {
     companion object {
         fun fromDomain(domain: QuestionGenerationStepLog): QuestionGenerationStepLogEntity =
             QuestionGenerationStepLogEntity(
-                id           = domain.id.value,
+                id = domain.id.value,
                 generationId = domain.generationId.value,
-                step         = domain.step,
-                status       = domain.status,
-                durationMs   = domain.durationMs,
-                detail       = domain.detail,
-                occurredAt   = domain.occurredAt
+                step = domain.step,
+                status = domain.status,
+                durationMs = domain.durationMs,
+                detail = domain.detail,
+                occurredAt = domain.occurredAt
             )
     }
 
@@ -62,10 +62,10 @@ class QuestionGenerationStepLogEntity(
         QuestionGenerationStepLog(
             id = QuestionGenerationStepLogId(id),
             generationId = QuestionGenerationId(generationId),
-            step         = step,
-            status       = status,
-            durationMs   = durationMs,
-            detail       = detail,
-            occurredAt   = occurredAt
+            step = step,
+            status = status,
+            durationMs = durationMs,
+            detail = detail,
+            occurredAt = occurredAt
         )
 }

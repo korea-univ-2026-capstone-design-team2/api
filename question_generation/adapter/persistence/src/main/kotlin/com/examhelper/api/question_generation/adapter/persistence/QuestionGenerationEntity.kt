@@ -21,9 +21,9 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name    = "question_generations",
+    name = "question_generations",
     indexes = [
-        Index(name = "idx_qg_status",     columnList = "status"),
+        Index(name = "idx_qg_status", columnList = "status"),
         Index(name = "idx_qg_created_at", columnList = "created_at"),
     ]
 )
@@ -36,11 +36,11 @@ class QuestionGenerationEntity(
     val subject: Subject,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_type", nullable = false, length = 30)
+    @Column(nullable = false, length = 30)
     val questionType: QuestionType,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_sub_type", length = 30)
+    @Column(length = 30)
     val questionSubType: QuestionSubType?,
 
     @Enumerated(EnumType.STRING)
@@ -48,51 +48,51 @@ class QuestionGenerationEntity(
     val difficulty: DifficultyLevel,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "topic_category", nullable = false, length = 20)
+    @Column(nullable = false, length = 20)
     val topicCategory: TopicCategory,
 
-    @Column(name = "topic_keyword", length = 100)
+    @Column(length = 100)
     val topicKeyword: String?,
 
-    @Column(name = "topic_description", length = 500)
+    @Column(length = 500)
     val topicDescription: String?,
 
     @Column(nullable = false)
     val quantity: Int,
 
-    @Column(name = "frame_search_top_k", nullable = false)
+    @Column(nullable = false)
     val frameSearchTopK: Int,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     var status: QuestionGenerationStatus,
 
-    @Column(name = "failure_reason", length = 500)
+    @Column(length = 500)
     var failureReason: String?,
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     val createdAt: Instant,
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(nullable = false)
     var updatedAt: Instant
 ) {
     companion object {
         fun fromDomain(domain: QuestionGeneration): QuestionGenerationEntity {
             return QuestionGenerationEntity(
-                id              = domain.id.value,
-                subject         = domain.request.subject,
-                questionType    = domain.request.questionType,
+                id = domain.id.value,
+                subject = domain.request.subject,
+                questionType = domain.request.questionType,
                 questionSubType = domain.request.questionSubType,
-                difficulty      = domain.request.difficulty,
-                topicCategory   = domain.request.topic.category,
-                topicKeyword    = domain.request.topic.keyword,
-                topicDescription= domain.request.topic.description,
-                quantity        = domain.request.quantity,
+                difficulty = domain.request.difficulty,
+                topicCategory = domain.request.topic.category,
+                topicKeyword = domain.request.topic.keyword,
+                topicDescription = domain.request.topic.description,
+                quantity = domain.request.quantity,
                 frameSearchTopK = domain.request.frameSearchTopK,
-                status          = domain.status,
-                failureReason   = domain.failureReason,
-                createdAt       = domain.createdAt,
-                updatedAt       = domain.updatedAt
+                status = domain.status,
+                failureReason = domain.failureReason,
+                createdAt = domain.createdAt,
+                updatedAt = domain.updatedAt
             )
         }
     }
@@ -113,10 +113,10 @@ class QuestionGenerationEntity(
                 quantity = quantity,
                 frameSearchTopK = frameSearchTopK
             ),
-            status        = status,
+            status = status,
             failureReason = failureReason,
-            createdAt     = createdAt,
-            updatedAt     = updatedAt
+            createdAt = createdAt,
+            updatedAt = updatedAt
         )
     }
 }
