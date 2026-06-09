@@ -46,11 +46,11 @@ class ExamEntity(
     val subject: Subject,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_type", nullable = false, length = 30)
+    @Column(nullable = false, length = 30)
     val questionType: QuestionType,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_sub_type", length = 30)
+    @Column(length = 30)
     val questionSubType: QuestionSubType?,
 
     @Enumerated(EnumType.STRING)
@@ -58,7 +58,7 @@ class ExamEntity(
     val difficulty: DifficultyLevel,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "topic_category", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     val topicCategory: TopicCategory,
 
     @Column(length = 100)

@@ -46,7 +46,6 @@ class ExamController(
     }
 
     // ── 단건 조회 ─────────────────────────────────────────
-
     @GetMapping("/{examId}")
     @GetExamDetailDocs
     fun getExamDetail(
@@ -69,12 +68,12 @@ class ExamController(
     ): ResponseEntity<ApiResponse.Success<GetExamListResDto>> {
         val result = getExamListUseCase.execute(
             ExamFilter(
-                subject      = subject,
+                subject = subject,
                 questionType = questionType,
-                difficulty   = difficulty,
-                status       = status,
-                page         = page,
-                size         = size,
+                difficulty = difficulty,
+                status = status,
+                page = page,
+                size = size,
             )
         )
 

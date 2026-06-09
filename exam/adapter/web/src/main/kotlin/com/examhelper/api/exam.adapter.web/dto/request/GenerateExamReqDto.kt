@@ -39,16 +39,17 @@ data class GenerateExamReqDto(
     @Schema(description = "RAG 프레임 검색 수", example = "3", defaultValue = "3")
     val frameSearchTopK: Int = 3,
 ) {
-    fun toCommand(): GenerateExamCommand = GenerateExamCommand(
-        title               = title,
-        subject             = subject,
-        questionType        = questionType,
-        questionSubType     = questionSubType,
-        difficulty          = difficulty,
-        topicCategory       = topicCategory,
-        topicKeyword        = topicKeyword,
-        topicDescription    = topicDescription,
-        targetQuestionCount = targetQuestionCount,
-        frameSearchTopK     = frameSearchTopK,
-    )
+    fun toCommand(): GenerateExamCommand =
+        GenerateExamCommand(
+            title = title,
+            subject = subject,
+            questionType = questionType,
+            questionSubType = questionSubType,
+            difficulty = difficulty,
+            topicCategory = topicCategory,
+            topicKeyword = topicKeyword,
+            topicDescription = topicDescription,
+            targetQuestionCount = targetQuestionCount,
+            frameSearchTopK = frameSearchTopK,
+        )
 }

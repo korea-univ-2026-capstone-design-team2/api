@@ -18,11 +18,9 @@ data class GenerateExamCommand(
     val topicKeyword: String?,
     val topicDescription: String?,
     val targetQuestionCount: Int,
-    val frameSearchTopK: Int = 3,
+    val frameSearchTopK: Int = 3
 ) {
-    init {
-        require(title.isNotBlank()) { "title must not be blank" }
-    }
+    init { validate() }
 
     fun toMetadata(): ExamMetadata = ExamMetadata(
         subject = subject,
@@ -36,4 +34,8 @@ data class GenerateExamCommand(
         ),
         targetQuestionCount = targetQuestionCount,
     )
+
+    private fun validate() {
+        require(title.isNotBlank()) { "title must not be blank" }
+    }
 }
