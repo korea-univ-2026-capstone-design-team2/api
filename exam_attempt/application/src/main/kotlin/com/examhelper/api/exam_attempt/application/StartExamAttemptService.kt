@@ -24,15 +24,6 @@ class StartExamAttemptService(
         require(examExistencePort.existsById(command.examId)) { throw ExamAttemptException.ExamNotFound(command.examId.value) }
 
         // ── 진행중 응시 확인 ───────────────────────────
-        val existingAttempt = examAttemptStore.loadInProgressByExamIdAndMemberId(
-            examId = command.examId,
-            memberId = command.memberId
-        )
-
-        check(existingAttempt == null) { throw ExamAttemptException.AlreadyInProgress(
-            examId = command.examId.value,
-            memberId = command.memberId.value
-        ) }
 
         // ── Aggregate 생성 ────────────────────────────
         val attempt = ExamAttempt.start(
