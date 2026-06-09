@@ -4,7 +4,6 @@ import com.examhelper.api.learning_statistics.domain.exception.DailyLearningStat
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.DailyLearningStatId
 import com.examhelper.api.kernel.identifier.MemberId
-import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.Subject
 import java.time.Instant
 import java.time.LocalDate
@@ -18,7 +17,7 @@ class DailyLearningStat private constructor(
     correctCount: Int,
     studySeconds: Long,
     val createdAt: Instant,
-    var updatedAt: Instant,
+    var updatedAt: Instant
 ) : AggregateRoot<DailyLearningStatId>(id) {
     var questionCount: Int = questionCount
         private set
@@ -31,8 +30,6 @@ class DailyLearningStat private constructor(
 
     // 학습 결과 누적 ──────────────────────────────
     fun accumulate(isCorrect: Boolean, timeSpentSeconds: Int) {
-        require(timeSpentSeconds >= 0) { "추가되는 풀이 시간은 음수일 수 없습니다: $timeSpentSeconds" }
-
         this.questionCount += 1
         if (isCorrect) { this.correctCount += 1 }
         this.studySeconds += timeSpentSeconds

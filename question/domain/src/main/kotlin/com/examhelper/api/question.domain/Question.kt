@@ -36,12 +36,10 @@ class Question private constructor(
 
     // ── 문제 편입 ──────────────────────────────────────────────
     fun addItem(item: QuestionItem) {
-        check(status == QuestionStatus.DRAFT) {
-            throw QuestionException.CannotModifyNonDraft(status.name)
-        }
+        check(status == QuestionStatus.DRAFT) { throw QuestionAssertionException.CannotModifyNonDraft(status.name) }
 
         check(_items.none { it.id == item.id }) {
-            throw QuestionException.QuestionAlreadyIn(item.id.value)
+            throw QuestionAssertionException.QuestionAlreadyIn(item.id.value)
         }
 
         _items.add(item)

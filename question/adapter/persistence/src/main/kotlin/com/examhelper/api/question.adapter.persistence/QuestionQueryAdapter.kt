@@ -4,6 +4,7 @@ import com.examhelper.api.question.adapter.persistence.projection.CorrectAnswerP
 import com.examhelper.api.question.adapter.persistence.projection.QuestionItemSummaryProjection
 import com.examhelper.api.question.adapter.persistence.record.AnswerChoiceRecord
 import com.examhelper.api.question.adapter.persistence.record.SharedQuestionContextRecord
+import com.examhelper.api.question.domain.exception.QuestionItemAssertionException
 import com.examhelper.api.question.domain.exception.QuestionItemException
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceView
 import com.examhelper.api.question.port.inbound.view.AnswerChoiceViewWithAnswer
@@ -52,22 +53,12 @@ class QuestionQueryAdapter(
     override fun findPapersByGenerationId(generationId: Long): List<QuestionPaperView> {
         val questions = questionJpaReader.findAllByGenerationId(generationId)
 
-        if (questions.isEmpty()) {
-            return emptyList()
-        }
+        if (questions.isEmpty()) return emptyList()
 
         val questionIds = questions.map { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(questionIds).groupBy { it.question.id }
 
-        val itemsByQuestionId =
-            questionItemJpaReader
-                .findAllByQuestionIds(questionIds)
-                .groupBy { it.question.id }
-
-        return questions.map { question ->
-            question.toPaperView(
-                itemsByQuestionId[question.id] ?: emptyList()
-            )
-        }
+        return questions.map { it.toPaperView(itemsByQuestionId[it.id] ?: emptyList()) }
     }
 
     override fun findReviewById(id: Long): QuestionReviewView? {
@@ -141,15 +132,12 @@ class QuestionQueryAdapter(
             questionId = filter.questionId,
         )
 
-    override fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView> {
-        return questionItemJpaReader.findCorrectAnswersByIds(questionItemIds).map { it.toView() }
-    }
+    override fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView> =
+        questionItemJpaReader.findCorrectAnswersByIds(questionItemIds).map { it.toView() }
 }
 
 // ── QuestionEntity → PaperView ────────────────────────────
-private fun QuestionEntity.toPaperView(
-    items: List<QuestionItemEntity>,
-): QuestionPaperView {
+private fun QuestionEntity.toPaperView(items: List<QuestionItemEntity>): QuestionPaperView {
     val orderedItems = items.sortedBy { it.id }
     val (contextContent, contextDescription) = sharedContext.toContentPair()
     return QuestionPaperView(
@@ -165,9 +153,7 @@ private fun QuestionEntity.toPaperView(
 }
 
 // ── QuestionEntity → ReviewView ───────────────────────────
-private fun QuestionEntity.toReviewView(
-    items: List<QuestionItemEntity>,
-): QuestionReviewView {
+private fun QuestionEntity.toReviewView(items: List<QuestionItemEntity>): QuestionReviewView {
     val orderedItems = items.sortedBy { items.indexOf(it) }
     val (contextContent, contextDescription) = sharedContext.toContentPair()
     return QuestionReviewView(
@@ -183,9 +169,7 @@ private fun QuestionEntity.toReviewView(
 }
 
 // ── QuestionEntity → DetailView ───────────────────────────
-private fun QuestionEntity.toDetailView(
-    items: List<QuestionItemEntity>,
-): QuestionDetailView {
+private fun QuestionEntity.toDetailView(items: List<QuestionItemEntity>): QuestionDetailView {
     val orderedItems = items.sortedBy { items.indexOf(it) }
     val (contextContent, contextDescription) = sharedContext.toContentPair()
     return QuestionDetailView(
@@ -292,9 +276,9 @@ private fun SharedQuestionContextRecord?.toContentPair(): Pair<String?, String?>
 }
 
 private fun AnswerChoiceRecord.toDisplayText(): String = when (type) {
-    "TEXT" -> content ?: throw QuestionItemException.AnswerChoiceBlank()
+    "TEXT" -> content ?: throw QuestionItemAssertionException.AnswerChoiceBlank()
     "PROPOSITION_COMBINATION" ->
-        labels?.joinToString(", ") ?: throw QuestionItemException.AnswerChoiceBlank()
+        labels?.joinToString(", ") ?: throw QuestionItemAssertionException.AnswerChoiceBlank()
     else -> error("Unknown AnswerChoice type: $type")
 }
 

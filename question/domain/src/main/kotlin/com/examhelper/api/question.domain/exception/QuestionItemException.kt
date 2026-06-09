@@ -9,24 +9,14 @@ sealed class QuestionItemException(
     status: ErrorStatus,
 ) : DomainBusinessException(code, message, status) {
     class NotFound(id: String) : QuestionItemException(
-        "Q001", "문제를 찾을 수 없습니다: $id", ErrorStatus.NOT_FOUND
+        code = "QUESTION_ITEM_NOT_FOUND",
+        message = "문제를 찾을 수 없습니다: $id",
+        status = ErrorStatus.NOT_FOUND,
     )
-    class AlreadyPublished(id: String) : QuestionItemException(
-        "Q002", "이미 출제된 문제입니다: $id", ErrorStatus.CONFLICT
-    )
-    class StatusTransitionNotAllowed(from: String, to: String) : QuestionItemException(
-        "Q003", "상태 전이가 허용되지 않습니다: $from -> $to", ErrorStatus.BAD_REQUEST
-    )
+
     class QualityScoreTooLowToPublish(score: Double) : QuestionItemException(
-        "Q004", "품질 점수가 출제 기준 미달입니다: $score", ErrorStatus.BAD_REQUEST
-    )
-    class QualityScoreNotAssigned : QuestionItemException(
-        "Q005", "품질 점수가 부여되지 않았습니다", ErrorStatus.BAD_REQUEST
-    )
-    class QuestionItemSetAlreadyAssigned(questionSetId: Long) : QuestionItemException(
-        "Q006", "이미 세트에 편입된 문제입니다: set=$questionSetId", ErrorStatus.CONFLICT
-    )
-    class AnswerChoiceBlank : QuestionItemException(
-        "Q007", "선지는 비어 있을 수 없습니다.", ErrorStatus.BAD_REQUEST
+        code = "QUESTION_ITEM_QUALITY_SCORE_TOO_LOW",
+        message = "품질 점수가 출제 기준 미달입니다: $score",
+        status = ErrorStatus.CONFLICT,
     )
 }

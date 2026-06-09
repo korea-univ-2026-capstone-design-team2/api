@@ -24,12 +24,8 @@ class CreateQuestionService(
     private val questionStore: QuestionStore,
     private val idGenerator: IdGenerator,
 ) : CreateQuestionUseCase {
-
     @Transactional
-    override fun execute(
-        command: CreateQuestionCommand
-    ): CreateQuestionResult {
-
+    override fun execute(command: CreateQuestionCommand): CreateQuestionResult {
         // ── Aggregate 생성 ─────────────────────────────
         val questionId = QuestionId(idGenerator.generateId())
 
@@ -42,26 +38,21 @@ class CreateQuestionService(
 
         // ── QuestionItems 생성 및 aggregate 편입 ───────
         command.questions.forEach { q ->
-
             val questionItem = QuestionItem.create(
                 id = QuestionItemId(idGenerator.generateId()),
                 generationId = QuestionGenerationId(command.generationId),
-
                 content = QuestionItemContent(
                     stem = q.stem,
                     exhibit = q.exhibit,
                 ),
-
                 answerSheet = q.answerSheet,
-
                 metadata = QuestionItemMetadata(
                     subject = command.metadata.subject,
                     questionType = command.metadata.questionType,
                     questionSubType = command.metadata.questionSubType,
                     difficulty = command.metadata.difficulty,
                 ),
-
-                explanation = q.explanation,
+                explanation = q.explanation
             )
 
             question.addItem(questionItem)
