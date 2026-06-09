@@ -37,7 +37,7 @@ class ExamAttempt private constructor(
     fun saveAnswer(
         answer: ExamAttemptAnswer,
     ) {
-        check(status == ExamAttemptStatus.IN_PROGRESS) { throw ExamAttemptException.CannotModifySubmitted() }
+        check(status == ExamAttemptStatus.IN_PROGRESS) { throw ExamAttemptAssertionException.CannotModifySubmitted() }
 
         val existing = _answers.firstOrNull { it.questionItemId == answer.questionItemId }
 
@@ -56,20 +56,19 @@ class ExamAttempt private constructor(
     }
 
     fun submit(submittedAt: Instant) {
-        check(status == ExamAttemptStatus.IN_PROGRESS) { throw ExamAttemptException.AlreadySubmitted() }
+        check(status == ExamAttemptStatus.IN_PROGRESS) { throw ExamAttemptAssertionException.AlreadySubmitted() }
 
         status = ExamAttemptStatus.SUBMITTED
         this.submittedAt = submittedAt
         updatedAt = submittedAt
     }
 
+    fun validateOwner(memberId: MemberId) {
+        if (this.memberId != memberId) throw ExamAttemptException.Forbidden()
+    }
+
     private fun validate() {
-        require(
-            _answers
-                .map { it.questionItemId }
-                .distinct()
-                .size == _answers.size
-        ) {
+        require(_answers.map { it.questionItemId }.distinct().size == _answers.size) {
             throw ExamAttemptAssertionException.DuplicateQuestionItemIds()
         }
     }

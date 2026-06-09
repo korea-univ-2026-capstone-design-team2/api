@@ -13,29 +13,25 @@ class ExamAttemptPersistenceAdapter(
     private val jpaStore: ExamAttemptJpaStore,
 ) : ExamAttemptStore {
     override fun save(attempt: ExamAttempt) {
-        val entity = ExamAttemptEntity.fromDomain(attempt)
-        jpaStore.save(entity)
+        jpaStore.save(ExamAttemptEntity.fromDomain(attempt))
     }
 
-    override fun loadById(id: ExamAttemptId): ExamAttempt? {
-        return jpaStore.findById(id.value).orElse(null)?.toDomain()
-    }
+    override fun loadById(id: ExamAttemptId): ExamAttempt? =
+        jpaStore.findById(id.value).orElse(null)?.toDomain()
 
     override fun loadByExamIdAndMemberId(
         examId: ExamId,
         memberId: MemberId,
-    ): ExamAttempt? {
-        return jpaStore.findByExamIdAndMemberId(examId.value, memberId.value)?.toDomain()
-    }
+    ): ExamAttempt? =
+        jpaStore.findByExamIdAndMemberId(examId.value, memberId.value)?.toDomain()
 
     override fun loadInProgressByExamIdAndMemberId(
         examId: ExamId,
         memberId: MemberId,
-    ): ExamAttempt? {
-        return jpaStore.findByExamIdAndMemberIdAndStatus(
+    ): ExamAttempt? =
+        jpaStore.findByExamIdAndMemberIdAndStatus(
             examId = examId.value,
             memberId = memberId.value,
             status = ExamAttemptStatus.IN_PROGRESS,
         )?.toDomain()
-    }
 }

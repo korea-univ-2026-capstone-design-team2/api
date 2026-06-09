@@ -1,5 +1,6 @@
 package com.examhelper.api.exam_attempt.application
 
+import com.examhelper.api.exam_attempt.domain.exception.ExamAttemptAssertionException
 import com.examhelper.api.exam_attempt.domain.exception.ExamAttemptException
 import com.examhelper.api.exam_attempt.domain.type.ExamAttemptStatus
 import com.examhelper.api.exam_attempt.port.inbound.GetExamAttemptResultUseCase
@@ -23,7 +24,7 @@ class GetExamAttemptResultService(
             ?: throw ExamAttemptException.NotFound(query.attemptId)
 
         check(attempt.memberId == query.memberId) { throw ExamAttemptException.Forbidden() }
-        check(attempt.status == ExamAttemptStatus.SUBMITTED) { throw ExamAttemptException.NotSubmitted() }
+        check(attempt.status == ExamAttemptStatus.SUBMITTED) { throw ExamAttemptAssertionException.NotSubmitted() }
 
         val answers = examAttemptReader.findResultAnswers(query.attemptId)
 
