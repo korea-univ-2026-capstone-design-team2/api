@@ -14,29 +14,22 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class GetExamDetailService(
     private val examReader: ExamReader,
-    private val questionReader: QuestionReader,
+    private val questionReader: QuestionReader
 ) : GetExamDetailUseCase {
-
-    override fun execute(
-        query: GetExamDetailQuery
-    ): ExamDetailView {
-
-        val exam =
-            examReader.findBaseById(query.examId)
-                ?: throw ExamException.NotFound(query.examId)
+    override fun execute(query: GetExamDetailQuery): ExamDetailView {
+        val exam = examReader.findBaseById(query.examId)
+            ?: throw ExamException.NotFound(query.examId)
 
         val items = exam.generationId?.let { generationId ->
             questionReader.findPapersByGenerationId(generationId)
                 .mapIndexed { index, question ->
-
                     ExamItemView(
-                        examItemId = question.questionId, // 임시
+                        examItemId = question.questionId,
                         questionId = question.questionId,
-                        ordering = index + 1,
+                        ordering = index + 1
                     )
                 }
-        }
-            ?: emptyList()
+        } ?: emptyList()
 
         return ExamDetailView(
             examId = exam.examId,
@@ -55,7 +48,7 @@ class GetExamDetailService(
             generationFailCount = exam.targetQuestionCount - items.size,
             items = items,
             createdAt = exam.createdAt,
-            updatedAt = exam.updatedAt,
+            updatedAt = exam.updatedAt
         )
     }
 }

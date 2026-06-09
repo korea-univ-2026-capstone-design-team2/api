@@ -21,12 +21,13 @@ data class GenerateExamResDto(
     val failCount: Int
 ) {
     companion object {
-        fun fromResult(result: GenerateExamResult): GenerateExamResDto = GenerateExamResDto(
-            examId       = result.examId.value.toString(),
-            status       = result.status,
-            generationId = result.generationId?.value.toString(),
-            successCount = result.successCount,
-            failCount    = result.failCount,
-        )
+        fun fromResult(result: GenerateExamResult): GenerateExamResDto =
+            GenerateExamResDto(
+                examId = result.examId.value.toString(),
+                status = result.status,
+                generationId = result.generationId?.value.toString(),
+                successCount = result.successCount,
+                failCount = result.failCount
+            )
     }
 }

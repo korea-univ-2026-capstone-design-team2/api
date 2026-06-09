@@ -36,38 +36,39 @@ class ExamQueryAdapter(
             status = filter.status,
         )
 
-    override fun existsById(examId: Long): Boolean {
-        return examJpaReader.existsById(examId)
-    }
+    override fun existsById(examId: Long): Boolean =
+        examJpaReader.existsById(examId)
 }
 
 // ── ExamEntity → DetailView ───────────────────────────────────
-private fun ExamEntity.toDetailView(): ExamDetailView = ExamDetailView(
-    examId = id,
-    title = title,
-    subject = subject,
-    questionType = questionType,
-    questionSubType = questionSubType,
-    difficulty = difficulty,
-    topicCategory = topicCategory,
-    topicKeyword = topicKeyword,
-    topicDescription = topicDescription,
-    targetQuestionCount = targetQuestionCount,
-    status = status,
-    generationId = generationId,
-    generationSuccessCount = generationSuccessCount,
-    generationFailCount = generationFailCount,
-    items = items.map { it.toItemView() },
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
+private fun ExamEntity.toDetailView(): ExamDetailView =
+    ExamDetailView(
+        examId = id,
+        title = title,
+        subject = subject,
+        questionType = questionType,
+        questionSubType = questionSubType,
+        difficulty = difficulty,
+        topicCategory = topicCategory,
+        topicKeyword = topicKeyword,
+        topicDescription = topicDescription,
+        targetQuestionCount = targetQuestionCount,
+        status = status,
+        generationId = generationId,
+        generationSuccessCount = generationSuccessCount,
+        generationFailCount = generationFailCount,
+        items = items.map { it.toItemView() },
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+    )
 
 // ── ExamItemEntity → ItemView ────────────────────────────────
-private fun ExamItemEntity.toItemView(): ExamItemView = ExamItemView(
-    examItemId = id,
-    questionId = questionId,
-    ordering = ordering,
-)
+private fun ExamItemEntity.toItemView(): ExamItemView =
+    ExamItemView(
+        examItemId = id,
+        questionId = questionId,
+        ordering = ordering,
+    )
 
 private fun ExamEntity.toBaseView(): ExamBaseView =
     ExamBaseView(

@@ -36,7 +36,6 @@ class GenerateExamService(
 
         // 빈 모의고사 생성
         if (metadata.targetQuestionCount == 0) {
-
             exam.completeGeneration(
                 ExamGenerationResult(
                     generationId = null,

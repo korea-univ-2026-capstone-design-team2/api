@@ -38,13 +38,9 @@ class Exam private constructor(
 
     // ── 문항 편입 ──────────────────────────────────────────────
     fun addItem(item: ExamItem) {
-        if (status != ExamStatus.GENERATING) {
-            throw ExamException.CannotModifyItems(status.name)
-        }
+        if (status != ExamStatus.GENERATING) { throw ExamAssertionException.CannotModifyItems(status.name) }
 
-        if (_items.any { it.id == item.id }) {
-            throw ExamException.ItemAlreadyExists(item.id.value)
-        }
+        if (_items.any { it.id == item.id }) { throw ExamAssertionException.ItemAlreadyExists(item.id.value) }
 
         _items.add(item)
         updatedAt = Instant.now()
@@ -53,7 +49,7 @@ class Exam private constructor(
     // ── 상태 전이 ──────────────────────────────────────────────
     fun completeGeneration(result: ExamGenerationResult) {
         check(status == ExamStatus.GENERATING) {
-            throw ExamException.StatusTransitionNotAllowed(status.name, ExamStatus.READY.name)
+            throw ExamAssertionException.StatusTransitionNotAllowed(status.name, ExamStatus.READY.name)
         }
 
         generationResult = result
@@ -72,7 +68,7 @@ class Exam private constructor(
 
     fun failGeneration(reason: String) {
         check(status == ExamStatus.GENERATING) {
-            throw ExamException.StatusTransitionNotAllowed(status.name, ExamStatus.FAILED.name)
+            throw ExamAssertionException.StatusTransitionNotAllowed(status.name, ExamStatus.FAILED.name)
         }
         transitionTo(ExamStatus.FAILED)
 
@@ -87,9 +83,7 @@ class Exam private constructor(
 
     // ── 도메인 검증 ────────────────────────────────────────────
     private fun validate() {
-        require(_items.size == _items.distinctBy { it.id }.size) {
-            throw ExamAssertionException.DuplicateItemIds()
-        }
+        require(_items.size == _items.distinctBy { it.id }.size) { throw ExamAssertionException.DuplicateItemIds() }
     }
 
     // ── 내부 ───────────────────────────────────────────────────

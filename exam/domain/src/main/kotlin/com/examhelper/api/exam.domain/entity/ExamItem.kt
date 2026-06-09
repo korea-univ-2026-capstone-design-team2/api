@@ -10,12 +10,12 @@ class ExamItem(
     val ordering: Int,
     val createdAt: Instant = Instant.now(),
 ) {
-    init {
+    init { validate() }
+
+    private fun validate() {
         require(ordering > 0) { "ordering must be positive, got $ordering" }
     }
 
-    override fun equals(other: Any?): Boolean =
-        other is ExamItem && id == other.id
-
+    override fun equals(other: Any?): Boolean = other is ExamItem && id == other.id
     override fun hashCode(): Int = id.hashCode()
 }

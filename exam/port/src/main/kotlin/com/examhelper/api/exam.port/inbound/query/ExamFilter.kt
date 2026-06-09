@@ -13,7 +13,9 @@ data class ExamFilter(
     val page: Int = 0,
     val size: Int = 20,
 ) {
-    init {
+    init { validate() }
+
+    private fun validate() {
         require(page >= 0) { "page must be >= 0" }
         require(size in 1..100) { "size must be between 1 and 100" }
     }
