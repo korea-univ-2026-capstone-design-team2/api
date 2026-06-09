@@ -17,4 +17,16 @@ enum class QuestionType(val korean: String) {
     };
 
     abstract fun compatibleSubTypes(): List<QuestionSubType>
+
+    fun resolveSubType(requested: QuestionSubType?): QuestionSubType? =
+        when {
+            compatibleSubTypes().isEmpty() -> null
+            requested != null -> {
+                require(requested in compatibleSubTypes()) {
+                    "SubType ${requested.name} is not compatible with ${this.name}"
+                }
+                requested
+            }
+            else -> QuestionSubType.MATCH
+        }
 }

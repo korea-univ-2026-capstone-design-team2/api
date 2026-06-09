@@ -19,11 +19,13 @@ data class GenerateQuestionCommand(
     val quantity: Int,
     val frameSearchTopK: Int = 3
 ) {
-    fun toGenerationRequest(): QuestionGenerationRequest =
-        QuestionGenerationRequest(
+    fun toGenerationRequest(): QuestionGenerationRequest {
+        val resolvedSubType = questionType.resolveSubType(questionSubType)
+
+        return QuestionGenerationRequest(
             subject = subject,
             questionType = questionType,
-            questionSubType = questionSubType,
+            questionSubType = resolvedSubType,
             difficulty = difficulty,
             topic = QuestionGenerationTopic(
                 category = topicCategory,
@@ -33,4 +35,5 @@ data class GenerateQuestionCommand(
             quantity = quantity,
             frameSearchTopK = frameSearchTopK,
         )
+    }
 }
