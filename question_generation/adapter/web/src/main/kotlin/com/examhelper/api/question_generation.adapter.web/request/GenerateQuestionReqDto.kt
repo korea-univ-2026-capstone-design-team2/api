@@ -40,27 +40,12 @@ data class GenerateQuestionReqDto(
     val quantity: Int
 ) {
     fun toCommand(): GenerateQuestionCommand {
-        val resolvedSubject = enumValueOrThrow<Subject>(subject)
-
-        val resolvedQuestionType = questionType?.let { enumValueOrThrow<QuestionType>(it) }
-            ?: QuestionType.entries.random()
-
-        val resolvedQuestionSubType = questionSubType
-            ?.let { enumValueOrThrow<QuestionSubType>(it) }
-            ?: resolvedQuestionType.compatibleSubTypes().randomOrNull()
-
-        val resolvedDifficulty = difficulty?.let { enumValueOrThrow<DifficultyLevel>(it) }
-            ?: DifficultyLevel.entries.random()
-
-        val resolvedTopicCategory = topicCategory?.let { enumValueOrThrow<TopicCategory>(it) }
-            ?: TopicCategory.entries.random()
-
         return GenerateQuestionCommand(
-            subject = Subject.valueOf(subject),
-            questionType = resolvedQuestionType,
-            questionSubType = resolvedQuestionSubType,
-            difficulty = resolvedDifficulty,
-            topicCategory = resolvedTopicCategory,
+            subject = enumValueOrThrow<Subject>(subject),
+            questionType = questionType?.let(::enumValueOrThrow),
+            questionSubType = questionSubType?.let(::enumValueOrThrow),
+            difficulty = difficulty?.let(::enumValueOrThrow),
+            topicCategory = topicCategory?.let(::enumValueOrThrow),
             topicKeyword = topicKeyword,
             topicDescription = topicDescription,
             quantity = quantity
@@ -69,5 +54,7 @@ data class GenerateQuestionReqDto(
 
     private inline fun <reified T : Enum<T>> enumValueOrThrow(value: String): T =
         enumValues<T>().find { it.name == value }
-            ?: throw IllegalArgumentException("유효하지 않은 값: '$value'. 허용값: ${enumValues<T>().map { it.name }}")
+            ?: throw IllegalArgumentException(
+                "유효하지 않은 값: '$value'. 허용값: ${enumValues<T>().joinToString { it.name }}"
+            )
 }

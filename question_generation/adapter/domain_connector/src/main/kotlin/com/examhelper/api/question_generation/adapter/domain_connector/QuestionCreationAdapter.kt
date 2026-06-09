@@ -31,14 +31,14 @@ class QuestionCreationAdapter(
 
     override suspend fun create(command: QuestionCreationCommand): QuestionCreationResult =
         withContext(Dispatchers.IO) {
-            val result = createQuestionGroupUseCase.execute(command.toCreateQuestionGroupCommand())
+            val result = createQuestionGroupUseCase.execute(command.toCreateQuestionCommand())
             QuestionCreationResult(
                 questionId = QuestionId(result.questionId),
                 questionItemIds = result.questionItemIds.map { QuestionItemId(it) },
             )
         }
 
-    private fun QuestionCreationCommand.toCreateQuestionGroupCommand(): CreateQuestionCommand =
+    private fun QuestionCreationCommand.toCreateQuestionCommand(): CreateQuestionCommand =
         CreateQuestionCommand(
             generationId = generationId.value,
             sharedContext = result.sharedContext?.toDomain(),

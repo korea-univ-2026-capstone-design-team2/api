@@ -5,6 +5,7 @@ import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionGenerationStepLogId
 import com.examhelper.api.kernel.identifier.QuestionId
+import com.examhelper.api.question_generation.application.factory.QuestionGenerationRequestFactory
 import com.examhelper.api.question_generation.domain.QuestionGeneration
 import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
@@ -44,6 +45,7 @@ class GenerateQuestionService(
     private val questionCreationPort: QuestionCreationPort,
     private val idGenerator: IdGenerator,
     private val metricsPort: QuestionGenerationMetricsPort,
+    private val questionGenerationRequestFactory: QuestionGenerationRequestFactory,
     private val dispatcher: CoroutineDispatcher,
     private val applicationScope: CoroutineScope,
     private val domainEventPublisher: DomainEventPublisher,
@@ -53,7 +55,7 @@ class GenerateQuestionService(
     override fun execute(command: GenerateQuestionCommand): GenerateQuestionResult {
         val generation = QuestionGeneration.create(
             id = QuestionGenerationId(idGenerator.generateId()),
-            request = command.toGenerationRequest(),
+            request = questionGenerationRequestFactory.create(command)
         )
         questionGenerationStore.save(generation)
         logger.info { "문제 생성 시작: generationId=${generation.id}, quantity=${generation.request.quantity}" }
