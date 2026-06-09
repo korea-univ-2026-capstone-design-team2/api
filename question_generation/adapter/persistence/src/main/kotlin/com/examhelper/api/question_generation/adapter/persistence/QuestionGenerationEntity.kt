@@ -60,7 +60,7 @@ class QuestionGenerationEntity(
     @Column(nullable = false)
     val quantity: Int,
 
-    @Column(nullable = false)
+    @Column(name = "frame_search_top_k", nullable = false)
     val frameSearchTopK: Int,
 
     @Enumerated(EnumType.STRING)
