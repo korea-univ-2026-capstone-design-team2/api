@@ -3,6 +3,7 @@ package com.examhelper.api.auth.adapter.jwt
 import com.examhelper.api.auth.port.outbound.JwtTokenProviderPort
 import com.examhelper.api.auth.port.outbound.JwtTokenSet
 import com.examhelper.api.kernel.identifier.MemberId
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
@@ -42,5 +43,24 @@ class JwtTokenProviderAdapter(
             .compact()
 
         return JwtTokenSet(accessToken, refreshToken)
+    }
+    override fun validateAndExtractMemberId(token: String): MemberId? {
+        return try {
+            // 최신 jjwt 문법인 parser()와 verifyWith()를 사용합니다.
+            val claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+
+            // 토큰 주인의 ID(String)를 꺼내서 MemberId(Long) 객체로 복원합니다.
+            val memberIdString = claims.subject
+            MemberId(memberIdString.toLong())
+        } catch (e: JwtException) {
+            // 토큰이 변조되었거나, 만료되었을 경우 세부 예외가 터지며, null을 반환해 인증 실패 처리합니다.
+            null
+        } catch (e: IllegalArgumentException) {
+            null
+        }
     }
 }
