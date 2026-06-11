@@ -1,176 +1,128 @@
 package com.examhelper.api.question_generation.adapter.ai
 
+import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
 import com.examhelper.api.question_generation.port.outbound.command.LlmGenerationCommand
+import com.examhelper.api.question_generation.port.outbound.result.FrameSearchResult
 import org.springframework.stereotype.Component
 
 @Component
 class PromptAssembler {
     fun assembleUserPrompt(command: LlmGenerationCommand): String = buildString {
-        val req = command.generationRequest
+        appendGenerationRequest(command.generationRequest)
 
-        appendLine("[GENERATION_REQUEST]")
-        appendLine("SUBJECT:")
-        appendLine(req.subject.name)
         appendLine()
-
-        appendLine("QUESTION_TYPE:")
-        appendLine(req.questionType.name)
-        req.questionSubType?.let {
-            appendLine()
-            appendLine("QUESTION_SUBTYPE:")
-            appendLine(it.name)
-        }
-        appendLine()
-
-        appendLine("DIFFICULTY:")
-        appendLine(req.difficulty.name)
-        appendLine()
-
-        appendLine("TOPIC_CATEGORY:")
-        appendLine(req.topic.category)
-        req.topic.keyword?.let {
-            appendLine()
-            appendLine("TOPIC_KEYWORD:")
-            appendLine(it)
-        }
-        req.topic.description?.let {
-            appendLine()
-            appendLine("TOPIC_DESCRIPTION:")
-            appendLine(it)
-        }
-        appendLine()
-
         appendLine("==================================================")
         appendLine("[REFERENCE_FRAMES]")
         appendLine("==================================================")
+
+        command.referenceFrames.forEachIndexed { index, frame -> appendReferenceFrame(index + 1, frame) }
+
+        appendGenerationRules()
+    }.trimEnd()
+
+    private fun StringBuilder.appendGenerationRequest(req: QuestionGenerationRequest) {
+        appendLine("[GENERATION_REQUEST]")
+
+        appendLine("SUBJECT=${req.subject.name}")
+        appendLine("QUESTION_TYPE=${req.questionType.name}")
+
+        req.questionSubType?.let { appendLine("QUESTION_SUBTYPE=${it.name}") }
+
+        appendLine("DIFFICULTY=${req.difficulty.name}")
+        appendLine("TOPIC_CATEGORY=${req.topic.category}")
+
+        req.topic.keyword?.let { appendLine("TOPIC_KEYWORD=$it") }
+
+        req.topic.description?.let { appendLine("TOPIC_DESCRIPTION=$it") }
+    }
+
+    private fun StringBuilder.appendReferenceFrame(
+        index: Int,
+        frame: FrameSearchResult
+    ) {
+        appendLine()
+        appendLine("FRAME_$index")
+
+        appendLine("[QUESTION_METADATA]")
+        appendLine("QUESTION_TYPE=${frame.questionType.name}")
+
+        frame.questionSubType?.let { appendLine("QUESTION_SUBTYPE=${it.name}") }
+
+        appendLine("DIFFICULTY=${frame.difficulty.name}")
+        appendLine("TOPIC_CATEGORY=${frame.topicCategory}")
+
+        frame.topicKeyword?.let { appendLine("TOPIC_KEYWORD=$it") }
+
         appendLine()
 
-        command.referenceFrames.forEachIndexed { index, frame ->
-            appendLine("##############################")
-            appendLine("REFERENCE_FRAME_${index + 1}")
-            appendLine("##############################")
-            appendLine()
+        appendLine("[REASONING_FRAME]")
 
-            appendLine("[SIMILARITY_SCORE]")
-            appendLine("%.4f".format(frame.similarityScore))
-            appendLine()
+        appendLine("REASONING_TYPE=${frame.reasoningType}")
 
-            appendLine("[QUESTION_METADATA]")
-            appendLine("QUESTION_TYPE:")
-            appendLine(frame.questionType.name)
-            frame.questionSubType?.let {
-                appendLine()
-                appendLine("QUESTION_SUBTYPE:")
-                appendLine(it.name)
-            }
-            appendLine()
+        appendLine("PREMISES")
+        frame.premises.forEach { appendLine("- $it") }
 
-            appendLine("DIFFICULTY:")
-            appendLine(frame.difficulty.name)
-            appendLine()
+        appendLine("CONDITIONS")
+        frame.conditions.forEach { appendLine("- $it") }
 
-            appendLine("TOPIC_CATEGORY:")
-            appendLine(frame.topicCategory)
-            frame.topicKeyword?.let {
-                appendLine()
-                appendLine("TOPIC_KEYWORD:")
-                appendLine(it)
-            }
-            appendLine()
+        appendLine("LOGICAL_GOAL")
+        appendLine(frame.logicalGoal)
 
-            appendLine("[REASONING_FRAME]")
-            appendLine("REASONING_TYPE:")
-            appendLine(frame.reasoningType)
-            appendLine()
+        appendLine("INFERENCE_STRUCTURE")
+        frame.inferenceStructure.forEach { appendLine("- $it") }
 
-            appendLine("PREMISES:")
-            frame.premises.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine()
 
-            appendLine("CONDITIONS:")
-            frame.conditions.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine("[REASONING_PATTERNS]")
+        frame.reasoningPatterns.forEach { appendLine("- $it") }
 
-            appendLine("LOGICAL_GOAL:")
-            appendLine(frame.logicalGoal)
-            appendLine()
+        appendLine()
 
-            appendLine("INFERENCE_STRUCTURE:")
-            frame.inferenceStructure.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine("[TRAP_PATTERNS]")
+        frame.trapPatterns.forEach { appendLine("- $it") }
 
-            appendLine("[REASONING_PATTERNS]")
-            frame.reasoningPatterns.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine()
 
-            appendLine("[TRAP_PATTERNS]")
-            frame.trapPatterns.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine("[DISCOURSE_STRUCTURE]")
+        frame.discourseStructure.forEach { appendLine("- $it") }
 
-            appendLine("[DISCOURSE_STRUCTURE]")
-            frame.discourseStructure.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine()
 
-            appendLine("[COGNITIVE_OPERATIONS]")
-            frame.cognitiveOperations.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine("[COGNITIVE_OPERATIONS]")
+        frame.cognitiveOperations.forEach { appendLine("- $it") }
 
-            appendLine("[REASONING_COMPLEXITY]")
-            appendLine(frame.reasoningComplexity)
-            appendLine()
+        appendLine()
 
-            appendLine("[GENERATION_CONSTRAINTS]")
-            appendLine("MUST_PRESERVE:")
-            frame.mustPreserve.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine("[REASONING_COMPLEXITY]")
+        appendLine(frame.reasoningComplexity)
 
-            appendLine("VARIABLE_ELEMENTS:")
-            frame.variableElements.forEach { appendLine("- $it") }
-            appendLine()
+        appendLine()
 
-            appendLine("[ORIGINAL_PROBLEM]")
-            appendLine("STEM:")
-            appendLine(frame.questionStem)
-            frame.passage?.let {
-                appendLine()
-                appendLine("PASSAGE:")
-                appendLine(it)
-            }
-            frame.passageDescription?.let {
-                appendLine()
-                appendLine("PASSAGE_DESCRIPTION:")
-                appendLine(it)
-            }
-            appendLine()
+        appendLine("[GENERATION_CONSTRAINTS]")
 
-            appendLine("CHOICES:")
-            frame.answerChoices.forEachIndexed { i, choice -> appendLine("${i + 1}. $choice") }
-            appendLine()
+        appendLine("MUST_PRESERVE")
+        frame.mustPreserve.forEach { appendLine("- $it") }
 
-            appendLine("ANSWER:")
-            appendLine(frame.correctAnswer)
-            appendLine()
+        appendLine("VARIABLE_ELEMENTS")
+        frame.variableElements.forEach { appendLine("- $it") }
 
-            appendLine("CORRECT_REASON:")
-            appendLine(frame.correctReason)
-            appendLine()
+        appendLine()
+        appendLine("----------------------------------------")
+    }
 
-            appendLine("[RETRIEVAL_TEXT]")
-            appendLine(frame.retrievalText)
-            appendLine()
-
-            appendLine("==================================================")
-            appendLine()
-        }
-
+    private fun StringBuilder.appendGenerationRules() {
+        appendLine()
         appendLine("[GENERATION_RULES]")
-        appendLine("- 참조 프레임의 논리 구조와 추론 패턴을 유지하되 내용은 새롭게 생성할 것")
-        appendLine("- 동일 표현 반복 금지")
-        appendLine("- trap pattern 을 반드시 포함할 것")
-        appendLine("- reasoning complexity 수준 유지")
-        appendLine("- 선택지는 실제 PSAT 스타일처럼 구성할 것")
-        appendLine("- 정답은 명확한 reasoning chain 으로 도출 가능해야 함")
-        appendLine("- passage 와 choice 사이의 논리적 정합성을 유지할 것")
-        appendLine("- 한국 PSAT/5급 공채 언어논리 스타일 유지")
-    }.trimEnd()
+
+        appendLine("- Preserve reasoning structure, trap patterns, and difficulty")
+        appendLine("- Generate entirely new subject matter and entities")
+        appendLine("- Do not reuse original wording from any reference frame")
+        appendLine("- Maintain PSAT style logical rigor")
+        appendLine("- Include realistic distractors")
+        appendLine("- Ensure the correct answer is uniquely derivable")
+        appendLine("- Preserve logical consistency between passage and choices")
+        appendLine("- incorrectReasons must contain every incorrect choice")
+        appendLine("- If answer=2 and choices are 1~5, incorrectReasons must contain keys 1,3,4,5")
+        appendLine("- Never omit an incorrect choice explanation")
+    }
 }
