@@ -3,10 +3,10 @@ package com.examhelper.api.question_generation.domain
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
-import com.examhelper.api.question_generation.domain.event.GenerationCompletedEvent
+import com.examhelper.api.kernel.event.GenerationCompletedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationFailedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationRequestedEvent
-import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
+import com.examhelper.api.kernel.event.QuestionGeneratedEvent
 import com.examhelper.api.question_generation.domain.exception.GenerationAssertionException
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
@@ -20,7 +20,6 @@ class QuestionGeneration private constructor(
     val createdAt: Instant,
     updatedAt: Instant,
 ) : AggregateRoot<QuestionGenerationId>(id) {
-
     var status: QuestionGenerationStatus = status
         private set
 
@@ -31,11 +30,15 @@ class QuestionGeneration private constructor(
         private set
 
     // ── 상태 전이 ─────────────────────────────────────────────
-    fun markQuestionGenerated(questionId: QuestionId) {
+    fun markQuestionGenerated(
+        questionId: QuestionId,
+        ordering: Int,
+    ) {
         addDomainEvent(
             QuestionGeneratedEvent(
                 generationId = id.value,
                 questionId = questionId.value,
+                ordering = ordering,
                 occurredAt = Instant.now(),
             )
         )

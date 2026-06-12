@@ -7,7 +7,6 @@ import com.examhelper.api.kernel.identifier.QuestionGenerationStepLogId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question_generation.application.factory.QuestionGenerationRequestFactory
 import com.examhelper.api.question_generation.domain.QuestionGeneration
-import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStep
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStepStatus
@@ -148,7 +147,7 @@ class GenerateQuestionService(
             .onFailure { logger.error(it) { "LLM 생성 실패: generationId=${generation.id}, index=$index" } }
             .getOrElse { return Result.failure(it) }
 
-        return runWithLog(generation.id, QuestionGenerationStep.QUESTION_CREATION, "index=$index") {
+        val questionId = runWithLog(generation.id, QuestionGenerationStep.QUESTION_CREATION, "index=$index") {
             questionCreationPort.create(
                 QuestionCreationCommand(
                     result = llmResult,
@@ -165,7 +164,18 @@ class GenerateQuestionService(
                     )
                 )
             ).questionId
-        }.onFailure { logger.error(it) { "문제 생성 실패: generationId=${generation.id}, index=$index" } }
+        }
+            .onFailure { logger.error(it) { "문제 생성 실패: generationId=${generation.id}, index=$index" } }
+            .getOrElse { return Result.failure(it) }
+
+        generation.markQuestionGenerated(
+            questionId = questionId,
+            ordering = index + 1
+        )
+
+        domainEventPublisher.publishFrom(generation)
+
+        return Result.success(questionId)
     }
 
     // ── 완료 처리 ──────────────────────────────────────────────
@@ -182,18 +192,9 @@ class GenerateQuestionService(
             successCount = successIds.size,
             failureCount = failureCount,
         )
-        logger.info { generation.request.frameSearchTopK }
+
         questionGenerationStore.save(generation)
 
-        successIds.forEach { questionId ->
-            domainEventPublisher.publish(
-                QuestionGeneratedEvent(
-                    generationId = generation.id.value,
-                    questionId = questionId.value,
-                    occurredAt = Instant.now(),
-                )
-            )
-        }
         domainEventPublisher.publishFrom(generation)
     }
 

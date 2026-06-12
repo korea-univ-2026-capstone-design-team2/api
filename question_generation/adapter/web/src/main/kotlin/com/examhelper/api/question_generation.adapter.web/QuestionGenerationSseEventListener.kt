@@ -1,9 +1,9 @@
 package com.examhelper.api.question_generation.adapter.web
 
 import com.examhelper.api.question_generation.adapter.web.response.QuestionGeneratedSseResponse
-import com.examhelper.api.question_generation.domain.event.GenerationCompletedEvent
+import com.examhelper.api.kernel.event.GenerationCompletedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationFailedEvent
-import com.examhelper.api.question_generation.domain.event.QuestionGeneratedEvent
+import com.examhelper.api.kernel.event.QuestionGeneratedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 

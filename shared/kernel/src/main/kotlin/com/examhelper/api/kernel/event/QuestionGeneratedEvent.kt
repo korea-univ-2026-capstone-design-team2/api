@@ -1,4 +1,4 @@
-package com.examhelper.api.question_generation.domain.event
+package com.examhelper.api.kernel.event
 
 import com.examhelper.api.kernel.core.DomainEvent
 import com.examhelper.api.kernel.core.EventChannel
@@ -7,6 +7,7 @@ import java.time.Instant
 class QuestionGeneratedEvent(
     val generationId: Long,
     val questionId: Long,
+    val ordering: Int,
     val occurredAt: Instant,
 ) : DomainEvent(
     aggregateId   = generationId.toString(),

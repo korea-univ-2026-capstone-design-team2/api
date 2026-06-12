@@ -2,4 +2,6 @@ package com.examhelper.api.exam.adapter.persistence
 
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ExamJpaStore: JpaRepository<ExamEntity, Long>
+interface ExamJpaStore: JpaRepository<ExamEntity, Long> {
+    fun findByGenerationId(generationId: Long): ExamEntity?
+}
