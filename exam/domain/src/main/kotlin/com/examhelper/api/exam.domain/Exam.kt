@@ -5,12 +5,12 @@ import com.examhelper.api.exam.domain.event.ExamCreatedEvent
 import com.examhelper.api.exam.domain.event.ExamGenerationCompletedEvent
 import com.examhelper.api.exam.domain.event.ExamGenerationFailedEvent
 import com.examhelper.api.exam.domain.exception.ExamAssertionException
-import com.examhelper.api.exam.domain.exception.ExamException
 import com.examhelper.api.exam.domain.type.ExamStatus
 import com.examhelper.api.exam.domain.vo.ExamGenerationResult
 import com.examhelper.api.exam.domain.vo.ExamMetadata
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.ExamId
+import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import java.time.Instant
 import kotlin.collections.toMutableList
 
@@ -45,6 +45,18 @@ class Exam private constructor(
         _items.add(item)
         updatedAt = Instant.now()
     }
+
+    fun startGeneration(generationId: QuestionGenerationId) {
+        require(status == ExamStatus.GENERATING) { "생성 중 상태에서만 generationId를 연결할 수 있습니다." }
+        generationResult = ExamGenerationResult(
+            generationId = generationId,
+            successCount = 0,
+            failCount = 0,
+        )
+        status = ExamStatus.GENERATING
+    }
+
+    fun isEmptyExam(): Boolean = metadata.targetQuestionCount == 0
 
     // ── 상태 전이 ──────────────────────────────────────────────
     fun completeGeneration(result: ExamGenerationResult) {
