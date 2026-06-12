@@ -3,6 +3,7 @@ package com.examhelper.api.exam.adapter.persistence
 import com.examhelper.api.exam.domain.Exam
 import com.examhelper.api.exam.port.outbound.ExamStore
 import com.examhelper.api.kernel.identifier.ExamId
+import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -23,5 +24,9 @@ class ExamPersistenceAdapter(
 
     override fun loadById(examId: ExamId): Exam? {
         return examJpaRepository.findById(examId.value).orElse(null)?.toDomain()
+    }
+
+    override fun loadByGenerationId(generationId: QuestionGenerationId): Exam? {
+        return examJpaRepository.findByGenerationId(generationId.value)?.toDomain()
     }
 }
