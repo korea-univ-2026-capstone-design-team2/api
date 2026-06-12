@@ -1,4 +1,4 @@
-package com.examhelper.api.question_generation.domain.event
+package com.examhelper.api.kernel.event
 
 import com.examhelper.api.kernel.core.DomainEvent
 import com.examhelper.api.kernel.core.EventChannel
