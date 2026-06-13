@@ -16,7 +16,7 @@ data class QuestionGenerationRequest(
     val frameSearchTopK: Int = 3
 ) {
     init {
-        require(quantity in 1..20) {
+        require(quantity in 1..10) {
             throw GenerationAssertionException.QuantityOutOfRange(quantity)
         }
         require(frameSearchTopK in 1..10) {
