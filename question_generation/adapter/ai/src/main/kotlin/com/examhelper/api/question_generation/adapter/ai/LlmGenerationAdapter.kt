@@ -11,6 +11,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mu.KotlinLogging
 import org.springframework.ai.chat.messages.SystemMessage
 import org.springframework.ai.chat.messages.UserMessage
 import org.springframework.ai.chat.model.ChatModel
@@ -29,6 +30,8 @@ class LlmGenerationAdapter(
     private val metrics: LlmGenerationMetrics,
     private val meterRegistry: MeterRegistry,
 ) : LlmGenerationPort {
+    private val logger = KotlinLogging.logger {}
+
     private val systemPrompt: String = resourceLoader
         .getResource("classpath:prompts/question-generation.system.prompt")
         .getContentAsString(Charsets.UTF_8)
@@ -57,6 +60,7 @@ class LlmGenerationAdapter(
         } catch (ex: LlmGenerationException) {
             throw ex
         } catch (ex: Exception) {
+            logger.info { ex }
             throw LlmGenerationException.ApiCallFailed(ex)
         }
 
