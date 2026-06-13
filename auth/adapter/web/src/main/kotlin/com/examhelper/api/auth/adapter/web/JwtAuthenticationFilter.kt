@@ -43,3 +43,7 @@ class JwtAuthenticationFilter(
         filterChain.doFilter(request, response)
     }
 }
+/*
+
+https://accounts.google.com/o/oauth2/v2/auth?client_id=849335475634-jbt5qngdusd8v18l57p6imrt4ebegeqq.apps.googleusercontent.com&redirect_uri=http://localhost:8080/login/oauth2/code/google&response_type=code&scope=email profile&state=RANDOM_STRING&access_type=offline
+*/
