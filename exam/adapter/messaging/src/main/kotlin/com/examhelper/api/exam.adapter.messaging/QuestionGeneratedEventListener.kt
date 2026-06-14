@@ -1,13 +1,9 @@
 package com.examhelper.api.exam.adapter.messaging
 
 import com.examhelper.api.exam.adapter.messaging.message.QuestionGeneratedMessage
-import com.examhelper.api.exam.domain.entity.ExamItem
 import com.examhelper.api.exam.port.inbound.AddExamItemUseCase
 import com.examhelper.api.exam.port.inbound.command.AddExamItemCommand
-import com.examhelper.api.exam.port.outbound.ExamStore
 import com.examhelper.api.infrastructure.message.KafkaMessageDeserializer
-import com.examhelper.api.kernel.core.IdGenerator
-import com.examhelper.api.kernel.identifier.ExamItemId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import mu.KotlinLogging
@@ -36,7 +32,8 @@ class QuestionGeneratedEventListener(
         runCatching {
             val message = deserializer.deserialize(record.value(), QuestionGeneratedMessage::class.java)
 
-            addExamItemUseCase.addItem(message.toAddExamItemCommand())
+            addExamItemUseCase.execute(message.toAddExamItemCommand())
+
             ack.acknowledge()
         }.onFailure { logger.error("Failed(QuestionGeneratedEvent): key=${record.key()}", it) }
     }

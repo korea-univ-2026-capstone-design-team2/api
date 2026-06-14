@@ -16,7 +16,7 @@ class AddExamItemService(
     private val idGenerator: IdGenerator,
 ) : AddExamItemUseCase {
     @Transactional
-    override fun addItem(command: AddExamItemCommand) {
+    override fun execute(command: AddExamItemCommand) {
         val exam = examStore.loadByGenerationId(command.generationId)
             ?: throw ExamException.NotFound(command.generationId.value)
 
