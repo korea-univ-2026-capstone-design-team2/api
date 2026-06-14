@@ -13,4 +13,10 @@ sealed class ExamException(
         message = "시험을 찾을 수 없습니다. examId: $examId",
         status = ErrorStatus.NOT_FOUND,
     )
+
+    class NotFoundByGenerationId(generationId: Long) : ExamException(
+        code = "EXAM_NOT_FOUND",
+        message = "시험을 찾을 수 없습니다. generationId: $generationId",
+        status = ErrorStatus.NOT_FOUND,
+    )
 }
