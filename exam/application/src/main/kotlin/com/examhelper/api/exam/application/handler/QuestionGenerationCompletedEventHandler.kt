@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional
 class QuestionGenerationCompletedEventHandler(
     private val examStore: ExamStore
 ) {
-    @EventListener
-    @Transactional
+    //@EventListener
+    //@Transactional
     fun handle(event: GenerationCompletedEvent) {
         val exam = examStore.loadByGenerationId(QuestionGenerationId(event.generationId)) ?: return
 

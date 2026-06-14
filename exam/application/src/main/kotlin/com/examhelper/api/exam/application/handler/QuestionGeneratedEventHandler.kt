@@ -16,8 +16,8 @@ class QuestionGeneratedEventHandler(
     private val examStore: ExamStore,
     private val idGenerator: IdGenerator
 ) {
-    @EventListener
-    @Transactional
+    //@EventListener
+    //@Transactional
     fun handle(event: QuestionGeneratedEvent) {
         val exam = examStore.loadByGenerationId(QuestionGenerationId(event.generationId)) ?: return
 
