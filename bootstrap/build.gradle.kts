@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":exam:adapter:web"))
     implementation(project(":exam:adapter:persistence"))
     implementation(project(":exam:adapter:domain_connector"))
+    implementation(project(":exam:adapter:messaging"))
 
     // Exam Attempt
     implementation(project(":exam_attempt:application"))
@@ -41,11 +42,13 @@ dependencies {
     implementation(project(":token_usage:application"))
     implementation(project(":token_usage:adapter:web"))
     implementation(project(":token_usage:adapter:persistence"))
+    implementation(project(":token_usage:adapter:messaging"))
 
     // Learning Statistics
     implementation(project(":learning_statistics:application"))
     implementation(project(":learning_statistics:adapter:web"))
     implementation(project(":learning_statistics:adapter:persistence"))
+    implementation(project(":learning_statistics:adapter:messaging"))
 
     // Auth
     implementation(project(":auth:application"))
@@ -65,6 +68,9 @@ dependencies {
     // implementation("org.springframework.ai:spring-ai-starter-model-google-genai")
     // implementation("org.springframework.ai:spring-ai-starter-model-google-genai-embedding")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-qdrant")
+
+    // Kafka
+    implementation("org.springframework.boot:spring-boot-starter-kafka")
 
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")

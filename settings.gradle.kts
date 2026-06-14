@@ -27,6 +27,7 @@ include(":exam:application")
 include(":exam:adapter:web")
 include(":exam:adapter:persistence")
 include(":exam:adapter:domain_connector")
+include(":exam:adapter:messaging")
 
 // exam_attempt
 include(":exam_attempt:domain")
@@ -42,6 +43,7 @@ include(":token_usage:port")
 include(":token_usage:application")
 include(":token_usage:adapter:web")
 include(":token_usage:adapter:persistence")
+include(":token_usage:adapter:messaging")
 
 // learning_statistics
 include(":learning_statistics:domain")
@@ -49,11 +51,9 @@ include(":learning_statistics:port")
 include(":learning_statistics:application")
 include(":learning_statistics:adapter:web")
 include(":learning_statistics:adapter:persistence")
+include(":learning_statistics:adapter:messaging")
 
-// auth
-include(":auth")
-
-//member
+// member
 include(":member")
 include("member:domain")
 include("member:application")
@@ -62,7 +62,7 @@ include("member:adapter:persistence")
 include("member:adapter:web")
 include("member:port")
 
-//member
+// auth
 include("auth:domain")
 include("auth:port")
 include("auth:application")
