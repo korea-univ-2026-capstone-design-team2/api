@@ -61,8 +61,6 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-      mysql:
-        condition: service_healthy
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
       GROUP_ID: psat-connect-cluster
