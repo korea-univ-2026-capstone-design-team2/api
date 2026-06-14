@@ -12,7 +12,7 @@ class GenerationCompletedEvent(
 ) : DomainEvent(
     aggregateId   = generationId.toString(),
     aggregateType = "QuestionGeneration",
-    channel       = EventChannel.INTERNAL,
+    channel       = EventChannel.BOTH
 ) {
     override val eventType: String = "GenerationCompleted"
     override fun topic(): String   = "question-generation.completed"

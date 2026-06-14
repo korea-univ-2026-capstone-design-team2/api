@@ -1,0 +1,41 @@
+{
+  "name": "psat-outbox-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+
+    "database.hostname": "${DB_HOST}",
+    "database.port": "${DB_PORT}",
+    "database.user": "${DEBEZIUM_DB_USER}",
+    "database.password": "${DEBEZIUM_DB_PASSWORD}",
+    "database.connectionTimeZone": "Asia/Seoul",
+
+    "database.server.id": "1",
+
+    "topic.prefix": "psat",
+
+    "database.include.list": "${DB_NAME}",
+    "table.include.list": "${DB_NAME}.outbox_events",
+
+    "snapshot.mode": "schema_only",
+
+    "schema.history.internal.kafka.bootstrap.servers": "${KAFKA_BOOTSTRAP_SERVERS}",
+    "schema.history.internal.kafka.topic": "_schema-history.psat",
+
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+
+    "transforms": "outbox",
+    "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+
+    "transforms.outbox.table.field.event.id": "id",
+    "transforms.outbox.table.field.event.key": "aggregate_id",
+    "transforms.outbox.table.field.event.type": "event_type",
+    "transforms.outbox.table.field.event.payload": "payload",
+
+    "transforms.outbox.route.by.field": "topic",
+    "transforms.outbox.route.topic.replacement": "psat.${routedByValue}"
+  }
+}
