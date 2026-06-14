@@ -1,11 +1,14 @@
 package com.examhelper.api.infrastructure.event
 
 import com.examhelper.api.kernel.core.DomainEvent
+import com.examhelper.api.kernel.core.OutboxStore
 import org.springframework.stereotype.Component
 
 @Component
-class ExternalEventPublisher {
+class ExternalEventPublisher(
+    private val outboxStore: OutboxStore
+) {
     fun publish(event: DomainEvent) {
-        // TODO: 추후 필요할지 검토
+        outboxStore.save(event)
     }
 }
