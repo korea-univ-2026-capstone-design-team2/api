@@ -2,6 +2,7 @@ package com.examhelper.api.exam.port.inbound.command
 
 import com.examhelper.api.exam.domain.type.ExamTopic
 import com.examhelper.api.exam.domain.vo.ExamMetadata
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
@@ -9,6 +10,7 @@ import com.examhelper.api.kernel.type.Subject
 import com.examhelper.api.kernel.type.TopicCategory
 
 data class GenerateExamCommand(
+    val memberId: MemberId,
     val title: String,
     val subject: Subject,
     val questionType: QuestionType,

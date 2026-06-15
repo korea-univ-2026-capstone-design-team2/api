@@ -6,6 +6,7 @@ import com.examhelper.api.kernel.type.QuestionType
 import com.examhelper.api.kernel.type.Subject
 
 data class ExamFilter(
+    val memberId: Long,
     val subject: Subject?,
     val questionType: QuestionType?,
     val difficulty: DifficultyLevel?,

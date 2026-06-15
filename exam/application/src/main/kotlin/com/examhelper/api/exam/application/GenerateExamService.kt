@@ -24,6 +24,7 @@ class GenerateExamService(
     override fun execute(command: GenerateExamCommand): GenerateExamResult {
         val exam = Exam.create(
             id = ExamId(idGenerator.generateId()),
+            memberId = command.memberId,
             title = command.title,
             metadata = command.toMetadata(),
         )
@@ -31,7 +32,10 @@ class GenerateExamService(
 
         if (exam.isEmptyExam()) return completeEmpty(exam)
 
-        return runCatching { generateExamQuestionsPort.generate(GenerateExamQuestionsCommand(exam.metadata)) }
+        return runCatching { generateExamQuestionsPort.generate(GenerateExamQuestionsCommand(
+            memberId = command.memberId,
+            metadata = exam.metadata
+        )) }
             .fold(
                 onSuccess = { result -> startGeneration(exam, result) },
                 onFailure = { ex -> failGeneration(exam, ex) },

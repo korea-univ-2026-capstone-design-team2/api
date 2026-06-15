@@ -6,6 +6,7 @@ import com.examhelper.api.exam.domain.type.ExamTopic
 import com.examhelper.api.exam.domain.vo.ExamGenerationResult
 import com.examhelper.api.exam.domain.vo.ExamMetadata
 import com.examhelper.api.kernel.identifier.ExamId
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
@@ -36,6 +37,9 @@ import java.time.Instant
 class ExamEntity(
     @Id
     val id: Long,
+
+    @Column(nullable = false)
+    val memberId: Long,
 
     @Column(nullable = false, length = 200)
     val title: String,
@@ -106,6 +110,7 @@ class ExamEntity(
         fun fromDomain(domain: Exam): ExamEntity {
             val entity = ExamEntity(
                 id = domain.id.value,
+                memberId = domain.memberId.value,
                 title = domain.title,
                 subject = domain.metadata.subject,
                 questionType = domain.metadata.questionType,
@@ -131,6 +136,7 @@ class ExamEntity(
 
     fun toDomain(): Exam = Exam.of(
         id = ExamId(id),
+        memberId = MemberId(memberId),
         title = title,
         metadata = ExamMetadata(
             subject = subject,

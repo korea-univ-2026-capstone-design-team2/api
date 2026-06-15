@@ -15,8 +15,12 @@ interface ExamJpaReader : JpaRepository<ExamEntity, Long> {
     @EntityGraph(attributePaths = ["items"])
     fun findEntityById(id: Long): ExamEntity?
 
-    @Query(
-        """
+    @EntityGraph(attributePaths = ["items"])
+    fun findEntityByIdAndMemberId(id: Long, memberId: Long): ExamEntity?
+
+    fun existsByIdAndMemberId(id: Long, memberId: Long): Boolean
+
+    @Query("""
         SELECT new com.examhelper.api.exam.port.inbound.view.ExamSummaryView(
             e.id,
             e.title,
@@ -29,32 +33,33 @@ interface ExamJpaReader : JpaRepository<ExamEntity, Long> {
             e.createdAt
         )
         FROM ExamEntity e
-        WHERE (:subject      IS NULL OR e.subject      = :subject)
+        WHERE e.memberId = :memberId
+          AND (:subject      IS NULL OR e.subject      = :subject)
           AND (:questionType IS NULL OR e.questionType = :questionType)
           AND (:difficulty   IS NULL OR e.difficulty   = :difficulty)
           AND (:status       IS NULL OR e.status       = :status)
         ORDER BY e.createdAt DESC
-    """
-    )
+    """)
     fun findSummaries(
+        @Param("memberId") memberId: Long,
         @Param("subject") subject: Subject?,
         @Param("questionType") questionType: QuestionType?,
         @Param("difficulty") difficulty: DifficultyLevel?,
         @Param("status") status: ExamStatus?,
-        pageable: Pageable
+        pageable: Pageable,
     ): List<ExamSummaryView>
 
-    @Query(
-        """
+    @Query("""
         SELECT COUNT(e)
         FROM ExamEntity e
-        WHERE (:subject      IS NULL OR e.subject      = :subject)
+        WHERE e.memberId = :memberId
+          AND (:subject      IS NULL OR e.subject      = :subject)
           AND (:questionType IS NULL OR e.questionType = :questionType)
           AND (:difficulty   IS NULL OR e.difficulty   = :difficulty)
           AND (:status       IS NULL OR e.status       = :status)
-    """
-    )
+    """)
     fun countByFilter(
+        @Param("memberId") memberId: Long,
         @Param("subject") subject: Subject?,
         @Param("questionType") questionType: QuestionType?,
         @Param("difficulty") difficulty: DifficultyLevel?,
