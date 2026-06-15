@@ -19,6 +19,7 @@ class RecordTokenUsageService(
     override fun execute(command: RecordTokenUsageCommand): RecordTokenUsageResult {
         val tokenUsage = TokenUsage.create(
             id = TokenUsageId(idGenerator.generateId()),
+            memberId = command.memberId,
             target = command.target,
             provider = command.provider,
             model = command.model,
