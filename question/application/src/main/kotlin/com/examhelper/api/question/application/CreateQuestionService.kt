@@ -31,16 +31,17 @@ class CreateQuestionService(
 
         val question = Question.create(
             id = questionId,
-            generationId = QuestionGenerationId(command.generationId),
+            memberId = command.memberId,
+            generationId = command.generationId,
             sharedContext = command.sharedContext,
-            metadata = command.metadata,
+            metadata = command.metadata
         )
 
         // ── QuestionItems 생성 및 aggregate 편입 ───────
         command.questions.forEach { q ->
             val questionItem = QuestionItem.create(
                 id = QuestionItemId(idGenerator.generateId()),
-                generationId = QuestionGenerationId(command.generationId),
+                generationId = command.generationId,
                 content = QuestionItemContent(
                     stem = q.stem,
                     exhibit = q.exhibit,

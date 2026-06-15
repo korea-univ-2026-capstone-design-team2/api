@@ -12,6 +12,6 @@ class GetQuestionPaperService(
     private val questionReader: QuestionReader,
 ) : GetQuestionPaperUseCase {
     override fun execute(query: GetQuestionPaperQuery): QuestionPaperView =
-        questionReader.findPaperById(query.questionId)
+        questionReader.findPaperById(query.questionId, query.memberId)
             ?: throw QuestionException.NotFound(query.questionId)
 }

@@ -13,21 +13,16 @@ import com.examhelper.api.question.port.inbound.view.QuestionSummaryView
 
 interface QuestionReader {
     // ── Group 단위 ─────────────────────────────────────────
-    fun findPaperById(id: Long): QuestionPaperView?
-    fun findPapersByIds(ids: List<Long>): List<QuestionPaperView>
-    fun findPapersByGenerationId(generationId: Long): List<QuestionPaperView>
-    fun findReviewById(id: Long): QuestionReviewView?
-    fun findReviewsByIds(ids: List<Long>): List<QuestionReviewView>
+    fun findPaperById(id: Long, memberId: Long): QuestionPaperView?
+    fun findPapersByIds(ids: List<Long>, memberId: Long): List<QuestionPaperView>
+    fun findPapersByGenerationId(generationId: Long, memberId: Long): List<QuestionPaperView>
+    fun findReviewById(id: Long, memberId: Long): QuestionReviewView?
+    fun findReviewsByIds(ids: List<Long>, memberId: Long): List<QuestionReviewView>
     fun findDetailById(id: Long): QuestionDetailView?
     fun findAll(filter: QuestionFilter): List<QuestionSummaryView>
     fun count(filter: QuestionFilter): Long
 
     // ── Item 단위 ──────────────────────────────────────────
-    fun findItemPaperById(questionItemId: Long): QuestionItemPaperView?
-    fun findItemReviewById(questionItemId: Long): QuestionItemReviewView?
-    fun findItemDetailById(questionItemId: Long): QuestionItemDetailView?
     fun findItemSummaries(questionItemIds: List<Long>): List<QuestionItemMetadataView>
-    fun findAllItems(filter: QuestionItemFilter): List<QuestionItemSummaryView>
-    fun countItems(filter: QuestionItemFilter): Long
     fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView>
 }

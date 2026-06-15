@@ -1,6 +1,7 @@
 package com.examhelper.api.question.domain
 
 import com.examhelper.api.kernel.core.AggregateRoot
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.kernel.identifier.QuestionItemId
@@ -14,6 +15,7 @@ import java.time.Instant
 
 class Question private constructor(
     id: QuestionId,
+    val memberId: MemberId,
     val generationId: QuestionGenerationId,
     sharedContext: SharedQuestionContext?,
     items: List<QuestionItem>,
@@ -57,6 +59,7 @@ class Question private constructor(
     companion object {
         fun create(
             id: QuestionId,
+            memberId: MemberId,
             generationId: QuestionGenerationId,
             sharedContext: SharedQuestionContext?,
             metadata: QuestionMetadata,
@@ -64,6 +67,7 @@ class Question private constructor(
             val now = Instant.now()
             return Question(
                 id = id,
+                memberId = memberId,
                 generationId = generationId,
                 sharedContext = sharedContext,
                 items = emptyList(),
@@ -87,6 +91,7 @@ class Question private constructor(
 
         fun of(
             id: QuestionId,
+            memberId: MemberId,
             generationId: QuestionGenerationId,
             sharedContext: SharedQuestionContext?,
             items: List<QuestionItem>,
@@ -96,13 +101,14 @@ class Question private constructor(
             updatedAt: Instant,
         ): Question = Question(
             id = id,
+            memberId = memberId,
             generationId = generationId,
             sharedContext = sharedContext,
             items = items,
             metadata = metadata,
             status = status,
             createdAt = createdAt,
-            updatedAt = updatedAt,
+            updatedAt = updatedAt
         ).also { it.validate() }
     }
 }

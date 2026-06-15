@@ -21,6 +21,7 @@ import com.examhelper.api.question.port.inbound.view.QuestionDetailView
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -51,8 +52,9 @@ class QuestionController(
     @CreateQuestionDocs
     fun createQuestion(
         @RequestBody request: CreateQuestionReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<CreateQuestionResDto>> {
-        val result = createQuestionUseCase.execute(request.toCommand())
+        val result = createQuestionUseCase.execute(request.toCommand(memberId))
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.Success(CreateQuestionResDto.fromResult(result)))
     }
@@ -62,8 +64,14 @@ class QuestionController(
     @GetQuestionPaperDocs
     fun getQuestionPaper(
         @PathVariable questionId: Long,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<QuestionPaperResDto>> {
-        val view = getQuestionPaperUseCase.execute(GetQuestionPaperQuery(questionId))
+        val view = getQuestionPaperUseCase.execute(
+            GetQuestionPaperQuery(
+                questionId = questionId,
+                memberId = memberId
+            )
+        )
         return ResponseEntity.ok(ApiResponse.Success(QuestionPaperResDto.fromView(view)))
     }
 
@@ -72,8 +80,14 @@ class QuestionController(
     @GetQuestionReviewDocs
     fun getQuestionReview(
         @PathVariable questionId: Long,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<QuestionReviewResDto>> {
-        val view = getQuestionReviewUseCase.execute(GetQuestionReviewQuery(questionId))
+        val view = getQuestionReviewUseCase.execute(
+            GetQuestionReviewQuery(
+                questionId = questionId,
+                memberId = memberId
+            )
+        )
         return ResponseEntity.ok(ApiResponse.Success(QuestionReviewResDto.fromView(view)))
     }
 
@@ -81,7 +95,7 @@ class QuestionController(
     @GetMapping("/{questionId}/detail")
     @GetQuestionDetailDocs
     fun getQuestionGroupDetail(
-        @PathVariable questionId: Long,
+        @PathVariable questionId: Long
     ): ResponseEntity<ApiResponse.Success<QuestionDetailResDto>> {
         val view = getQuestionDetailUseCase.execute(GetQuestionDetailQuery(questionId))
         return ResponseEntity.ok(ApiResponse.Success(QuestionDetailResDto.fromView(view)))
@@ -92,8 +106,9 @@ class QuestionController(
     @GetQuestionPapersDocs
     fun getQuestionPapers(
         @RequestBody request: GetQuestionPapersReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<List<QuestionPaperResDto>>> {
-        val views = getQuestionPapersUseCase.execute(request.toQuery())
+        val views = getQuestionPapersUseCase.execute(request.toQuery(memberId))
         return ResponseEntity.ok(ApiResponse.Success(views.map(QuestionPaperResDto::fromView)))
     }
 
@@ -102,19 +117,20 @@ class QuestionController(
     @GetQuestionReviewsDocs
     fun getQuestionReviews(
         @RequestBody request: GetQuestionReviewsReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<List<QuestionReviewResDto>>> {
-        val views = getQuestionReviewsUseCase.execute(request.toQuery())
+        val views = getQuestionReviewsUseCase.execute(request.toQuery(memberId))
         return ResponseEntity.ok(ApiResponse.Success(views.map(QuestionReviewResDto::fromView)))
     }
-/*
-    // ── 목록 조회 ──────────────────────────────────────────
-    @GetMapping
-    fun getQuestionGroups(
-        @ModelAttribute filter: QuestionGroupFilterReqDto,
-    ): ResponseEntity<ApiResponse.Success<QuestionGroupListResDto>> {
-        val result = getQuestionGroupListUseCase.execute(filter.toQuery())
-        return ResponseEntity.ok(ApiResponse.Success(QuestionGroupListResDto.fromResult(result)))
-    }
+    /*
+        // ── 목록 조회 ──────────────────────────────────────────
+        @GetMapping
+        fun getQuestionGroups(
+            @ModelAttribute filter: QuestionGroupFilterReqDto,
+        ): ResponseEntity<ApiResponse.Success<QuestionGroupListResDto>> {
+            val result = getQuestionGroupListUseCase.execute(filter.toQuery())
+            return ResponseEntity.ok(ApiResponse.Success(QuestionGroupListResDto.fromResult(result)))
+        }
 
- */
+     */
 }

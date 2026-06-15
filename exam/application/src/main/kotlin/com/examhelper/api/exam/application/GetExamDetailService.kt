@@ -14,6 +14,6 @@ class GetExamDetailService(
     private val examReader: ExamReader
 ) : GetExamDetailUseCase {
     override fun execute(query: GetExamDetailQuery): ExamDetailView =
-        examReader.findDetailById(query.examId)
+        examReader.findDetailById(query.examId, query.memberId)
             ?: throw ExamException.NotFound(query.examId)
 }

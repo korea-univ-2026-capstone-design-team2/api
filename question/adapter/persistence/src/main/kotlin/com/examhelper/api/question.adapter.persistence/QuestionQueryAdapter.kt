@@ -32,64 +32,68 @@ class QuestionQueryAdapter(
 ) : QuestionReader {
 
     // ── Question 단위 ──────────────────────────────────────
-    override fun findPaperById(id: Long): QuestionPaperView? {
-        val question = questionJpaReader.findEntityById(id) ?: return null
+    override fun findPaperById(id: Long, memberId: Long): QuestionPaperView? {
+        val question = questionJpaReader.findEntityByIdAndMemberId(id, memberId) ?: return null
         val items = questionItemJpaReader.findAllByQuestionId(id)
         return question.toPaperView(items)
     }
 
-    override fun findPapersByIds(ids: List<Long>): List<QuestionPaperView> {
+    override fun findPapersByIds(ids: List<Long>, memberId: Long): List<QuestionPaperView> {
         if (ids.isEmpty()) return emptyList()
 
-        val questionsById = questionJpaReader.findAllByIdIn(ids).associateBy { it.id }
-        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(ids).groupBy { it.question.id }
+        val questionsById = questionJpaReader.findAllByIdInAndMemberId(ids, memberId)
+            .associateBy { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(questionsById.keys.toList())
+            .groupBy { it.question.id }
 
-        return ids.mapNotNull {
-            val question = questionsById[it] ?: return@mapNotNull null
-            question.toPaperView(itemsByQuestionId[it] ?: emptyList())
+        return ids.mapNotNull { id ->
+            val question = questionsById[id] ?: return@mapNotNull null
+            question.toPaperView(itemsByQuestionId[id] ?: emptyList())
         }
     }
 
-    override fun findPapersByGenerationId(generationId: Long): List<QuestionPaperView> {
-        val questions = questionJpaReader.findAllByGenerationId(generationId)
-
+    override fun findPapersByGenerationId(generationId: Long, memberId: Long): List<QuestionPaperView> {
+        val questions = questionJpaReader.findAllByGenerationIdAndMemberId(generationId, memberId)
         if (questions.isEmpty()) return emptyList()
 
         val questionIds = questions.map { it.id }
-        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(questionIds).groupBy { it.question.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(questionIds)
+            .groupBy { it.question.id }
 
         return questions.map { it.toPaperView(itemsByQuestionId[it.id] ?: emptyList()) }
     }
 
-    override fun findReviewById(id: Long): QuestionReviewView? {
-        val question = questionJpaReader.findEntityById(id) ?: return null
+    // Detail — memberId 검증 제외
+    override fun findReviewById(id: Long, memberId: Long): QuestionReviewView? {
+        val question = questionJpaReader.findEntityByIdAndMemberId(id, memberId) ?: return null
         val items = questionItemJpaReader.findAllByQuestionId(id)
         return question.toReviewView(items)
     }
 
-    override fun findReviewsByIds(ids: List<Long>): List<QuestionReviewView> {
+    override fun findReviewsByIds(ids: List<Long>, memberId: Long): List<QuestionReviewView> {
         if (ids.isEmpty()) return emptyList()
 
-        val questionsById = questionJpaReader.findAllByIdIn(ids).associateBy { it.id }
-        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(ids).groupBy { it.question.id }
+        val questionsById = questionJpaReader.findAllByIdInAndMemberId(ids, memberId)
+            .associateBy { it.id }
+        val itemsByQuestionId = questionItemJpaReader.findAllByQuestionIds(questionsById.keys.toList())
+            .groupBy { it.question.id }
 
-        return ids.mapNotNull {
-            val question = questionsById[it] ?: return@mapNotNull null
-            question.toReviewView(itemsByQuestionId[it] ?: emptyList())
+        return ids.mapNotNull { id ->
+            val question = questionsById[id] ?: return@mapNotNull null
+            question.toReviewView(itemsByQuestionId[id] ?: emptyList())
         }
     }
 
+    // Detail — memberId 검증 제외
     override fun findDetailById(id: Long): QuestionDetailView? {
         val question = questionJpaReader.findEntityById(id) ?: return null
         val items = questionItemJpaReader.findAllByQuestionId(id)
         return question.toDetailView(items)
     }
 
-    override fun findItemSummaries(questionItemIds: List<Long>): List<QuestionItemMetadataView> =
-        questionItemJpaReader.findItemSummaries(questionItemIds).map { it.toView() }
-
     override fun findAll(filter: QuestionFilter): List<QuestionSummaryView> =
         questionJpaReader.findSummaries(
+            memberId = filter.memberId,
             subject = filter.subject,
             questionType = filter.questionType,
             difficulty = filter.difficulty,
@@ -98,39 +102,14 @@ class QuestionQueryAdapter(
 
     override fun count(filter: QuestionFilter): Long =
         questionJpaReader.countByFilter(
+            memberId = filter.memberId,
             subject = filter.subject,
             questionType = filter.questionType,
-            difficulty = filter.difficulty
-        )
-
-    // ── QuestionItem 단위 ──────────────────────────────────
-    override fun findItemPaperById(questionItemId: Long): QuestionItemPaperView? =
-        questionItemJpaReader.findEntityById(questionItemId)?.toItemPaperView()
-
-    override fun findItemReviewById(questionItemId: Long): QuestionItemReviewView? =
-        questionItemJpaReader.findEntityById(questionItemId)?.toItemReviewView()
-
-    override fun findItemDetailById(questionItemId: Long): QuestionItemDetailView? =
-        questionItemJpaReader.findEntityById(questionItemId)?.toItemDetailView()
-
-    override fun findAllItems(filter: QuestionItemFilter): List<QuestionItemSummaryView> =
-        questionItemJpaReader.findSummaries(
-            subject = filter.subject,
-            questionType = filter.questionType,
-            questionSubType = filter.questionSubType,
             difficulty = filter.difficulty,
-            questionId = filter.questionId,
-            pageable = PageRequest.of(filter.page, filter.size),
         )
 
-    override fun countItems(filter: QuestionItemFilter): Long =
-        questionItemJpaReader.countByFilter(
-            subject = filter.subject,
-            questionType = filter.questionType,
-            questionSubType = filter.questionSubType,
-            difficulty = filter.difficulty,
-            questionId = filter.questionId,
-        )
+    override fun findItemSummaries(questionItemIds: List<Long>): List<QuestionItemMetadataView> =
+        questionItemJpaReader.findItemSummaries(questionItemIds).map { it.toView() }
 
     override fun findCorrectAnswersByQuestionItemIds(questionItemIds: List<Long>): List<CorrectAnswerView> =
         questionItemJpaReader.findCorrectAnswersByIds(questionItemIds).map { it.toView() }
