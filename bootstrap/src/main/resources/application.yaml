@@ -121,8 +121,8 @@ management:
 
 jwt:
   secret: ${JWT_SECRET:your_jwt_secret_key}
-  access-token-validity-in-ms: 1800000
-  refresh-token-validity-in-ms: 604800000
+  access-token-validity-in-ms: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-validity-in-ms: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
 oauth:
   google:
