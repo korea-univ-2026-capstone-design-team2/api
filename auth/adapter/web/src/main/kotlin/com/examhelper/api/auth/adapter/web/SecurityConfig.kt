@@ -23,6 +23,7 @@ class SecurityConfig(
 
         http
             // 2. REST API 전용 설정 (불필요한 기본 기능 끄기)
+            .cors {  }
             .csrf { it.disable() }        // 브라우저 폼 로그인이 아니므로 CSRF 비활성화
             .httpBasic { it.disable() }   // 헤더에 ID/PW를 달고 다니는 기본 방식 비활성화
             .formLogin { it.disable() }   // 스프링 기본 로그인 화면 비활성화
