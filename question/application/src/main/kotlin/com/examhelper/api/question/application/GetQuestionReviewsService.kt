@@ -11,5 +11,5 @@ class GetQuestionReviewsService(
     private val questionReader: QuestionReader,
 ) : GetQuestionReviewsUseCase {
     override fun execute(query: GetQuestionReviewsQuery): List<QuestionReviewView> =
-        questionReader.findReviewsByIds(query.questionIds)
+        questionReader.findReviewsByIds(query.questionIds, query.memberId)
 }

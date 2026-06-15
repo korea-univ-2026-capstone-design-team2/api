@@ -1,5 +1,7 @@
 package com.examhelper.api.question.adapter.web.request
 
+import com.examhelper.api.kernel.identifier.MemberId
+import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
@@ -16,12 +18,13 @@ data class CreateQuestionReqDto(
     val metadata: QuestionGroupMetadataReqDto,
     val questions: List<QuestionReqDto>,
 ) {
-    fun toCommand(): CreateQuestionCommand =
+    fun toCommand(memberId: Long): CreateQuestionCommand =
         CreateQuestionCommand(
-            generationId = generationId,
+            generationId = QuestionGenerationId(generationId),
+            memberId = MemberId(memberId),
             sharedContext = sharedContext?.toDomain(),
             metadata = metadata.toDomain(),
-            questions = questions.map { it.toCommand() },
+            questions = questions.map { it.toCommand() }
         )
 
     data class SharedContextReqDto(

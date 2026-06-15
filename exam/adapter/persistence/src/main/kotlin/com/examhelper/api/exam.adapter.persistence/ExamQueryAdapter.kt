@@ -16,8 +16,19 @@ class ExamQueryAdapter(
     override fun findDetailById(examId: Long): ExamDetailView? =
         examJpaReader.findEntityById(examId)?.toDetailView()
 
+    override fun findBaseById(examId: Long): ExamBaseView? =
+        examJpaReader.findEntityById(examId)?.toBaseView()
+
+    // memberId 귀속 검증
+    override fun findDetailById(examId: Long, memberId: Long): ExamDetailView? =
+        examJpaReader.findEntityByIdAndMemberId(examId, memberId)?.toDetailView()
+
+    override fun findBaseById(examId: Long, memberId: Long): ExamBaseView? =
+        examJpaReader.findEntityByIdAndMemberId(examId, memberId)?.toBaseView()
+
     override fun findSummaries(filter: ExamFilter): List<ExamSummaryView> =
         examJpaReader.findSummaries(
+            memberId = filter.memberId,
             subject = filter.subject,
             questionType = filter.questionType,
             difficulty = filter.difficulty,
@@ -25,19 +36,17 @@ class ExamQueryAdapter(
             pageable = PageRequest.of(filter.page, filter.size),
         )
 
-    override fun findBaseById(examId: Long): ExamBaseView? =
-        examJpaReader.findEntityById(examId)?.toBaseView()
-
     override fun count(filter: ExamFilter): Long =
         examJpaReader.countByFilter(
+            memberId = filter.memberId,
             subject = filter.subject,
             questionType = filter.questionType,
             difficulty = filter.difficulty,
             status = filter.status,
         )
 
-    override fun existsById(examId: Long): Boolean =
-        examJpaReader.existsById(examId)
+    override fun existsById(examId: Long, memberId: Long): Boolean =
+        examJpaReader.existsByIdAndMemberId(examId, memberId)
 }
 
 // ── ExamEntity → DetailView ───────────────────────────────────

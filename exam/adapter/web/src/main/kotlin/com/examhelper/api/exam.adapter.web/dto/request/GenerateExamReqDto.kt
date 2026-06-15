@@ -1,6 +1,7 @@
 package com.examhelper.api.exam.adapter.web.dto.request
 
 import com.examhelper.api.exam.port.inbound.command.GenerateExamCommand
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
@@ -39,8 +40,9 @@ data class GenerateExamReqDto(
     @Schema(description = "RAG 프레임 검색 수", example = "3", defaultValue = "3")
     val frameSearchTopK: Int = 3,
 ) {
-    fun toCommand(): GenerateExamCommand =
+    fun toCommand(memberId: Long): GenerateExamCommand =
         GenerateExamCommand(
+            memberId = MemberId(memberId),
             title = title,
             subject = subject,
             questionType = questionType,

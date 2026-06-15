@@ -1,5 +1,6 @@
 package com.examhelper.api.token_usage.adapter.web.dto.request
 
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.token_usage.domain.type.AiModel
 import com.examhelper.api.token_usage.domain.type.AiProvider
 import com.examhelper.api.token_usage.domain.type.TokenUsageDomain
@@ -9,6 +10,7 @@ import java.math.BigDecimal
 import java.util.Currency
 
 data class RecordTokenUsageReqDto(
+    val memberId: Long,
     val targetDomain: TokenUsageDomain,
     val targetReferenceId: Long,
     val provider: AiProvider,
@@ -23,6 +25,7 @@ data class RecordTokenUsageReqDto(
 ) {
     fun toCommand(): RecordTokenUsageCommand =
         RecordTokenUsageCommand(
+            memberId = MemberId(memberId),
             target = TokenUsageTarget(
                 domain = targetDomain,
                 referenceId = targetReferenceId,

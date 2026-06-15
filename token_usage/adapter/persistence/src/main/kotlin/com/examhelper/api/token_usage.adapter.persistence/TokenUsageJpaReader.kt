@@ -32,7 +32,8 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
             t.createdAt
         )
         FROM TokenUsageEntity t
-        WHERE (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
+        WHERE t.memberId = :memberId
+          AND (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
           AND (:targetReferenceId IS NULL OR t.targetReferenceId = :targetReferenceId)
           AND (:provider IS NULL OR t.provider = :provider)
           AND (:model IS NULL OR t.model = :model)
@@ -42,6 +43,7 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
         ORDER BY t.createdAt DESC
     """)
     fun findSummaries(
+        @Param("memberId") memberId: Long,
         @Param("targetDomain") targetDomain: TokenUsageDomain?,
         @Param("targetReferenceId") targetReferenceId: Long?,
         @Param("provider") provider: AiProvider?,
@@ -55,7 +57,8 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
     @Query("""
         SELECT COUNT(t)
         FROM TokenUsageEntity t
-        WHERE (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
+        WHERE t.memberId = :memberId
+          AND (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
           AND (:targetReferenceId IS NULL OR t.targetReferenceId = :targetReferenceId)
           AND (:provider IS NULL OR t.provider = :provider)
           AND (:model IS NULL OR t.model = :model)
@@ -64,6 +67,7 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
           AND (:to IS NULL OR t.createdAt <= :to)
     """)
     fun countByFilter(
+        @Param("memberId") memberId: Long,
         @Param("targetDomain") targetDomain: TokenUsageDomain?,
         @Param("targetReferenceId") targetReferenceId: Long?,
         @Param("provider") provider: AiProvider?,
@@ -81,7 +85,8 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
             COALESCE(SUM(t.totalTokens), 0) AS totalTokens,
             COALESCE(SUM(t.totalCost), 0) AS totalCost
         FROM TokenUsageEntity t
-        WHERE (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
+        WHERE t.memberId = :memberId
+          AND (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
           AND (:targetReferenceId IS NULL OR t.targetReferenceId = :targetReferenceId)
           AND (:provider IS NULL OR t.provider = :provider)
           AND (:model IS NULL OR t.model = :model)
@@ -90,17 +95,16 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
           AND (:to IS NULL OR t.createdAt <= :to)
     """)
     fun findStatistics(
+        @Param("memberId") memberId: Long,
         @Param("targetDomain") targetDomain: TokenUsageDomain?,
         @Param("targetReferenceId") targetReferenceId: Long?,
         @Param("provider") provider: AiProvider?,
         @Param("model") model: AiModel?,
-        @Param("status")
-        status: TokenUsageStatus?,
+        @Param("status") status: TokenUsageStatus?,
         @Param("from") from: Instant?,
-        @Param("to") to: Instant?
+        @Param("to") to: Instant?,
     ): TokenUsageStatisticsProjection
 
-    // ── Daily Statistics ────────────────────────────────
     @Query("""
         SELECT 
             FUNCTION('DATE', t.createdAt) AS date,
@@ -110,7 +114,8 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
             COALESCE(SUM(t.totalTokens), 0) AS totalTokens,
             COALESCE(SUM(t.totalCost), 0) AS totalCost
         FROM TokenUsageEntity t
-        WHERE (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
+        WHERE t.memberId = :memberId
+          AND (:targetDomain IS NULL OR t.targetDomain = :targetDomain)
           AND (:targetReferenceId IS NULL OR t.targetReferenceId = :targetReferenceId)
           AND (:provider IS NULL OR t.provider = :provider)
           AND (:model IS NULL OR t.model = :model)
@@ -121,6 +126,7 @@ interface TokenUsageJpaReader : JpaRepository<TokenUsageEntity, Long> {
         ORDER BY FUNCTION('DATE', t.createdAt) ASC
     """)
     fun findDailyStatistics(
+        @Param("memberId") memberId: Long,
         @Param("targetDomain") targetDomain: TokenUsageDomain?,
         @Param("targetReferenceId") targetReferenceId: Long?,
         @Param("provider") provider: AiProvider?,

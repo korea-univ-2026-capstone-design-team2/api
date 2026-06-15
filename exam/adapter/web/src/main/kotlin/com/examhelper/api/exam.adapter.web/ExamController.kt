@@ -17,6 +17,7 @@ import com.examhelper.api.kernel.type.Subject
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -38,8 +39,9 @@ class ExamController(
     @GenerateExamDocs
     fun generateExam(
         @RequestBody request: GenerateExamReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<GenerateExamResDto>> {
-        val result = generateExamUseCase.execute(request.toCommand())
+        val result = generateExamUseCase.execute(request.toCommand(memberId))
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(ApiResponse.Success(GenerateExamResDto.fromResult(result)))
@@ -50,8 +52,9 @@ class ExamController(
     @GetExamDetailDocs
     fun getExamDetail(
         @PathVariable examId: Long,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<GetExamDetailResDto>> {
-        val view = getExamDetailUseCase.execute(GetExamDetailQuery(examId))
+        val view = getExamDetailUseCase.execute(GetExamDetailQuery(examId, memberId))
         return ResponseEntity.ok(ApiResponse.Success(GetExamDetailResDto.fromView(view)))
     }
 
@@ -59,6 +62,7 @@ class ExamController(
     @GetMapping
     @GetExamListDocs
     fun getExamList(
+        @AuthenticationPrincipal memberId: Long,
         @RequestParam(required = false) subject: Subject?,
         @RequestParam(required = false) questionType: QuestionType?,
         @RequestParam(required = false) difficulty: DifficultyLevel?,
@@ -68,12 +72,13 @@ class ExamController(
     ): ResponseEntity<ApiResponse.Success<GetExamListResDto>> {
         val result = getExamListUseCase.execute(
             ExamFilter(
+                memberId = memberId,
                 subject = subject,
                 questionType = questionType,
                 difficulty = difficulty,
                 status = status,
                 page = page,
-                size = size,
+                size = size
             )
         )
 

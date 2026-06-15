@@ -12,6 +12,6 @@ class GetQuestionReviewService(
     private val questionReader: QuestionReader
 ) : GetQuestionReviewUseCase {
     override fun execute(query: GetQuestionReviewQuery): QuestionReviewView =
-        questionReader.findReviewById(query.questionId)
+        questionReader.findReviewById(query.questionId, query.memberId)
             ?: throw QuestionException.NotFound(query.questionId)
 }

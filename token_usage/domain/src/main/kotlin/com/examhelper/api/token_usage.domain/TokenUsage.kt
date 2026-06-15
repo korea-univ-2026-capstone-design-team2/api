@@ -1,6 +1,7 @@
 package com.examhelper.api.token_usage.domain
 
 import com.examhelper.api.kernel.core.AggregateRoot
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.TokenUsageId
 import com.examhelper.api.token_usage.domain.event.TokenUsageRecordedEvent
 import com.examhelper.api.token_usage.domain.exception.TokenUsageAssertionException
@@ -15,7 +16,7 @@ import java.time.Instant
 
 class TokenUsage private constructor(
     id: TokenUsageId,
-    // val memberId: MemberId?,
+    val memberId: MemberId,
     val target: TokenUsageTarget,
     val provider: AiProvider,
     val model: AiModel,
@@ -47,7 +48,7 @@ class TokenUsage private constructor(
     companion object {
         fun create(
             id: TokenUsageId,
-            //memberId: MemberId?,
+            memberId: MemberId,
             target: TokenUsageTarget,
             provider: AiProvider,
             model: AiModel,
@@ -58,7 +59,7 @@ class TokenUsage private constructor(
 
             return TokenUsage(
                 id = id,
-                // memberId = memberId,
+                memberId = memberId,
                 target = target,
                 provider = provider,
                 model = model,
@@ -70,7 +71,7 @@ class TokenUsage private constructor(
                 it.addDomainEvent(
                     TokenUsageRecordedEvent(
                         tokenUsageId = id.value,
-                        //memberId = memberId?.value,
+                        memberId = memberId.value,
                         provider = provider.name,
                         model = model.name,
                         targetType = target::class.simpleName!!,
@@ -89,7 +90,7 @@ class TokenUsage private constructor(
 
         fun of(
             id: TokenUsageId,
-            //memberId: MemberId?,
+            memberId: MemberId,
             target: TokenUsageTarget,
             provider: AiProvider,
             model: AiModel,
@@ -100,6 +101,7 @@ class TokenUsage private constructor(
         ): TokenUsage {
             return TokenUsage(
                 id = id,
+                memberId = memberId,
                 target = target,
                 provider = provider,
                 model = model,

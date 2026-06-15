@@ -11,11 +11,11 @@ data class SubmitExamAttemptReqDto(
 ) {
     fun toCommand(
         attemptId: String,
-        memberId: String,
+        memberId: Long,
     ): SubmitExamAttemptCommand {
         return SubmitExamAttemptCommand(
             attemptId = ExamAttemptId(attemptId.toLong()),
-            memberId = MemberId(memberId.toLong()),
+            memberId = MemberId(memberId),
             answers = answers.map { it.toCommand() },
         )
     }

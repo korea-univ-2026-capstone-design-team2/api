@@ -11,8 +11,9 @@ import org.springframework.data.repository.query.Param
 
 interface QuestionJpaReader : JpaRepository<QuestionEntity, Long> {
     fun findEntityById(id: Long): QuestionEntity?
-    fun findAllByIdIn(ids: List<Long>): List<QuestionEntity>
-    fun findAllByGenerationId(generationId: Long): List<QuestionEntity>
+    fun findEntityByIdAndMemberId(id: Long, memberId: Long): QuestionEntity?
+    fun findAllByIdInAndMemberId(ids: List<Long>, memberId: Long): List<QuestionEntity>
+    fun findAllByGenerationIdAndMemberId(generationId: Long, memberId: Long): List<QuestionEntity>
 
     @Query("""
         SELECT new com.examhelper.api.question.port.inbound.view.QuestionSummaryView(
@@ -24,11 +25,13 @@ interface QuestionJpaReader : JpaRepository<QuestionEntity, Long> {
             q.status
         )
         FROM QuestionEntity q
-        WHERE (:subject IS NULL OR q.subject = :subject)
+        WHERE q.memberId = :memberId
+          AND (:subject IS NULL OR q.subject = :subject)
           AND (:questionType IS NULL OR q.questionType = :questionType)
           AND (:difficulty IS NULL OR q.difficulty = :difficulty)
     """)
     fun findSummaries(
+        @Param("memberId") memberId: Long,
         @Param("subject") subject: Subject?,
         @Param("questionType") questionType: QuestionType?,
         @Param("difficulty") difficulty: DifficultyLevel?,
@@ -38,13 +41,15 @@ interface QuestionJpaReader : JpaRepository<QuestionEntity, Long> {
     @Query("""
         SELECT COUNT(q)
         FROM QuestionEntity q
-        WHERE (:subject IS NULL OR q.subject = :subject)
+        WHERE q.memberId = :memberId
+          AND (:subject IS NULL OR q.subject = :subject)
           AND (:questionType IS NULL OR q.questionType = :questionType)
           AND (:difficulty IS NULL OR q.difficulty = :difficulty)
     """)
     fun countByFilter(
+        @Param("memberId") memberId: Long,
         @Param("subject") subject: Subject?,
         @Param("questionType") questionType: QuestionType?,
-        @Param("difficulty") difficulty: DifficultyLevel?
+        @Param("difficulty") difficulty: DifficultyLevel?,
     ): Long
 }

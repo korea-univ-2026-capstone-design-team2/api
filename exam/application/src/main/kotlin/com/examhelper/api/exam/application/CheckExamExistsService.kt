@@ -11,7 +11,7 @@ class CheckExamExistsService(
     private val examExistsReader: ExamReader
 ) : CheckExamExistsUseCase {
     override fun execute(command: CheckExamExistsQuery): CheckExamExistsResult {
-        val exists = examExistsReader.existsById(command.examId)
+        val exists = examExistsReader.existsById(command.examId, command.memberId)
         return CheckExamExistsResult(exists)
     }
 }

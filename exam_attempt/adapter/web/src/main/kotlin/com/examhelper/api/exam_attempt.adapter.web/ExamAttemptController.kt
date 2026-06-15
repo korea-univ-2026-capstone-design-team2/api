@@ -15,6 +15,7 @@ import com.examhelper.api.exam_attempt.port.inbound.query.GetExamAttemptResultQu
 import com.examhelper.api.infrastructure.web.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -35,10 +36,10 @@ class ExamAttemptController(
     @PostMapping
     @StartExamAttemptDocs
     fun startAttempt(
-        // @AuthMember memberId: Long,
-        @RequestBody reqDto: StartExamAttemptReqDto
+        @RequestBody reqDto: StartExamAttemptReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<StartExamAttemptResDto>> {
-        val result = startExamAttemptUseCase.execute(reqDto.toCommand())
+        val result = startExamAttemptUseCase.execute(reqDto.toCommand(memberId))
 
         return ResponseEntity.ok(ApiResponse.Success(StartExamAttemptResDto.fromResult(result)))
     }
@@ -46,11 +47,11 @@ class ExamAttemptController(
     @PatchMapping("/{attemptId}/answers")
     @SaveExamAttemptAnswersDocs
     fun saveAnswers(
-//        @AuthMember memberId: Long,
         @PathVariable attemptId: String,
-        @RequestBody reqDto: SaveExamAttemptAnswersReqDto
+        @RequestBody reqDto: SaveExamAttemptAnswersReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<SaveExamAttemptAnswersResDto>> {
-        val result = saveExamAttemptAnswersUseCase.execute(reqDto.toCommand(attemptId, 1L.toString()))
+        val result = saveExamAttemptAnswersUseCase.execute(reqDto.toCommand(attemptId, memberId))
 
         return ResponseEntity.ok(ApiResponse.Success(SaveExamAttemptAnswersResDto.fromResult(result)))
     }
@@ -58,14 +59,14 @@ class ExamAttemptController(
     @PostMapping("/{attemptId}/submit")
     @SubmitExamAttemptDocs
     fun submit(
-        //@CurrentMember member: MemberPrincipal,
         @PathVariable attemptId: String,
         @RequestBody request: SubmitExamAttemptReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<SubmitExamAttemptResDto>> {
         val result = submitExamAttemptUseCase.execute(
             request.toCommand(
                 attemptId = attemptId,
-                memberId = 1L.toString()
+                memberId = memberId
             )
         )
 
@@ -76,13 +77,13 @@ class ExamAttemptController(
     @GetMapping("/{attemptId}/result")
     @GetExamAttemptResultDocs
     fun getResult(
-        //@AuthenticationPrincipal member: MemberPrincipal,
         @PathVariable attemptId: String,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<ExamAttemptResDto>> {
         val result = getExamAttemptResultUseCase.execute(
             GetExamAttemptResultQuery(
                 attemptId = attemptId.toLong(),
-                memberId = 1L
+                memberId = memberId
             )
         )
 

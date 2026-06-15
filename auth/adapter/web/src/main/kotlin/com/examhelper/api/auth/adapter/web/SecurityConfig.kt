@@ -37,7 +37,9 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 // 로그인이나 최초 회원가입 API는 토큰이 없어도 패스! (누구나 접근 가능)
                 auth.requestMatchers("/auth/**").permitAll()
-                //auth.requestMatchers("/members/register").permitAll()
+                auth.requestMatchers("/swagger-ui/**").permitAll()
+                auth.requestMatchers("/v3/api-docs/**").permitAll()
+                auth.requestMatchers("/favicon.ico").permitAll()
 
                 // 💡 그 외의 모든 요청(특히 /members/me)은 무조건 인증(토큰)을 거쳐야 한다!
                 auth.anyRequest().authenticated()

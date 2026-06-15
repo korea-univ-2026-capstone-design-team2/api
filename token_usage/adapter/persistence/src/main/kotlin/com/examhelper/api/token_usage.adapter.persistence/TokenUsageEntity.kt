@@ -1,5 +1,6 @@
 package com.examhelper.api.token_usage.adapter.persistence
 
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.TokenUsageId
 import com.examhelper.api.token_usage.domain.TokenUsage
 import com.examhelper.api.token_usage.domain.type.AiModel
@@ -24,7 +25,7 @@ import java.util.Currency
 @Table(
     name = "token_usages",
     indexes = [
-        //Index(name = "idx_token_usage_member_id", columnList = "memberId"),
+        Index(name = "idx_token_usage_member_id", columnList = "memberId"),
         Index(name = "idx_token_usage_target_created", columnList = "targetDomain,targetReferenceId,createdAt"),
         Index(name = "idx_token_usage_model_created", columnList = "model,createdAt"),
         Index(name = "idx_token_usage_status_created", columnList = "status,createdAt"),
@@ -34,6 +35,9 @@ import java.util.Currency
 class TokenUsageEntity(
     @Id
     val id: Long,
+
+    @Column(nullable = false)
+    val memberId: Long,
 
     // ── Usage Target ─────────────────────────────────────
     @Enumerated(EnumType.STRING)
@@ -88,6 +92,7 @@ class TokenUsageEntity(
         fun fromDomain(domain: TokenUsage): TokenUsageEntity =
             TokenUsageEntity(
                 id = domain.id.value,
+                memberId = domain.memberId.value,
                 targetDomain = domain.target.domain,
                 targetReferenceId = domain.target.referenceId,
                 provider = domain.provider,
@@ -107,6 +112,7 @@ class TokenUsageEntity(
     fun toDomain(): TokenUsage =
         TokenUsage.of(
             id = TokenUsageId(id),
+            memberId = MemberId(memberId),
             target = TokenUsageTarget(
                 domain = targetDomain,
                 referenceId = targetReferenceId,

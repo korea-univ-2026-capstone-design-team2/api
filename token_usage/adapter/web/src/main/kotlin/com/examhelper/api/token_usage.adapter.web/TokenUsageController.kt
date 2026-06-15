@@ -17,6 +17,7 @@ import com.examhelper.api.token_usage.port.inbound.result.GetTokenUsageStatistic
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -37,6 +38,7 @@ class TokenUsageController(
     @RecordTokenUsageDocs
     fun recordTokenUsage(
         @RequestBody request: RecordTokenUsageReqDto,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<RecordTokenUsageResDto>> {
         val result = recordTokenUsageUseCase.execute(request.toCommand())
 
@@ -59,11 +61,12 @@ class TokenUsageController(
         @RequestParam(required = false) from: Instant?,
         @RequestParam(required = false) to: Instant?,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20")
-        size: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<GetTokenUsageListResult>> {
         val result = getTokenUsageListUseCase.execute(
             TokenUsageFilter(
+                memberId = memberId,
                 targetDomain = targetDomain,
                 targetReferenceId = targetReferenceId,
                 provider = provider,
@@ -90,9 +93,11 @@ class TokenUsageController(
         @RequestParam(required = false) status: TokenUsageStatus?,
         @RequestParam(required = false) from: Instant?,
         @RequestParam(required = false) to: Instant?,
+        @AuthenticationPrincipal memberId: Long
     ): ResponseEntity<ApiResponse.Success<GetTokenUsageStatisticsResult>> {
         val result = getTokenUsageStatisticsUseCase.execute(
             TokenUsageStatisticsFilter(
+                memberId = memberId,
                 targetDomain = targetDomain,
                 targetReferenceId = targetReferenceId,
                 provider = provider,

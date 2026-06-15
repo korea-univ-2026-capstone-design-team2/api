@@ -12,6 +12,7 @@ class GetTokenUsageStatisticsService(
 ) : GetTokenUsageStatisticsUseCase {
     override fun execute(query: TokenUsageStatisticsFilter): GetTokenUsageStatisticsResult {
         val filter = TokenUsageStatisticsFilter(
+            memberId = query.memberId,
             targetDomain = query.targetDomain,
             targetReferenceId = query.targetReferenceId,
             provider = query.provider,

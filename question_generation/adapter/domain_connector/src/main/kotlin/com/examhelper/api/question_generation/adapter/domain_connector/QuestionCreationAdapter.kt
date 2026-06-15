@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component
 class QuestionCreationAdapter(
     private val createQuestionGroupUseCase: CreateQuestionUseCase
 ) : QuestionCreationPort {
-
     override suspend fun create(command: QuestionCreationCommand): QuestionCreationResult =
         withContext(Dispatchers.IO) {
             val result = createQuestionGroupUseCase.execute(command.toCreateQuestionCommand())
@@ -40,7 +39,8 @@ class QuestionCreationAdapter(
 
     private fun QuestionCreationCommand.toCreateQuestionCommand(): CreateQuestionCommand =
         CreateQuestionCommand(
-            generationId = generationId.value,
+            generationId = generationId,
+            memberId = memberId,
             sharedContext = result.sharedContext?.toDomain(),
             metadata = QuestionMetadata(
                 subject = metadata.subject,

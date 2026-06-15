@@ -100,6 +100,7 @@ The output must be a single JSON object. Never change key names, structure, or t
 10. JSON key names must never be changed.
 11. Never output any text outside the JSON.
 12. Never use markdown code blocks (```).
+13. Never insert raw control characters inside any JSON string value. If a line break is needed within a string value, write \n explicitly. Raw newline, tab, or carriage return characters inside string values are a violation of JSON spec and will cause a generation failure.
 
 ──────────────────────────────
 [REFERENCE FRAME USAGE]

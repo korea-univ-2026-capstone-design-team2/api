@@ -11,5 +11,5 @@ class GetQuestionPapersService(
     private val questionReader: QuestionReader,
 ) : GetQuestionPapersUseCase {
     override fun execute(query: GetQuestionPapersQuery): List<QuestionPaperView> =
-        questionReader.findPapersByIds(query.questionIds)
+        questionReader.findPapersByIds(query.questionIds, query.memberId)
 }

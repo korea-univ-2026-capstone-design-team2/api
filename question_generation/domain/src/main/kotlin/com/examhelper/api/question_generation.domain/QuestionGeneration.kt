@@ -7,6 +7,7 @@ import com.examhelper.api.kernel.event.GenerationCompletedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationFailedEvent
 import com.examhelper.api.question_generation.domain.event.GenerationRequestedEvent
 import com.examhelper.api.kernel.event.QuestionGeneratedEvent
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.question_generation.domain.exception.GenerationAssertionException
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.vo.QuestionGenerationRequest
@@ -14,6 +15,7 @@ import java.time.Instant
 
 class QuestionGeneration private constructor(
     id: QuestionGenerationId,
+    val memberId: MemberId,
     val request: QuestionGenerationRequest,
     status: QuestionGenerationStatus,
     failureReason: String?,
@@ -87,11 +89,13 @@ class QuestionGeneration private constructor(
     companion object {
         fun create(
             id: QuestionGenerationId,
+            memberId: MemberId,
             request: QuestionGenerationRequest,
         ): QuestionGeneration {
             val now = Instant.now()
             return QuestionGeneration(
                 id = id,
+                memberId = memberId,
                 request = request,
                 status = QuestionGenerationStatus.PENDING,
                 failureReason = null,
@@ -104,7 +108,7 @@ class QuestionGeneration private constructor(
                         subject = request.subject.name,
                         questionType = request.questionType.name,
                         quantity = request.quantity,
-                        occurredAt = now,
+                        occurredAt = now
                     )
                 )
             }
@@ -112,6 +116,7 @@ class QuestionGeneration private constructor(
 
         fun of(
             id: QuestionGenerationId,
+            memberId: MemberId,
             request: QuestionGenerationRequest,
             status: QuestionGenerationStatus,
             failureReason: String?,
@@ -119,11 +124,12 @@ class QuestionGeneration private constructor(
             updatedAt: Instant,
         ): QuestionGeneration = QuestionGeneration(
             id = id,
+            memberId = memberId,
             request = request,
             status = status,
             failureReason = failureReason,
             createdAt = createdAt,
-            updatedAt = updatedAt,
+            updatedAt = updatedAt
         )
     }
 }

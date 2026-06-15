@@ -13,10 +13,9 @@ import org.springframework.stereotype.Repository
 class TokenUsageQueryAdapter(
     private val tokenUsageJpaReader: TokenUsageJpaReader,
 ) : TokenUsageReader {
-
-    // ── Raw Usage ───────────────────────────────────────
     override fun findAll(filter: TokenUsageFilter): List<TokenUsageSummaryView> =
         tokenUsageJpaReader.findSummaries(
+            memberId = filter.memberId,
             targetDomain = filter.targetDomain,
             targetReferenceId = filter.targetReferenceId,
             provider = filter.provider,
@@ -24,11 +23,12 @@ class TokenUsageQueryAdapter(
             status = filter.status,
             from = filter.from,
             to = filter.to,
-            pageable = PageRequest.of(filter.page, filter.size)
+            pageable = PageRequest.of(filter.page, filter.size),
         )
 
     override fun count(filter: TokenUsageFilter): Long =
         tokenUsageJpaReader.countByFilter(
+            memberId = filter.memberId,
             targetDomain = filter.targetDomain,
             targetReferenceId = filter.targetReferenceId,
             provider = filter.provider,
@@ -38,31 +38,29 @@ class TokenUsageQueryAdapter(
             to = filter.to,
         )
 
-    // ── Statistics ──────────────────────────────────────
     override fun findStatistics(filter: TokenUsageStatisticsFilter): TokenUsageStatisticsView {
         val projection = tokenUsageJpaReader.findStatistics(
+            memberId = filter.memberId,
             targetDomain = filter.targetDomain,
             targetReferenceId = filter.targetReferenceId,
             provider = filter.provider,
             model = filter.model,
             status = filter.status,
             from = filter.from,
-            to = filter.to
+            to = filter.to,
         )
-
         return TokenUsageStatisticsView(
             totalRequests = projection.totalRequests,
             totalPromptTokens = projection.totalPromptTokens,
             totalCompletionTokens = projection.totalCompletionTokens,
             totalTokens = projection.totalTokens,
-            totalCost = projection.totalCost
+            totalCost = projection.totalCost,
         )
     }
 
-    override fun findDailyStatistics(
-        filter: TokenUsageStatisticsFilter,
-    ): List<TokenUsageDailyStatisticsView> {
-        val projections = tokenUsageJpaReader.findDailyStatistics(
+    override fun findDailyStatistics(filter: TokenUsageStatisticsFilter): List<TokenUsageDailyStatisticsView> =
+        tokenUsageJpaReader.findDailyStatistics(
+            memberId = filter.memberId,
             targetDomain = filter.targetDomain,
             targetReferenceId = filter.targetReferenceId,
             provider = filter.provider,
@@ -70,17 +68,16 @@ class TokenUsageQueryAdapter(
             status = filter.status,
             from = filter.from,
             to = filter.to,
-        )
-
-        return projections.map { TokenUsageDailyStatisticsView(
-            date = it.date,
-            totalRequests = it.totalRequests,
-            totalPromptTokens = it.totalPromptTokens,
-            totalCompletionTokens = it.totalCompletionTokens,
-            totalTokens = it.totalTokens,
-            totalCost = it.totalCost
-        ) }
-    }
+        ).map {
+            TokenUsageDailyStatisticsView(
+                date = it.date,
+                totalRequests = it.totalRequests,
+                totalPromptTokens = it.totalPromptTokens,
+                totalCompletionTokens = it.totalCompletionTokens,
+                totalTokens = it.totalTokens,
+                totalCost = it.totalCost,
+            )
+        }
 
     /*
     override fun findModelStatistics(

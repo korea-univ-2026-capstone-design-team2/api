@@ -1,5 +1,6 @@
 package com.examhelper.api.question.adapter.persistence
 
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.kernel.type.DifficultyLevel
@@ -29,6 +30,9 @@ import java.time.Instant
 class QuestionEntity(
     @Id
     val id: Long,
+
+    @Column
+    val memberId: Long,
 
     // ── 역추적 ─────────────────────────────────────────────
     @Column(nullable = false, updatable = false)
@@ -82,6 +86,7 @@ class QuestionEntity(
         fun fromDomain(domain: Question): QuestionEntity {
             val entity = QuestionEntity(
                 id = domain.id.value,
+                memberId = domain.memberId.value,
                 generationId = domain.generationId.value,
                 subject = domain.metadata.subject,
                 questionType = domain.metadata.questionType,
@@ -110,6 +115,7 @@ class QuestionEntity(
 
     fun toDomain(): Question = Question.of(
         id = QuestionId(id),
+        memberId = MemberId(memberId),
         generationId = QuestionGenerationId(generationId),
         sharedContext = sharedContext?.toDomain(),
         items = items.map { it.toDomain() },

@@ -7,6 +7,7 @@ import com.examhelper.api.token_usage.domain.type.TokenUsageStatus
 import java.time.Instant
 
 data class TokenUsageFilter(
+    val memberId: Long,
     val targetDomain: TokenUsageDomain? = null,
     val targetReferenceId: Long? = null,
     val provider: AiProvider? = null,

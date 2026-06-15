@@ -7,7 +7,7 @@ import java.time.Instant
 
 class TokenUsageRecordedEvent(
     val tokenUsageId: Long,
-    //val memberId: Long?,
+    val memberId: Long,
     val provider: String,
     val model: String,
     val targetType: String,

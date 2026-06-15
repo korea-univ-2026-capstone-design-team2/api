@@ -10,12 +10,14 @@ import com.examhelper.api.exam.domain.vo.ExamGenerationResult
 import com.examhelper.api.exam.domain.vo.ExamMetadata
 import com.examhelper.api.kernel.core.AggregateRoot
 import com.examhelper.api.kernel.identifier.ExamId
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import java.time.Instant
 import kotlin.collections.toMutableList
 
 class Exam private constructor(
     id: ExamId,
+    val memberId: MemberId,
     val title: String,
     val metadata: ExamMetadata,
     status: ExamStatus,
@@ -108,12 +110,14 @@ class Exam private constructor(
     companion object {
         fun create(
             id: ExamId,
+            memberId: MemberId,
             title: String,
             metadata: ExamMetadata,
         ): Exam {
             val now = Instant.now()
             return Exam(
                 id = id,
+                memberId = memberId,
                 title = title,
                 metadata = metadata,
                 status = ExamStatus.GENERATING,
@@ -138,6 +142,7 @@ class Exam private constructor(
 
         fun of(
             id: ExamId,
+            memberId: MemberId,
             title: String,
             metadata: ExamMetadata,
             status: ExamStatus,
@@ -147,6 +152,7 @@ class Exam private constructor(
             updatedAt: Instant,
         ): Exam = Exam(
             id = id,
+            memberId = memberId,
             title = title,
             metadata = metadata,
             status = status,
