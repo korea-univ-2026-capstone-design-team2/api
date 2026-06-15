@@ -54,6 +54,7 @@ class GenerateQuestionService(
     override fun execute(command: GenerateQuestionCommand): GenerateQuestionResult {
         val generation = QuestionGeneration.create(
             id = QuestionGenerationId(idGenerator.generateId()),
+            memberId = command.memberId,
             request = questionGenerationRequestFactory.create(command)
         )
         questionGenerationStore.save(generation)
@@ -151,6 +152,7 @@ class GenerateQuestionService(
             questionCreationPort.create(
                 QuestionCreationCommand(
                     result = llmResult,
+                    memberId = generation.memberId,
                     generationId = generation.id,
                     metadata = QuestionCreationMetadata(
                         subject = generation.request.subject,

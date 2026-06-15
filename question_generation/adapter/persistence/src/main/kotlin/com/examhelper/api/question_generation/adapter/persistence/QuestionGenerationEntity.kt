@@ -1,5 +1,6 @@
 package com.examhelper.api.question_generation.adapter.persistence
 
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
@@ -30,6 +31,9 @@ import java.time.Instant
 class QuestionGenerationEntity(
     @Id
     val id: Long,
+
+    @Column(nullable = false)
+    val memberId: Long,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -80,6 +84,7 @@ class QuestionGenerationEntity(
         fun fromDomain(domain: QuestionGeneration): QuestionGenerationEntity {
             return QuestionGenerationEntity(
                 id = domain.id.value,
+                memberId = domain.memberId.value,
                 subject = domain.request.subject,
                 questionType = domain.request.questionType,
                 questionSubType = domain.request.questionSubType,
@@ -100,6 +105,7 @@ class QuestionGenerationEntity(
     fun toDomain(): QuestionGeneration {
         return QuestionGeneration.of(
             id = QuestionGenerationId(id),
+            memberId = MemberId(memberId),
             request = QuestionGenerationRequest(
                 subject = subject,
                 questionType = questionType,

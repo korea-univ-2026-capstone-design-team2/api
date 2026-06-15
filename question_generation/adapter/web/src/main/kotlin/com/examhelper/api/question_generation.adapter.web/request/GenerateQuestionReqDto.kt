@@ -1,5 +1,6 @@
 package com.examhelper.api.question_generation.adapter.web.request
 
+import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.kernel.type.DifficultyLevel
 import com.examhelper.api.kernel.type.QuestionSubType
 import com.examhelper.api.kernel.type.QuestionType
@@ -39,8 +40,9 @@ data class GenerateQuestionReqDto(
     @Schema(description = "생성할 문항 수", example = "1")
     val quantity: Int
 ) {
-    fun toCommand(): GenerateQuestionCommand {
+    fun toCommand(memberId: Long): GenerateQuestionCommand {
         return GenerateQuestionCommand(
+            memberId = MemberId(memberId),
             subject = enumValueOrThrow<Subject>(subject),
             questionType = questionType?.let(::enumValueOrThrow),
             questionSubType = questionSubType?.let(::enumValueOrThrow),
