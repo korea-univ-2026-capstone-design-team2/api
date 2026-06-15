@@ -57,6 +57,11 @@ dependencies {
     implementation(project(":auth:adapter:oauth"))
     implementation(project(":auth:adapter:jwt"))
 
+    // Member
+    implementation(project(":member:application"))
+    implementation(project(":member:adapter:web"))
+    implementation(project(":member:adapter:persistence"))
+
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
