@@ -1,8 +1,14 @@
 .git
 .gradle
+.idea
+.vscode
+
 **/build
 **/.idea
 **/*.iml
 **/out
+target
+
 .env*
 *.md
+docs
