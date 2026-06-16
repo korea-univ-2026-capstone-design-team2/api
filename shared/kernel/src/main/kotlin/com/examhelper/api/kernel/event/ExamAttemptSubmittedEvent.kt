@@ -13,7 +13,7 @@ class ExamAttemptSubmittedEvent(
 ) : DomainEvent(
     aggregateId = attemptId.toString(),
     aggregateType = "ExamAttempt",
-    channel = EventChannel.INTERNAL
+    channel = EventChannel.EXTERNAL
 ) {
     override val eventType = "ExamAttemptSubmitted"
     override fun topic(): String = "exam-attempt.submitted"
