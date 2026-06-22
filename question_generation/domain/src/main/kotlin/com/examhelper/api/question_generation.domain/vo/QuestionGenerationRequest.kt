@@ -13,7 +13,7 @@ data class QuestionGenerationRequest(
     val difficulty: DifficultyLevel,
     val topic: QuestionGenerationTopic,
     val quantity: Int,
-    val frameSearchTopK: Int = 3
+    val frameSearchTopK: Int
 ) {
     init {
         require(quantity in 1..10) {

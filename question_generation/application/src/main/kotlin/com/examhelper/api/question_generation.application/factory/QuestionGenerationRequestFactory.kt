@@ -32,7 +32,8 @@ class QuestionGenerationRequestFactory {
                 keyword = command.topicKeyword,
                 description = command.topicDescription
             ),
-            quantity = command.quantity
+            quantity = command.quantity,
+            frameSearchTopK = command.quantity * 2
         )
     }
 
