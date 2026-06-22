@@ -111,7 +111,8 @@ class GenerateQuestionService(
         generation: QuestionGeneration,
         frames: List<FrameSearchResult>
     ): List<Result<QuestionId>> {
-        val referenceFrames = List(generation.request.quantity) { frames[it % frames.size] }
+        val referenceFrames = assignFrames(frames, generation.request.quantity)
+
         return coroutineScope {
             referenceFrames.mapIndexed { index, referenceFrame ->
                 async {
@@ -229,5 +230,15 @@ class GenerateQuestionService(
                 )
             )
         }
+    }
+
+    private fun assignFrames(
+        frames: List<FrameSearchResult>,
+        quantity: Int
+    ): List<FrameSearchResult> {
+        if (frames.size >= quantity) { return frames.shuffled().take(quantity) }
+        val shuffled = frames.shuffled()
+
+        return (0 until quantity).map { shuffled[it % shuffled.size] }
     }
 }

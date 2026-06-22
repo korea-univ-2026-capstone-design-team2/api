@@ -17,5 +17,5 @@ data class GenerateQuestionCommand(
     val topicKeyword: String?,
     val topicDescription: String?,
     val quantity: Int,
-    val frameSearchTopK: Int = 3
+    val frameSearchTopK: Int = 5
 )

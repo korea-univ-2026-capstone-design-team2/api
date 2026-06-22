@@ -41,17 +41,26 @@ class PsatFrameSearchAdapter(
         query: FrameSearchQuery,
         queryText: String,
     ): List<FrameSearchResult> {
+        val minDesiredResults = (query.topK / 2).coerceAtLeast(1)
+
+        var lastResults: List<FrameSearchResult> = emptyList()
+
         for (step in FilterStep.entries) {
             val filter = buildFilterExpression(query, step)
             val results = executeSearch(query, queryText, filter)
-            if (results.isNotEmpty()) return results
+
+            if (results.size >= minDesiredResults) return results
+
+            if (results.size > lastResults.size) lastResults = results
 
             logger.warn {
-                "프레임 검색 결과 없음 - 다음 단계로 완화: step=${step.name}, " +
+                "프레임 검색 결과 부족 - 다음 단계로 완화: step=${step.name}, " +
+                        "found=${results.size}, minDesired=$minDesiredResults, " +
                         "subType=${query.questionSubType}, topic=${query.topic.category}"
             }
         }
-        return emptyList()
+
+        return lastResults
     }
 
     private enum class FilterStep { FULL, WITHOUT_TOPIC }
@@ -90,7 +99,6 @@ class PsatFrameSearchAdapter(
             add("question_type == '${query.questionType.name}'")
             query.questionSubType?.let { add("question_sub_type == '${it.name}'") }
             add("difficulty == '${query.difficulty.name}'")
-            if (step == FilterStep.FULL) add("topic_category == '${query.topic.category.name}'")
         }.joinToString(" && ")
 
     // ── 쿼리 텍스트 ────────────────────────────────────────────
