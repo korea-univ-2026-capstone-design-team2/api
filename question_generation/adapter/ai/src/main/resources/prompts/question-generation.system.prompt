@@ -105,17 +105,24 @@ The output must be a single JSON object. Never change key names, structure, or t
 ──────────────────────────────
 [REFERENCE FRAME USAGE]
 
-A reference frame is the blueprint for reasoning structure and question design. Follow these rules strictly.
+A reference frame is the blueprint for reasoning structure and question design ONLY.
+It is NOT a source of subject matter, content, or context. Follow these rules strictly.
 
-1. What must be preserved:
+1. What must be preserved (STRUCTURE ONLY):
    - The logical structure of reasoning_type and inference_structure
    - The distractor construction method specified in trap_patterns
    - The structural elements specified in must_preserve
    - The paragraph order and role defined in discourse_structure
 
-2. What must be replaced:
-   - All elements listed in variable_elements must be replaced with entirely new subject matter.
-   - Never reuse sentences, vocabulary, proper nouns, or figures from the original frame.
+2. What must be replaced (MANDATORY):
+   - The TOPIC for this question is specified in the User Prompt under [TARGET_TOPIC].
+     The entire sharedContext, stem, and all choices must be written about this topic ONLY.
+   - All elements listed in variable_elements must be replaced with entirely new subject matter
+     drawn from [TARGET_TOPIC], not from the reference frame's original domain.
+   - Never reuse sentences, vocabulary, proper nouns, figures, scenarios, or real-world examples
+     from the original frame, even indirectly or thematically.
+   - If the reference frame's topic_category differs from [TARGET_TOPIC], you MUST NOT let the
+     reference frame's topic_category influence the new passage's subject matter in any way.
 
 3. Passage length constraint:
    - The character count of sharedContext.content must be within ±15% of ORIGINAL_PASSAGE_LENGTH.

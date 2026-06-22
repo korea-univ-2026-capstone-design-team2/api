@@ -44,12 +44,6 @@ class PromptAssembler {
         appendLine("QUESTION_TYPE=${frame.questionType.name}")
         frame.questionSubType?.let { appendLine("QUESTION_SUBTYPE=${it.name}") }
         appendLine("DIFFICULTY=${frame.difficulty.name}")
-        appendLine("TOPIC_CATEGORY=${frame.topicCategory}")
-        frame.topicKeyword?.let { appendLine("TOPIC_KEYWORD=${it}") }
-
-        appendLine("[ORIGINAL PASSAGE] (FOR STRUCTURAL & TONE REFERENCE ONLY)")
-        appendLine(frame.passage)
-        appendLine("---------------------------------------------------------------")
 
         val passageLength = frame.passage?.length
         appendPassageLengthReference(passageLength)
@@ -139,6 +133,8 @@ class PromptAssembler {
         appendLine()
         appendLine("[GENERATION_RULES]")
         appendLine("- Preserve reasoning structure, trap patterns, and difficulty from the reference frame.")
+        appendLine("- The subject matter must be drawn ONLY from TOPIC_CATEGORY/TOPIC_KEYWORD specified in [GENERATION_REQUEST] above.")
+        appendLine("- Reference frames provide reasoning structure ONLY. They contain no subject-matter information in this prompt.")
         appendLine("- Generate entirely new subject matter and entities.")
         appendLine("- Never reuse original wording, vocabulary, or proper nouns from any reference frame.")
         appendLine("- Maintain PSAT-style logical rigor throughout.")
