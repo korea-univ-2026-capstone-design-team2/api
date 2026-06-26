@@ -17,21 +17,39 @@ sealed class ExamAssertionException(
         message = "생성 완료 처리 시 편입된 문항이 없습니다.",
     )
 
-    class StatusTransitionNotAllowed(from: String, to: String) : ExamException(
+    class GenerationIdMismatch(
+        expected: Long,
+        actual: Long,
+    ) : ExamAssertionException(
+        code = "EXAM_GENERATION_ID_MISMATCH",
+        message = "기대한 generationId와 다른 결과가 도착했습니다. expected=$expected, actual=$actual",
+    )
+
+    class StatusTransitionNotAllowed(
+        from: String,
+        to: String,
+    ) : ExamAssertionException(
         code = "EXAM_STATUS_TRANSITION_NOT_ALLOWED",
-        message = "허용되지 않는 상태 전이입니다. $from → $to",
-        status = ErrorStatus.CONFLICT,
+        message = "허용되지 않는 상태 전이입니다. $from → $to"
     )
 
-    class CannotModifyItems(status: String) : ExamException(
+    class GenerationAlreadyStarted(generationId: Long) : ExamAssertionException(
+        code = "EXAM_GENERATION_ALREADY_STARTED",
+        message = "이미 generationId가 연결되어 있습니다. generationId=$generationId"
+    )
+
+    class CannotModifyItems(status: String) : ExamAssertionException(
         code = "EXAM_CANNOT_MODIFY_ITEMS",
-        message = "GENERATING 상태가 아닐 때는 문항을 편입할 수 없습니다. 현재 상태: $status",
-        status = ErrorStatus.CONFLICT,
+        message = "문항 편입이 허용되지 않는 상태입니다. 현재 상태: $status"
     )
 
-    class ItemAlreadyExists(itemId: Long) : ExamException(
-        code = "EXAM_ITEM_ALREADY_EXISTS",
-        message = "이미 편입된 문항입니다. examItemId: $itemId",
-        status = ErrorStatus.CONFLICT,
+    class PendingGenerationResult : ExamAssertionException(
+        code = "EXAM_PENDING_GENERATION_RESULT",
+        message = "완료 처리에는 확정된 GenerationResult만 사용할 수 있습니다."
+    )
+
+    class InvalidImmediateCompletion : ExamAssertionException(
+        code = "EXAM_INVALID_IMMEDIATE_COMPLETION",
+        message = "즉시 완료는 빈 시험과 같이 비동기 문항 편입이 없는 경우에만 사용할 수 있습니다."
     )
 }
