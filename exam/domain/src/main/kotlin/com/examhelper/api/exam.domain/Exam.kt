@@ -38,32 +38,90 @@ class Exam private constructor(
     var updatedAt: Instant = updatedAt
         private set
 
+    fun startGeneration(generationId: QuestionGenerationId) {
+        check(status == ExamStatus.GENERATING) {
+            throw ExamAssertionException.StatusTransitionNotAllowed(status.name, ExamStatus.GENERATING.name)
+        }
+        check(generationResult == null) {
+            throw ExamAssertionException.GenerationAlreadyStarted(generationResult?.generationId?.value ?: -1L)
+        }
+
+        generationResult = ExamGenerationResult(
+            generationId = generationId,
+            successCount = null,
+            failCount = null,
+        )
+    }
+
     // ── 문항 편입 ──────────────────────────────────────────────
     fun addItem(item: ExamItem) {
-        if (status != ExamStatus.GENERATING) { throw ExamAssertionException.CannotModifyItems(status.name) }
+        check(status == ExamStatus.GENERATING || status == ExamStatus.GENERATION_FINISHED) {
+            throw ExamAssertionException.CannotModifyItems(status.name)
+        }
 
-        if (_items.any { it.id == item.id }) { throw ExamAssertionException.ItemAlreadyExists(item.id.value) }
+        if (_items.any { it.id == item.id }) return
 
         _items.add(item)
         updatedAt = Instant.now()
+
+        tryComplete()
     }
 
-    fun startGeneration(generationId: QuestionGenerationId) {
-        require(status == ExamStatus.GENERATING) { "생성 중 상태에서만 generationId를 연결할 수 있습니다." }
-        generationResult = ExamGenerationResult(
-            generationId = generationId,
-            successCount = 0,
-            failCount = 0,
+    fun markGenerationFinished(result: ExamGenerationResult) {
+        require(!result.isPending()) { throw ExamAssertionException.PendingGenerationResult() }
+
+        if (status == ExamStatus.GENERATION_FINISHED || status == ExamStatus.READY) {
+            if (generationResult?.generationId == result.generationId) return
+        }
+
+        check(status == ExamStatus.GENERATING) {
+            throw ExamAssertionException.StatusTransitionNotAllowed(
+                status.name,
+                ExamStatus.GENERATION_FINISHED.name,
+            )
+        }
+        check(generationResult?.generationId == result.generationId) {
+            throw ExamAssertionException.GenerationIdMismatch(
+                expected = generationResult?.generationId?.value ?: -1L,
+                actual = result.generationId?.value ?: -1L,
+            )
+        }
+
+        generationResult = result
+        transitionTo(ExamStatus.GENERATION_FINISHED)
+
+        tryComplete()
+    }
+
+    private fun tryComplete() {
+        if (status != ExamStatus.GENERATION_FINISHED) return
+
+        val result = generationResult ?: return
+        val successCount = result.successCount ?: return
+
+        val distinctItemCount = _items.distinctBy { it.id }.size
+        if (distinctItemCount < successCount) return
+
+        transitionTo(ExamStatus.READY)
+
+        addDomainEvent(
+            ExamGenerationCompletedEvent(
+                examId = id.value,
+                itemCount = distinctItemCount,
+                successCount = successCount,
+                failCount = result.failCount ?: 0,
+                occurredAt = Instant.now(),
+            )
         )
-        status = ExamStatus.GENERATING
     }
 
-    fun isEmptyExam(): Boolean = metadata.targetQuestionCount == 0
-
-    // ── 상태 전이 ──────────────────────────────────────────────
     fun completeGeneration(result: ExamGenerationResult) {
+        require(!result.isPending()) { throw ExamAssertionException.PendingGenerationResult() }
         check(status == ExamStatus.GENERATING) {
             throw ExamAssertionException.StatusTransitionNotAllowed(status.name, ExamStatus.READY.name)
+        }
+        require(isEmptyExam() || result.successCount == 0) {
+            throw ExamAssertionException.InvalidImmediateCompletion()
         }
 
         generationResult = result
@@ -73,17 +131,20 @@ class Exam private constructor(
             ExamGenerationCompletedEvent(
                 examId = id.value,
                 itemCount = _items.size,
-                successCount = result.successCount,
-                failCount = result.failCount,
+                successCount = result.successCount ?: 0,
+                failCount = result.failCount ?: 0,
                 occurredAt = updatedAt,
             )
         )
     }
 
     fun failGeneration(reason: String) {
+        if (status == ExamStatus.FAILED) return // 멱등 처리 (재시도 대응)
+
         check(status == ExamStatus.GENERATING) {
             throw ExamAssertionException.StatusTransitionNotAllowed(status.name, ExamStatus.FAILED.name)
         }
+
         transitionTo(ExamStatus.FAILED)
 
         addDomainEvent(
@@ -94,6 +155,8 @@ class Exam private constructor(
             )
         )
     }
+
+    fun isEmptyExam(): Boolean = metadata.targetQuestionCount == 0
 
     // ── 도메인 검증 ────────────────────────────────────────────
     private fun validate() {

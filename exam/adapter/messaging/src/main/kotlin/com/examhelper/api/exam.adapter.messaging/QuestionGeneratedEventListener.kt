@@ -1,6 +1,8 @@
 package com.examhelper.api.exam.adapter.messaging
 
 import com.examhelper.api.exam.adapter.messaging.message.QuestionGeneratedMessage
+import com.examhelper.api.exam.domain.exception.ExamAssertionException
+import com.examhelper.api.exam.domain.exception.ExamException
 import com.examhelper.api.exam.port.inbound.AddExamItemUseCase
 import com.examhelper.api.exam.port.inbound.command.AddExamItemCommand
 import com.examhelper.api.infrastructure.message.KafkaMessageDeserializer
@@ -16,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class QuestionGeneratedEventListener(
     private val addExamItemUseCase: AddExamItemUseCase,
-    private val deserializer: KafkaMessageDeserializer
+    private val deserializer: KafkaMessageDeserializer,
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -27,20 +29,33 @@ class QuestionGeneratedEventListener(
     @Transactional
     fun handle(
         record: ConsumerRecord<String, String>,
-        ack: Acknowledgment
+        ack: Acknowledgment,
     ) {
         runCatching {
             val message = deserializer.deserialize(record.value(), QuestionGeneratedMessage::class.java)
 
-            addExamItemUseCase.execute(message.toAddExamItemCommand())
+            addExamItemUseCase.execute(message.toCommand())
 
             ack.acknowledge()
-        }.onFailure { logger.error("Failed(QuestionGeneratedEvent): key=${record.key()}", it) }
+        }.onFailure { ex ->
+            when (ex) {
+                is ExamAssertionException, is ExamException -> {
+                    logger.error(ex) {
+                        "Permanent failure(QuestionGeneratedEvent), skipping retry: key=${record.key()}"
+                    }
+                    ack.acknowledge()
+                }
+                else -> {
+                    logger.error(ex) { "Failed(QuestionGeneratedEvent), will retry: key=${record.key()}" }
+                }
+            }
+        }
     }
 
-    private fun QuestionGeneratedMessage.toAddExamItemCommand() = AddExamItemCommand(
-        generationId = QuestionGenerationId(generationId),
-        questionId   = QuestionId(questionId),
-        ordering     = ordering
-    )
+    private fun QuestionGeneratedMessage.toCommand() =
+        AddExamItemCommand(
+            generationId = QuestionGenerationId(generationId),
+            questionId = QuestionId(questionId),
+            ordering = ordering,
+        )
 }

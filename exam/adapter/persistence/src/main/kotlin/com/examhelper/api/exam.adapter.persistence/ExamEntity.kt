@@ -179,11 +179,20 @@ class ExamEntity(
     }
 
     private fun toGenerationResult(): ExamGenerationResult? {
-        val genId = generationId ?: return null
+        val generationId = generationId ?: return null
+
+        val success = generationSuccessCount
+        val fail = generationFailCount
+
+        check((success == null) == (fail == null)) {
+            "generationSuccessCount와 generationFailCount 상태가 일치하지 않습니다. " +
+                    "generationId=$generationId, successCount=$success, failCount=$fail"
+        }
+
         return ExamGenerationResult(
-            generationId = QuestionGenerationId(genId),
-            successCount = requireNotNull(generationSuccessCount),
-            failCount = requireNotNull(generationFailCount),
+            generationId = QuestionGenerationId(generationId),
+            successCount = success,
+            failCount = fail,
         )
     }
 }
