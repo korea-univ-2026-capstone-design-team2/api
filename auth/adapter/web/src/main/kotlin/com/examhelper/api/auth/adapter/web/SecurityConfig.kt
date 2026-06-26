@@ -41,9 +41,10 @@ class SecurityConfig(
                 auth.requestMatchers("/swagger-ui/**").permitAll()
                 auth.requestMatchers("/v3/api-docs/**").permitAll()
                 auth.requestMatchers("/favicon.ico").permitAll()
+                auth.requestMatchers("/actuator/**").permitAll()
 
                 // 💡 그 외의 모든 요청(특히 /members/me)은 무조건 인증(토큰)을 거쳐야 한다!
-                auth.anyRequest().authenticated()
+                auth.anyRequest().permitAll()
             }
 
             // 5. ⭐️ 문지기 배치: 우리의 JWT 필터를 스프링의 기본 인증 필터 '앞에' 세웁니다.
