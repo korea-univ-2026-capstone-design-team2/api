@@ -17,7 +17,7 @@ class CompleteExamGenerationService(
         val exam = examStore.loadByGenerationId(command.generationId)
             ?: throw ExamException.NotFoundByGenerationId(command.generationId.value)
 
-        exam.completeGeneration(
+        exam.markGenerationFinished(
             ExamGenerationResult(
                 generationId = command.generationId,
                 successCount = command.successCount,
