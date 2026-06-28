@@ -59,7 +59,7 @@ class Exam private constructor(
             throw ExamAssertionException.CannotModifyItems(status.name)
         }
 
-        if (_items.any { it.id == item.id }) return
+        if (_items.any { it.questionId == item.questionId }) return
 
         _items.add(item)
         updatedAt = Instant.now()
@@ -139,7 +139,7 @@ class Exam private constructor(
     }
 
     fun failGeneration(reason: String) {
-        if (status == ExamStatus.FAILED) return // 멱등 처리 (재시도 대응)
+        if (status == ExamStatus.FAILED) return
 
         check(status == ExamStatus.GENERATING) {
             throw ExamAssertionException.StatusTransitionNotAllowed(status.name, ExamStatus.FAILED.name)
