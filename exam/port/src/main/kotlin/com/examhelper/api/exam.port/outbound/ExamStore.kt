@@ -9,4 +9,5 @@ interface ExamStore {
     fun saveAll(exams: List<Exam>)
     fun loadById(examId: ExamId): Exam?
     fun loadByGenerationId(generationId: QuestionGenerationId): Exam?
+    fun loadByGenerationIdForUpdate(generationId: QuestionGenerationId): Exam?
 }

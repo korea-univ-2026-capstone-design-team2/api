@@ -29,4 +29,7 @@ class ExamPersistenceAdapter(
     override fun loadByGenerationId(generationId: QuestionGenerationId): Exam? {
         return examJpaRepository.findByGenerationId(generationId.value)?.toDomain()
     }
+
+    override fun loadByGenerationIdForUpdate(generationId: QuestionGenerationId): Exam? =
+        examJpaRepository.findByGenerationIdForUpdate(generationId.value)?.toDomain()
 }
