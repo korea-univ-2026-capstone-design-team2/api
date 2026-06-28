@@ -10,6 +10,8 @@ import com.examhelper.api.kernel.identifier.QuestionGenerationId
 import com.examhelper.api.kernel.identifier.QuestionId
 import mu.KotlinLogging
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.springframework.dao.CannotAcquireLockException
+import org.springframework.dao.PessimisticLockingFailureException
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
@@ -45,6 +47,13 @@ class QuestionGeneratedEventListener(
                     }
                     ack.acknowledge()
                 }
+
+                is CannotAcquireLockException, is PessimisticLockingFailureException -> {
+                    logger.warn(ex) {
+                        "락 획득 타임아웃, 재시도 예정: key=${record.key()}"
+                    }
+                }
+
                 else -> {
                     logger.error(ex) { "Failed(QuestionGeneratedEvent), will retry: key=${record.key()}" }
                 }

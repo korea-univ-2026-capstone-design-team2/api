@@ -14,7 +14,7 @@ class CompleteExamGenerationService(
 ) : CompleteExamGenerationUseCase {
     @Transactional
     override fun execute(command: CompleteExamGenerationCommand) {
-        val exam = examStore.loadByGenerationId(command.generationId)
+        val exam = examStore.loadByGenerationIdForUpdate(command.generationId)
             ?: throw ExamException.NotFoundByGenerationId(command.generationId.value)
 
         exam.markGenerationFinished(

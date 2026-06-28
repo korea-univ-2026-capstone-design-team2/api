@@ -17,7 +17,7 @@ class AddExamItemService(
 ) : AddExamItemUseCase {
     @Transactional
     override fun execute(command: AddExamItemCommand) {
-        val exam = examStore.loadByGenerationId(command.generationId)
+        val exam = examStore.loadByGenerationIdForUpdate(command.generationId)
             ?: throw ExamException.NotFound(command.generationId.value)
 
         exam.addItem(
