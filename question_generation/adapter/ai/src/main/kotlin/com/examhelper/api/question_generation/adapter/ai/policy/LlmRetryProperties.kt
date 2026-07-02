@@ -1,5 +1,7 @@
 package com.examhelper.api.question_generation.adapter.ai.policy
 
+import com.examhelper.api.infrastructure.retry.RetryPolicy
+import com.examhelper.api.question_generation.adapter.ai.exception.LlmGenerationException
 import org.springframework.boot.context.properties.ConfigurationProperties
 import kotlin.math.pow
 
@@ -8,11 +10,11 @@ data class LlmRetryProperties(
     val llm: LlmCallRetry = LlmCallRetry(),
 ) {
     data class LlmCallRetry(
-        val maxAttempts: Int = 3,
+        override val maxAttempts: Int = 3,
         val initialBackoffMillis: Long = 500L,
         val backoffMultiplier: Double = 2.0,
         val maxBackoffMillis: Long = 10_000L,
-    ) {
+    ): RetryPolicy {
         init {
             require(maxAttempts in 1..10) {
                 "llm.retry.llm.max-attempts는 1~10 사이여야 합니다: $maxAttempts"
@@ -28,9 +30,12 @@ data class LlmRetryProperties(
             }
         }
 
-        fun backoffMillis(attempt: Int): Long =
+        override fun backoffMillis(attempt: Int): Long =
             (initialBackoffMillis * backoffMultiplier.pow(attempt.toDouble()))
                 .toLong()
                 .coerceAtMost(maxBackoffMillis)
+
+        override fun isRetryable(ex: Throwable): Boolean =
+            ex is LlmGenerationException.Retryable
     }
 }

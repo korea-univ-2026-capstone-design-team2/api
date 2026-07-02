@@ -1,5 +1,6 @@
 package com.examhelper.api.question_generation.adapter.ai
 
+import com.examhelper.api.infrastructure.retry.RetryExecutor
 import com.examhelper.api.question_generation.adapter.ai.dto.LlmGenerationResponse
 import com.examhelper.api.question_generation.adapter.ai.exception.LlmGenerationException
 import com.examhelper.api.question_generation.adapter.ai.mapper.LlmGenerationResponseMapper
@@ -31,6 +32,7 @@ class LlmGenerationAdapter(
     resourceLoader: ResourceLoader,
     private val metrics: LlmGenerationMetrics,
     private val meterRegistry: MeterRegistry,
+    private val retryExecutor: RetryExecutor,
     private val retryProperties: LlmRetryProperties
 ) : LlmGenerationPort {
     private val logger = KotlinLogging.logger {}
@@ -43,7 +45,7 @@ class LlmGenerationAdapter(
         return withContext(Dispatchers.IO) {
             val sample = Timer.start(meterRegistry)
             try {
-                retryable(retryProperties.llm) {
+                retryExecutor.execute(retryProperties.llm) {
                     val userPrompt = promptAssembler.assembleUserPrompt(command)
                     val rawJson = callLlm(userPrompt)
                     val response = parseResponse(rawJson)
@@ -78,29 +80,4 @@ class LlmGenerationAdapter(
         } catch (ex: Exception) {
             throw LlmGenerationException.Retryable.ResponseParseFailed(ex)
         }
-
-    suspend fun <T> retryable(
-        policy: LlmRetryProperties.LlmCallRetry,
-        block: suspend (attempt: Int) -> T
-    ): T {
-        var lastException: LlmGenerationException.Retryable? = null
-
-        repeat(policy.maxAttempts) { attemptIndex ->
-            try {
-                return block(attemptIndex)
-            } catch (ex: LlmGenerationException.Retryable) {
-                lastException = ex
-                val delayMillis = when (ex) {
-                    is LlmGenerationException.Retryable.RateLimited ->
-                        ex.retryAfterMillis ?: policy.backoffMillis(attemptIndex)
-                    else -> policy.backoffMillis(attemptIndex)
-                }
-                if (attemptIndex < policy.maxAttempts - 1) {
-                    delay(delayMillis)
-                }
-            }
-        }
-
-        throw lastException ?: IllegalStateException("재시도 정책 오류")
-    }
 }
