@@ -1,45 +1,18 @@
 package com.examhelper.api.question_generation.adapter.ai.exception
 
 sealed class LlmGenerationException(
-    val code    : String,
-    message : String,
-) : RuntimeException(message) {
-    class ApiCallFailed(cause: Throwable) : LlmGenerationException(
-        "LLM_API_CALL_FAILED",
-        "LLM API 호출에 실패했습니다: ${cause.message}",
-    ) {
-        init { initCause(cause) }
+    message: String,
+    cause: Throwable? = null
+) : Exception(message, cause) {
+    sealed class Retryable(message: String, cause: Throwable? = null) : LlmGenerationException(message, cause) {
+        class ApiCallFailed(cause: Throwable) : Retryable("LLM API 호출 실패", cause)
+        class RateLimited(val retryAfterMillis: Long?) : Retryable("LLM API rate limit 초과")
+        class ResponseParseFailed(cause: Throwable) : Retryable("LLM 응답 파싱 실패", cause)
+        class EmptyResponse : Retryable("LLM 응답이 비어있음")
     }
 
-    class EmptyResponse : LlmGenerationException(
-        "LLM_EMPTY_RESPONSE",
-        "LLM이 빈 응답을 반환했습니다",
-    )
-
-    class ResponseParseFailed(cause: Throwable) : LlmGenerationException(
-        "LLM_RESPONSE_PARSE_FAILED",
-        "LLM 응답 JSON 파싱에 실패했습니다: ${cause.message}",
-    ) {
-        init { initCause(cause) }
+    sealed class NonRetryable(message: String, cause: Throwable? = null) : LlmGenerationException(message, cause) {
+        class InvalidPrompt(message: String) : NonRetryable(message)
+        class ContentPolicyViolation(message: String) : NonRetryable(message)
     }
-
-    class InvalidExhibit(reason: String) : LlmGenerationException(
-        "LLM_INVALID_EXHIBIT",
-        "LLM 응답의 보기 형식이 잘못됐습니다: $reason",
-    )
-
-    class InvalidChoice(reason: String) : LlmGenerationException(
-        "LLM_INVALID_CHOICE",
-        "LLM 응답의 선지 형식이 잘못됐습니다: $reason",
-    )
-
-    class InvalidExplanation(reason: String) : LlmGenerationException(
-        "LLM_INVALID_EXPLANATION",
-        "LLM 응답의 해설 형식이 잘못됐습니다: $reason",
-    )
-
-    class InvalidResponse(reason: String) : LlmGenerationException(
-        "LLM_INVALID_RESPONSE",
-        "생성된 문제가 없습니다: $reason"
-    )
 }
