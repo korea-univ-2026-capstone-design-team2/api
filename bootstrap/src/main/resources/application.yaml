@@ -121,6 +121,14 @@ management:
       percentiles:
         http.server.requests: 0.5,0.95,0.99
 
+llm:
+  retry:
+    llm:
+      max-attempts: 3
+      initial-backoff-millis: 500
+      backoff-multiplier: 2.0
+      max-backoff-millis: 10000
+
 jwt:
   secret: ${JWT_SECRET:your_jwt_secret_key}
   access-token-validity-in-ms: ${JWT_ACCESS_TOKEN_EXPIRATION}
