@@ -9,6 +9,9 @@
 
 - [서비스 개요](#서비스-개요)
 - [기술 스택](#기술-스택)
+- [아키텍처](#아키텍처)
+    - [멀티모듈 + 헥사고날 아키텍처](#멀티모듈--헥사고날-아키텍처)
+    - [배포 구조](#배포-구조)
 - [로컬 환경 설정](#로컬-환경-설정)
 - [빌드 및 실행](#빌드-및-실행)
 - [커밋 컨벤션](#커밋-컨벤션)
@@ -21,30 +24,17 @@
 
 ### 핵심 전략: RAG 기반 문제 생성
 
-```
-[기출 DB (10년치)]
-       │
-       ▼
- 논리 프레임 추출
- (Logical Frame)
-       │
-       ▼
-  Vector DB 저장
-       │
-  신규 주제 입력
-       │
-       ▼
-유사 프레임 검색 (RAG)
-       │
-       ▼
-  LLM 프롬프트 실행
-       │
-       ▼
-  신규 문제 생성 ✅
+```mermaid
+graph LR
+    A["기출 DB (10년치)"] --> B["논리 프레임 추출<br>(Logical Frame)"]
+    B --> C["Vector DB 저장"]
+    D["신규 주제 입력"] --> E["유사 프레임 검색 (RAG)"]
+    C --> E
+    E --> F["LLM 프롬프트 실행"]
+    F --> G["신규 문제 생성 ✅"]
 ```
 
 - **RAG (Retrieval-Augmented Generation)**: 기출 문제의 구조·논리 패턴을 벡터화하여 유사 프레임을 검색, LLM에 컨텍스트로 주입
-- **논리 프레임**: 문제의 발문 구조, 선택지 구성 패턴, 난이도 특성 등 추상화된 메타 정보
 - **품질 보장**: 실제 PSAT 출제 경향을 학습한 데이터 기반으로 문체와 논리 구조를 유지
 
 ---
@@ -53,15 +43,108 @@
 
 | 구분 | 기술 |
 |------|------|
-| Language | Java 25 |
+| Language | Kotlin 2.3.x |
+| Runtime | JVM 25 |
 | Framework | Spring Boot 4.x.x |
-| Build | Gradle  |
+| Build | Gradle 9.x |
 | Database | MySQL 8.x |
-| Vector DB | pgvector / Qdrant (TBD) |
+| Vector DB | Qdrant |
+| Concurrency | Kotlin Coroutines |
 | AI | Anthropic Claude API / OpenAI API |
-| Infra | Docker, Docker Compose |
+| Infra | Docker, Docker Compose / GCP Compute Engine |
 
-> **Virtual Threads**: AI API 호출 및 DB I/O 등 블로킹 작업에 Project Loom의 가상 스레드를 활용하여 처리량을 극대화합니다.
+---
+
+## 아키텍처
+
+### 멀티모듈 + 헥사고날 아키텍처
+
+도메인별로 모듈을 분리하고, 각 도메인 내부는 헥사고날(포트-어댑터) 구조를 따릅니다.
+
+```
+root/
+├── shared/
+│   ├── kernel/                  # 순수 Kotlin. 공통 VO, Domain Event, 자체 검증 로직. Spring/외부 라이브러리 의존 금지
+│   └── infra/                   # 공통 기술 도구 (JPA, Messaging, Web 등)
+│
+├── {domain}/                    # question, question-generation, exam, exam-attempt, token-usage 등
+│   ├── domain/                  # 순수 비즈니스 엔티티/규칙. 외부 의존성 없음
+│   ├── application/
+│   │   └── service/             # UseCase 구현체
+│   ├── port/
+│   │   ├── inbound/             # Inbound Port (UseCase 인터페이스)
+│   │   ├── outbound/            # Outbound Port (SPI: DB, AI, 외부 API 등)
+│   └── adapter/
+│       ├── web/                 # Inbound Adapter. port/inbound 호출
+│       ├── persistence/         # Outbound Adapter. port/outbound 구현 (JPA, Vector Search)
+│       └── {technology}/        # 도메인별 필요에 따라 추가되는 여타 외부 기술 어댑터 (예: ai-client)
+│
+└── bootstrap/                   # 진입점. DI 및 설정 담당
+```
+
+**의존 방향 및 설계 규칙**
+
+- **의존 흐름**: `Adapter → Application (Port) → Domain`
+- **의존성 강제**: 멀티모듈 구조로, 꼭 필요한 모듈만 gradle 의존성으로 추가하여 사용합니다.
+- **Port 위치**: DB, AI API, 파일 시스템 등 모든 외부 연동은 반드시 `{domain}:port:outbound`에 인터페이스로 정의합니다.
+- **레이어 격리**: JPA Entity(영속성 계층)나 Request/Response DTO(웹 계층)가 `application`, `domain` 레이어로 새어 들어가지 않도록 하며, 계층 간 변환은 Mapper를 사용합니다.
+- **RAG 파이프라인 책임 분리**:
+    - `application`: 포트를 통해 RAG 흐름(프레임 검색 → 프롬프트 생성 → 문제 생성 → 저장)을 조율
+    - `adapter:persistence`: 벡터 유사도 검색 수행
+    - `adapter:ai-client`: 실제 LLM 프롬프트 실행 담당
+- **신규 기능 구현 순서**: 항상 `port/outbound`(또는 `port/inbound`) 정의부터 시작합니다.
+
+### 시스템 구조
+
+```mermaid
+graph TB
+    Client["Client"]
+    subgraph VM["GCP Compute Engine VM"]
+        direction TB
+        Web["adapter:web"]
+        subgraph InPort["port:in (inbound)"]
+            PortIn["UseCase Interface"]
+        end
+        subgraph App["application"]
+            UseCase["UseCase 구현체"]
+        end
+        subgraph OutPort["port:out (outbound, SPI)"]
+            PortOutPersist["PersistencePort"]
+            PortOutAi["AiClientPort"]
+        end
+        Domain["domain"]
+        subgraph Adapters["adapter"]
+            direction LR
+            Persistence["adapter:persistence"]
+            AiClient["adapter:ai-client"]
+        end
+        subgraph LocalInfra["VM 내 인프라"]
+            direction LR
+            Qdrant[("Qdrant")]
+            Debezium["Debezium CDC"]
+            Kafka[/"Kafka"/]
+        end
+        Web --> PortIn
+        PortIn --> UseCase
+        UseCase --> Domain
+        UseCase --> PortOutPersist
+        UseCase --> PortOutAi
+        PortOutPersist --> Persistence
+        PortOutAi --> AiClient
+        Persistence --> Qdrant
+    end
+    CloudSQL[("Cloud SQL - MySQL 8.x")]
+    OpenAI(["OpenAI API"])
+    Client --> Web
+    Persistence --> CloudSQL
+    AiClient --> OpenAI
+    CloudSQL -.binlog 캡처.-> Debezium
+    Debezium --> Kafka
+```
+
+- **VM**: `adapter:web` ~ `adapter:ai-client`까지 애플리케이션 전체와 Qdrant, Debezium, Kafka가 GCP Compute Engine VM 한 대에 배치됩니다.
+- **Cloud SQL**: MySQL 8.x는 관리형 서비스(Cloud SQL)로 분리되어 있으며, binlog 캡처를 통해 Debezium이 CDC 이벤트를 Kafka로 발행합니다.
+- **AI 연동**: `adapter:ai-client`가 외부 OpenAI API를 호출합니다.
 
 ---
 
@@ -69,7 +152,7 @@
 
 ### Prerequisites
 
-- Java 25+
+- JDK 25+
 - Docker & Docker Compose
 - Gradle 9.x
 
