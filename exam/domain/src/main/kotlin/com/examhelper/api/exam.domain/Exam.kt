@@ -99,7 +99,7 @@ class Exam private constructor(
         val result = generationResult ?: return
         val successCount = result.successCount ?: return
 
-        val distinctItemCount = _items.distinctBy { it.id }.size
+        val distinctItemCount = _items.distinctBy { it.questionId }.size
         if (distinctItemCount < successCount) return
 
         transitionTo(ExamStatus.READY)
