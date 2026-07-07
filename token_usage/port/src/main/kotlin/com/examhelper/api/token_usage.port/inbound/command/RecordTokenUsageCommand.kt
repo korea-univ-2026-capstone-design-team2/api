@@ -10,13 +10,8 @@ import java.util.Currency
 data class RecordTokenUsageCommand(
     val memberId: MemberId,
     val target: TokenUsageTarget,
-    val provider: AiProvider,
     val model: AiModel,
     val promptTokens: Int,
     val completionTokens: Int,
-    val totalTokens: Int,
-    val promptCost: BigDecimal,
-    val completionCost: BigDecimal,
-    val totalCost: BigDecimal,
-    val currency: Currency
+    val totalTokens: Int
 )

@@ -7,7 +7,6 @@ import com.examhelper.api.token_usage.domain.type.TokenUsageDomain
 import com.examhelper.api.token_usage.domain.vo.TokenUsageTarget
 import com.examhelper.api.token_usage.port.inbound.command.RecordTokenUsageCommand
 import java.math.BigDecimal
-import java.util.Currency
 
 data class RecordTokenUsageReqDto(
     val memberId: Long,
@@ -30,14 +29,9 @@ data class RecordTokenUsageReqDto(
                 domain = targetDomain,
                 referenceId = targetReferenceId,
             ),
-            provider = provider,
             model = model,
             promptTokens = promptTokens,
             completionTokens = completionTokens,
-            totalTokens = totalTokens,
-            promptCost = promptCost,
-            completionCost = completionCost,
-            totalCost = totalCost,
-            currency = Currency.getInstance(currency)
+            totalTokens = totalTokens
         )
 }
