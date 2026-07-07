@@ -7,6 +7,8 @@ data class TokenConsumption(
     val completionTokens: Int,
     val totalTokens: Int
 ) {
+    init { validate() }
+
     private fun validate() {
         require(promptTokens >= 0) {
             throw TokenUsageAssertionException.NegativePromptTokens(promptTokens)

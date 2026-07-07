@@ -10,6 +10,8 @@ data class TokenCost(
     val totalCost: BigDecimal,
     val currency: Currency
 ) {
+    init { validate() }
+
     private fun validate() {
         require(promptCost >= BigDecimal.ZERO) {
             throw TokenUsageAssertionException.NegativePromptCost(promptCost)

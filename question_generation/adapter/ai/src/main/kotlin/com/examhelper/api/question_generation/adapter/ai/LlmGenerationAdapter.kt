@@ -4,6 +4,7 @@ import com.examhelper.api.infrastructure.retry.RetryExecutor
 import com.examhelper.api.question_generation.adapter.ai.dto.LlmGenerationResponse
 import com.examhelper.api.question_generation.adapter.ai.exception.LlmGenerationException
 import com.examhelper.api.question_generation.adapter.ai.mapper.LlmGenerationResponseMapper
+import com.examhelper.api.question_generation.adapter.ai.mapper.LlmTokenUsageMapper
 import com.examhelper.api.question_generation.adapter.ai.metrics.LlmGenerationMetrics
 import com.examhelper.api.question_generation.adapter.ai.policy.LlmRetryProperties
 import com.examhelper.api.question_generation.port.outbound.LlmGenerationPort
@@ -12,11 +13,11 @@ import com.examhelper.api.question_generation.port.outbound.result.LlmGeneration
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.springframework.ai.chat.messages.SystemMessage
 import org.springframework.ai.chat.messages.UserMessage
+import org.springframework.ai.chat.metadata.Usage
 import org.springframework.ai.chat.model.ChatModel
 import org.springframework.ai.chat.prompt.Prompt
 import org.springframework.core.io.ResourceLoader
@@ -28,6 +29,7 @@ class LlmGenerationAdapter(
     private val chatModel: ChatModel,
     private val promptAssembler: PromptAssembler,
     private val responseMapper: LlmGenerationResponseMapper,
+    private val tokenUsageMapper: LlmTokenUsageMapper,
     private val objectMapper: ObjectMapper,
     resourceLoader: ResourceLoader,
     private val metrics: LlmGenerationMetrics,
@@ -47,9 +49,10 @@ class LlmGenerationAdapter(
             try {
                 retryExecutor.execute(retryProperties.llm) {
                     val userPrompt = promptAssembler.assembleUserPrompt(command)
-                    val rawJson = callLlm(userPrompt)
-                    val response = parseResponse(rawJson)
-                    responseMapper.toDomain(response)
+                    val llmCallResult = callLlm(userPrompt)
+                    val response = parseResponse(llmCallResult.rawJson)
+                    val usage = tokenUsageMapper.toDomain("gpt-5-mini", llmCallResult.usage)
+                    responseMapper.toDomain(response, usage)
                 }
             } finally {
                 sample.stop(metrics.generationTimer)
@@ -57,11 +60,21 @@ class LlmGenerationAdapter(
         }
     }
 
-    private fun callLlm(userPrompt: String): String =
+    private fun callLlm(userPrompt: String): LlmCallResult =
         try {
-            val prompt = Prompt(SystemMessage(systemPrompt), UserMessage(userPrompt))
-            chatModel.call(prompt).result?.output?.text
-                ?: throw LlmGenerationException.Retryable.EmptyResponse()
+            val prompt = Prompt(
+                SystemMessage(systemPrompt),
+                UserMessage(userPrompt)
+            )
+
+            val response = chatModel.call(prompt)
+
+            LlmCallResult(
+                rawJson = response.result?.output?.text
+                    ?: throw LlmGenerationException.Retryable.EmptyResponse(),
+                usage = response.metadata.usage
+            )
+
         } catch (ex: LlmGenerationException) {
             throw ex
         } catch (ex: Exception) {
@@ -80,4 +93,9 @@ class LlmGenerationAdapter(
         } catch (ex: Exception) {
             throw LlmGenerationException.Retryable.ResponseParseFailed(ex)
         }
+
+    private data class LlmCallResult(
+        val rawJson: String,
+        val usage: Usage
+    )
 }

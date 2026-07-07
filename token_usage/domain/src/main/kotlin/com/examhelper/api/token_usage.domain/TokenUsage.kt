@@ -25,6 +25,8 @@ class TokenUsage private constructor(
     status: TokenUsageStatus,
     val createdAt: Instant
 ) : AggregateRoot<TokenUsageId>(id) {
+    init { validate() }
+
     var status: TokenUsageStatus = status
         private set
 
@@ -74,7 +76,7 @@ class TokenUsage private constructor(
                         memberId = memberId.value,
                         provider = provider.name,
                         model = model.name,
-                        targetType = target::class.simpleName!!,
+                        targetType = target.domain.name,
                         targetReferenceId = target.referenceId,
                         promptTokens = tokenConsumption.promptTokens,
                         completionTokens = tokenConsumption.completionTokens,

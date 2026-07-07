@@ -7,6 +7,7 @@ import com.examhelper.api.kernel.identifier.QuestionGenerationStepLogId
 import com.examhelper.api.kernel.identifier.QuestionId
 import com.examhelper.api.question_generation.application.factory.QuestionGenerationRequestFactory
 import com.examhelper.api.question_generation.domain.QuestionGeneration
+import com.examhelper.api.question_generation.domain.event.QuestionGenerationTokenUsedEvent
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStatus
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStep
 import com.examhelper.api.question_generation.domain.type.QuestionGenerationStepStatus
@@ -148,6 +149,20 @@ class GenerateQuestionService(
         }
             .onFailure { logger.error(it) { "LLM 생성 실패: generationId=${generation.id}, index=$index" } }
             .getOrElse { return Result.failure(it) }
+
+        val usage = llmResult.usage
+
+        domainEventPublisher.publish(
+            QuestionGenerationTokenUsedEvent(
+                generationId = generation.id.value,
+                memberId = generation.memberId.value,
+                model = usage.model,
+                promptTokens = usage.promptTokens,
+                completionTokens = usage.completionTokens,
+                totalTokens = usage.totalTokens,
+                occurredAt = Instant.now()
+            )
+        )
 
         val questionId = runWithLog(generation.id, QuestionGenerationStep.QUESTION_CREATION, "index=$index") {
             questionCreationPort.create(

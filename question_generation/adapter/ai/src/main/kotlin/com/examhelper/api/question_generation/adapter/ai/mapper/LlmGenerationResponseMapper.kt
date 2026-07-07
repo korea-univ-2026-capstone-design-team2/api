@@ -10,11 +10,15 @@ import com.examhelper.api.question_generation.port.outbound.result.LlmGeneration
 import com.examhelper.api.question_generation.port.outbound.result.LlmPropositionResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmQuestionResult
 import com.examhelper.api.question_generation.port.outbound.result.LlmSharedContextResult
+import com.examhelper.api.question_generation.port.outbound.result.LlmTokenUsageResult
 import org.springframework.stereotype.Component
 
 @Component
 class LlmGenerationResponseMapper {
-    fun toDomain(response: LlmGenerationResponse): LlmGenerationResult {
+    fun toDomain(
+        response: LlmGenerationResponse,
+        usage: LlmTokenUsageResult
+    ): LlmGenerationResult {
         require(response.questions.isNotEmpty()) {
             throw LlmGenerationMappingException.EmptyQuestions()
         }
@@ -22,6 +26,7 @@ class LlmGenerationResponseMapper {
         return LlmGenerationResult(
             sharedContext = response.sharedContext?.toDomain(),
             questions = response.questions.map { it.toDomain() },
+            usage = usage
         )
     }
 
