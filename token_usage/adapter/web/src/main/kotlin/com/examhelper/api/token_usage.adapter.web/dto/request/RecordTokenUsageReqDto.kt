@@ -2,7 +2,6 @@ package com.examhelper.api.token_usage.adapter.web.dto.request
 
 import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.token_usage.domain.type.AiModel
-import com.examhelper.api.token_usage.domain.type.AiProvider
 import com.examhelper.api.token_usage.domain.type.TokenUsageDomain
 import com.examhelper.api.token_usage.domain.vo.TokenUsageTarget
 import com.examhelper.api.token_usage.port.inbound.command.RecordTokenUsageCommand
@@ -12,7 +11,6 @@ data class RecordTokenUsageReqDto(
     val memberId: Long,
     val targetDomain: TokenUsageDomain,
     val targetReferenceId: Long,
-    val provider: AiProvider,
     val model: AiModel,
     val promptTokens: Int,
     val completionTokens: Int,

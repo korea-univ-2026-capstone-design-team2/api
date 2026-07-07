@@ -2,7 +2,7 @@ package com.examhelper.api.token_usage.application
 
 import com.examhelper.api.kernel.core.IdGenerator
 import com.examhelper.api.kernel.identifier.TokenUsageId
-import com.examhelper.api.token_usage.domain.TokenPricingPolicy
+import com.examhelper.api.token_usage.application.resolver.TokenPricingPolicyResolver
 import com.examhelper.api.token_usage.domain.TokenUsage
 import com.examhelper.api.token_usage.domain.vo.TokenConsumption
 import com.examhelper.api.token_usage.port.inbound.RecordTokenUsageUseCase
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class RecordTokenUsageService(
     private val tokenUsageStore: TokenUsageStore,
-    private val tokenPricingPolicy: TokenPricingPolicy,
+    private val tokenPricingPolicyResolver: TokenPricingPolicyResolver,
     private val idGenerator: IdGenerator
 ) : RecordTokenUsageUseCase {
     override fun execute(command: RecordTokenUsageCommand): RecordTokenUsageResult {
@@ -24,10 +24,12 @@ class RecordTokenUsageService(
             totalTokens = command.totalTokens,
         )
 
-        val tokenCost = tokenPricingPolicy.calculate(
-            model = command.model,
-            consumption = tokenConsumption,
-        )
+        val tokenCost = tokenPricingPolicyResolver
+            .resolve(command.model.provider)
+            .calculate(
+                model = command.model,
+                consumption = tokenConsumption,
+            )
 
         val tokenUsage = TokenUsage.create(
             id = TokenUsageId(idGenerator.generateId()),

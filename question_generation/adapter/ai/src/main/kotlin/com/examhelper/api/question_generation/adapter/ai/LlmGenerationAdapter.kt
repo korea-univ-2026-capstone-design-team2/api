@@ -75,7 +75,7 @@ class LlmGenerationAdapter(
                 usage = response.metadata.usage
             )
 
-        }catch (ex: LlmGenerationException) {
+        } catch (ex: LlmGenerationException) {
             throw ex
         } catch (ex: Exception) {
             logger.warn(ex) { "LLM API 호출 실패, 재시도 대상으로 분류" }
