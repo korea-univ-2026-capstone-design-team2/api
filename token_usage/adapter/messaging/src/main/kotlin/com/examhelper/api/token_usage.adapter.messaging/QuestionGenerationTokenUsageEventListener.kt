@@ -4,7 +4,6 @@ import com.examhelper.api.infrastructure.message.KafkaMessageDeserializer
 import com.examhelper.api.kernel.identifier.MemberId
 import com.examhelper.api.token_usage.adapter.messaging.message.QuestionGenerationTokenUsageMessage
 import com.examhelper.api.token_usage.domain.type.AiModel
-import com.examhelper.api.token_usage.domain.type.AiProvider
 import com.examhelper.api.token_usage.domain.type.TokenUsageDomain
 import com.examhelper.api.token_usage.domain.vo.TokenUsageTarget
 import com.examhelper.api.token_usage.port.inbound.RecordTokenUsageUseCase
@@ -13,7 +12,6 @@ import mu.KotlinLogging
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
-import java.util.Currency
 
 @Component
 class QuestionGenerationTokenUsageEventListener(
@@ -23,9 +21,7 @@ class QuestionGenerationTokenUsageEventListener(
     private val log = KotlinLogging.logger {}
 
     @KafkaListener(
-        topics = [
-            //"psat.question-generation.question-generated"
-              "temp"   ],
+        topics = ["psat.question-generation.token-used"],
         groupId = "examhelper-token-usage-group"
     )
     fun handle(record: ConsumerRecord<String, String>) {
@@ -48,14 +44,9 @@ class QuestionGenerationTokenUsageEventListener(
             domain = TokenUsageDomain.QUESTION_GENERATION,
             referenceId = generationId,
         ),
-        provider = AiProvider.valueOf(provider),
-        model = AiModel.valueOf(model),
+        model = AiModel.fromModelName(model),
         promptTokens = promptTokens,
         completionTokens = completionTokens,
-        totalTokens = totalTokens,
-        promptCost = promptCost,
-        completionCost = completionCost,
-        totalCost = totalCost,
-        currency = Currency.getInstance(currency),
+        totalTokens = totalTokens
     )
 }
