@@ -25,7 +25,6 @@ class QuestionGenerationCompletedEventListener(
         topics = ["psat.question-generation.completed"],
         groupId = "examhelper-consumer-group",
     )
-    @Transactional
     fun handle(
         record: ConsumerRecord<String, String>,
         ack: Acknowledgment,
