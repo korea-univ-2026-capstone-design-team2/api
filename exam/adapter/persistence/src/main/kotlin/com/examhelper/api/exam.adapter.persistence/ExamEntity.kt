@@ -24,6 +24,7 @@ import jakarta.persistence.Index
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.Instant
 
 @Entity
@@ -32,6 +33,9 @@ import java.time.Instant
     indexes = [
         Index(name = "idx_exams_status", columnList = "status"),
         Index(name = "idx_exams_created_at", columnList = "created_at"),
+    ],
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_exams_generation_id", columnNames = ["generation_id"])
     ]
 )
 class ExamEntity(
